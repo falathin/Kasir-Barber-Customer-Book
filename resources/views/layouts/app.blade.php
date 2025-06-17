@@ -13,73 +13,86 @@
     <link href="https://fonts.googleapis.com/css2?family=Rye&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 </head>
+
 <body class="flex h-full flex-col bg-gray-100">
     <!-- Sidebar -->
     <aside id="sidebar"
         class="fixed inset-y-0 left-0 z-20 w-64 transform -translate-x-full bg-white border-r border-gray-200
-                transition-transform duration-300 ease-in-out md:translate-x-0">
+       transition-transform duration-300 ease-in-out md:translate-x-0">
         <div class="p-6 flex items-center space-x-3">
             <img src="{{ asset('images/bb-logo.png') }}" alt="Logo" class="w-10 h-10 rounded-full shadow-md">
             <h1 class="text-2xl font-bold bg-gradient-to-r from-orange-900 via-orange-800 to-yellow-800 bg-clip-text text-transparent"
-                style="font-family: 'Rye', cursive;"">Barber Kasir</h1>
+                style="font-family: 'Rye', cursive;">Barber Kasir</h1>
         </div>
         <nav class="mt-6">
             <ul>
-                <li class="mb-1">
-                    <a href="{{ route('dashboard') }}"
-                        class="group flex items-center px-6 py-3 rounded-md transition-all duration-200 ease-in-out
-        {{ request()->routeIs('dashboard')
-            ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600'
-            : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }} 
-        relative overflow-hidden">
+@php
+$menus = [
+    [
+        'label' => 'Dashboard',
+        'route' => 'dashboard',
+        'icon' => <<<'SVG'
+<path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0
+002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm8-8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0
+002-2V5a2 2 0 00-2-2h-2zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0
+00-2-2h-2z"/>
+SVG,
+    ],
+    [
+        'label' => 'Customer Books',
+        'route' => 'customer-books.index',
+        'icon' => <<<'SVG'
+<path fill-rule="evenodd"
+    d="M10 2a4 4 0 100 8 4 4 0 000-8zM2 16a8 8 0 1116 0H2z"
+    clip-rule="evenodd"/>
+SVG,
+    ],
+    [
+        'label' => 'Capsters',
+        'route' => 'capsters.index',
+        'icon' => <<<'SVG'
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+    d="M12 2v2M12 20v2M15 4H9a1 1 0 00-1 1v14a1 1 0 001 1h6a1 1 0 001-1V5a1 1 0 00-1-1z" />
+<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+    d="M9 6l6 3-6 3 6 3-6 3" />
+SVG,
+        'stroke' => true,
+    ],
+];
+@endphp
 
-                        <span
-                            class="absolute left-0 top-2 bottom-2 my-auto w-1 rounded-full
-                     bg-indigo-600 scale-y-0 group-hover:scale-y-100 opacity-0 group-hover:opacity-100
-                     transition-all duration-300 ease-out origin-top"></span>
+                @foreach ($menus as $menu)
+                    @php
+                        $isActive = request()->routeIs(str_replace('.index', '*', $menu['route']));
+                    @endphp
+                    <li class="mb-1">
+                        <a href="{{ route($menu['route']) }}"
+                            class="group flex items-center px-6 py-3 rounded-md relative overflow-hidden transition-all duration-200 ease-in-out
+                {{ $isActive ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
 
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-6 w-6 mr-3 text-gray-700 group-hover:text-indigo-600 
-                   transition-all duration-200 transform group-hover:scale-110"
-                            fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0
-                     002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm8-8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0
-                     002-2V5a2 2 0 00-2-2h-2zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0
-                     00-2-2h-2z" />
-                        </svg>
+                            <span
+                                class="absolute left-0 top-2 bottom-2 my-auto w-1 rounded-full
+                    bg-indigo-600 scale-y-0 group-hover:scale-y-100 opacity-0 group-hover:opacity-100
+                    transition-all duration-300 ease-out origin-top"></span>
 
-                        <span class="flex-1 transition-opacity duration-200">Dashboard</span>
-                    </a>
-                </li>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-6 w-6 mr-3 {{ $isActive ? 'text-indigo-600' : 'text-gray-700 group-hover:text-indigo-600' }}
+                    transition-all duration-200 transform group-hover:scale-110"
+                                viewBox="0 0 20 20"
+                                {{ isset($menu['stroke']) ? 'fill=none stroke=currentColor' : 'fill=currentColor' }}>
+                                {!! $menu['icon'] !!}
+                            </svg>
 
-                <li class="mb-1">
-                    <a href="{{ route('customer-books.index') }}"
-                        class="group flex items-center px-6 py-3 rounded-md transition-all duration-200 ease-in-out
-        {{ request()->routeIs('customer-books.*')
-            ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600'
-            : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }} 
-        relative overflow-hidden">
+                            <span class="flex-1">{{ $menu['label'] }}</span>
+                        </a>
+                    </li>
+                @endforeach
 
-                        <span
-                            class="absolute left-0 top-2 bottom-2 my-auto w-1 rounded-full
-                     bg-indigo-600 scale-y-0 group-hover:scale-y-100 opacity-0 group-hover:opacity-100
-                     transition-all duration-300 ease-out origin-top"></span>
-
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-6 w-6 mr-3 text-gray-700 group-hover:text-indigo-600 
-                   transition-all duration-200 transform group-hover:scale-110"
-                            fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 2a4 4 0 100 8 4 4 0 000-8zM2 16a8 8 0 1116 0H2z"
-                                clip-rule="evenodd" />
-                        </svg>
-
-                        <span class="flex-1 transition-opacity duration-200">Customer Books</span>
-                    </a>
-                </li>
+                <!-- Logout -->
                 <li class="mt-6 border-t pt-4">
                     <button type="submit"
                         class="w-full text-left group flex items-center px-6 py-3 rounded-md transition-all duration-200 ease-in-out
-            text-red-600 hover:bg-red-50 hover:text-red-700 relative overflow-hidden">
+                text-red-600 hover:bg-red-50 hover:text-red-700 relative overflow-hidden">
                         <span
                             class="absolute left-0 top-2 bottom-2 my-auto w-1 rounded-full
                 bg-red-600 scale-y-0 group-hover:scale-y-100 opacity-0 group-hover:opacity-100
@@ -93,11 +106,11 @@
                                 clip-rule="evenodd" />
                         </svg>
 
-                        <span class="flex-1 transition-opacity duration-200">Logout</span>
+                        <span class="flex-1">Logout</span>
                     </button>
                 </li>
-
             </ul>
+
         </nav>
     </aside>
 

@@ -1,6 +1,5 @@
 @extends('layouts.app')
 
-{{-- Title dinamis: Show Customer Book #12 – Rizky ZXY --}}
 @section('title', 'Show Customer Book #' . $customerBook->id . ' – ' . $customerBook->customer)
 
 @section('content')
@@ -24,7 +23,7 @@
                 $items = [
                     'Booking ID'    => $customerBook->id,
                     'Customer'      => $customerBook->customer,
-                    'Capster'       => $customerBook->cap,
+                    'Capster'       => $customerBook->capster?->nama ?? $customerBook->cap,
                     'Style'         => $customerBook->haircut_type,
                     'Shop'          => $customerBook->barber_name,
                 ];

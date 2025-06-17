@@ -8,12 +8,29 @@ use Illuminate\Support\Facades\Storage;  // ← import Storage
 
 class CapsterController extends Controller
 {
-    public function index()
+    public function index(Request $request) // Inject Request here
     {
-        $capsters = Capster::orderBy('nama')->paginate(10);
+        // Get the search term from the request
+        $search = $request->input('search');
+
+        // Start building the query
+        $query = Capster::orderBy('nama');
+
+        // If a search term is provided, apply the filter
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', '%' . $search . '%')
+                    ->orWhere('inisial', 'like', '%' . $search . '%')
+                    ->orWhere('no_hp', 'like', '%' . $search . '%')
+                    ->orWhere('asal', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Paginate the results
+        $capsters = $query->paginate(10);
+
         return view('capsters.index', compact('capsters'));
     }
-
     public function create()
     {
         return view('capsters.create');
@@ -22,13 +39,13 @@ class CapsterController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nama'           => 'required|string|max:255',
-            'inisial'        => 'required|string|max:10',
-            'jenis_kelamin'  => 'required|in:L,P',
-            'no_hp'          => 'required|string|max:20',
-            'tgl_lahir'      => 'required|date',
-            'asal'           => 'required|string|max:255',
-            'foto'           => 'nullable|image|max:2048',
+            'nama' => 'required|string|max:255',
+            'inisial' => 'required|string|max:10',
+            'jenis_kelamin' => 'required|in:L,P',
+            'no_hp' => 'required|string|max:20',
+            'tgl_lahir' => 'required|date',
+            'asal' => 'required|string|max:255',
+            'foto' => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('foto')) {
@@ -55,13 +72,13 @@ class CapsterController extends Controller
     public function update(Request $request, Capster $capster)
     {
         $data = $request->validate([
-            'nama'           => 'required|string|max:255',
-            'inisial'        => 'required|string|max:10',
-            'jenis_kelamin'  => 'required|in:L,P',
-            'no_hp'          => 'required|string|max:20',
-            'tgl_lahir'      => 'required|date',
-            'asal'           => 'required|string|max:255',
-            'foto'           => 'nullable|image|max:2048',
+            'nama' => 'required|string|max:255',
+            'inisial' => 'required|string|max:10',
+            'jenis_kelamin' => 'required|in:L,P',
+            'no_hp' => 'required|string|max:20',
+            'tgl_lahir' => 'required|date',
+            'asal' => 'required|string|max:255',
+            'foto' => 'nullable|image|max:2048',
         ]);
 
         if ($request->hasFile('foto')) {

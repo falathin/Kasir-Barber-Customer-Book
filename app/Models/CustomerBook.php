@@ -16,4 +16,9 @@ class CustomerBook extends Model
         'price',
         'qr',
     ];
+    public function capster()
+    {
+        return $this->belongsTo(Capster::class, 'cap', 'inisial');
+    }
+
 }

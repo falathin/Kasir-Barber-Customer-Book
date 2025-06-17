@@ -24,9 +24,16 @@
                     {{-- Capster --}}
                     <label class="block">
                         <span class="text-gray-700">✂️ Capster</span>
-                        <input type="text" name="cap" value="{{ old('cap') }}" placeholder="e.g. Capster A"
-                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            required>
+                        <select name="cap" required
+                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">Pilih Capster</option>
+                            @foreach ($capsters as $capster)
+                                <option value="{{ $capster->inisial }}"
+                                    {{ old('cap') == $capster->inisial ? 'selected' : '' }}>
+                                    {{ $capster->inisial }} - {{ $capster->nama }}
+                                </option>
+                            @endforeach
+                        </select>
                         @error('cap')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -38,7 +45,8 @@
                         <select name="haircut_type"
                             class="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             required>
-                            <option value="" disabled {{ old('haircut_type') ? '' : 'selected' }}>-- Select Type --</option>
+                            <option value="" disabled {{ old('haircut_type') ? '' : 'selected' }}>-- Select Type --
+                            </option>
                             <option value="Gentle" {{ old('haircut_type') == 'Gentle' ? 'selected' : '' }}>Gentle</option>
                             <option value="Ladies" {{ old('haircut_type') == 'Ladies' ? 'selected' : '' }}>Ladies</option>
                         </select>
@@ -86,7 +94,7 @@
 
                     {{-- Hidden field untuk menyimpan barber services ke colouring_other --}}
                     <input type="hidden" name="colouring_other" id="colouring_other_hidden"
-                           value="{{ old('colouring_other') }}">
+                        value="{{ old('colouring_other') }}">
 
                     {{-- Sell/Use Product --}}
                     <label class="block">
@@ -117,7 +125,8 @@
                         <select name="qr"
                             class="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <option value="cash" {{ old('qr') == 'cash' ? 'selected' : '' }}>Cash</option>
-                            <option value="qr_transfer" {{ old('qr') == 'qr_transfer' ? 'selected' : '' }}>QR Transfer</option>
+                            <option value="qr_transfer" {{ old('qr') == 'qr_transfer' ? 'selected' : '' }}>QR Transfer
+                            </option>
                         </select>
                     </label>
 
@@ -146,9 +155,11 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Price formatting
             const priceInput = document.getElementById('price');
+
             function formatNumber(n) {
                 return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
             }
+
             function plainNumber(n) {
                 return n.replace(/\./g, '');
             }
@@ -174,7 +185,8 @@
                 listDiv.innerHTML = '';
                 selected.forEach(action => {
                     const wrap = document.createElement('span');
-                    wrap.className = 'px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full flex items-center space-x-1';
+                    wrap.className =
+                        'px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full flex items-center space-x-1';
                     wrap.innerHTML = `
                         <span>${action}</span>
                         <button type="button" data-action="${action}" class="remove-action text-indigo-600 hover:text-indigo-900">&times;</button>
