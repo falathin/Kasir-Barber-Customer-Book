@@ -4,32 +4,57 @@ namespace App\Http\Controllers;
 
 use App\Models\CustomerBook;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    public function toggleStats(Request $request)
+    {
+        // toggle value di session, default true
+        $visible = session('stats_visible', true);
+        session(['stats_visible' => !$visible]);
+
+        return response()->json([
+            'visible' => session('stats_visible')
+        ]);
+    }
+
+
     public function index()
     {
-        // Total transaksi hari ini
-        $totalTransaksi = CustomerBook::whereDate('created_at', today())->count();
+        $today = today();
+        $now = now();
 
-        // Total pendapatan hari ini
-        $totalPendapatan = CustomerBook::whereDate('created_at', today())->sum(DB::raw('CAST(price AS UNSIGNED)'));
+        $totalTransaksi = CustomerBook::whereDate('created_at', $today)->count();
+        $totalPendapatan = CustomerBook::whereDate('created_at', $today)->sum('price');
+        $totalPengembalian = CustomerBook::whereDate('created_at', $today)
+            ->where('price', '<', 0)
+            ->sum('price');
 
-        // Estimasi produk terjual dari data "sell_use_product" yang diisi (anggap 1 baris = 1 produk)
-        $produkTerjual = CustomerBook::whereDate('created_at', today())
-                            ->whereNotNull('sell_use_product')
-                            ->where('sell_use_product', '!=', '')
-                            ->count();
+        $customersToday = CustomerBook::whereDate('created_at', $today)->count();
+        $customersMonth = CustomerBook::whereMonth('created_at', $now->month)
+            ->whereYear('created_at', $now->year)
+            ->count();
 
-        // Komisi kasir (misal 10% dari total pendapatan)
-        $komisiKasir = $totalPendapatan * 0.1;
+        $pendapatanBulanan = CustomerBook::whereMonth('created_at', $now->month)
+            ->whereYear('created_at', $now->year)
+            ->sum('price');
+        $pendapatanTahunan = CustomerBook::whereYear('created_at', $now->year)
+            ->sum('price');
+
+        $produkTerjual = CustomerBook::whereDate('created_at', $today)
+            ->whereNotNull('sell_use_product')
+            ->where('sell_use_product', '!=', '')
+            ->count();
 
         return view('index', compact(
             'totalTransaksi',
             'totalPendapatan',
+            'totalPengembalian',
+            'pendapatanBulanan',
+            'pendapatanTahunan',
             'produkTerjual',
-            'komisiKasir'
+            'customersToday',
+            'customersMonth'
         ));
     }
 }
