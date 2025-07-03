@@ -87,27 +87,31 @@ SVG,
                         </a>
                     </li>
                 @endforeach
-
+                
                 <!-- Logout -->
                 <li class="mt-6 border-t pt-4">
-                    <button type="submit"
-                        class="w-full text-left group flex items-center px-6 py-3 rounded-md transition-all duration-200 ease-in-out
-                text-red-600 hover:bg-red-50 hover:text-red-700 relative overflow-hidden">
-                        <span
-                            class="absolute left-0 top-2 bottom-2 my-auto w-1 rounded-full
-                bg-red-600 scale-y-0 group-hover:scale-y-100 opacity-0 group-hover:opacity-100
-                transition-all duration-300 ease-out origin-top"></span>
-
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-6 w-6 mr-3 text-red-600 group-hover:text-red-700 transition-all duration-200 transform group-hover:scale-110"
-                            fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M3 4a1 1 0 011-1h6a1 1 0 110 2H5v10h5a1 1 0 110 2H4a1 1 0 01-1-1V4zm13.707 5.293a1 1 0 00-1.414 1.414L17.586 12H9a1 1 0 100 2h8.586l-2.293 2.293a1 1 0 001.414 1.414l4-4a1 1 0 000-1.414l-4-4z"
-                                clip-rule="evenodd" />
-                        </svg>
-
-                        <span class="flex-1">Logout</span>
-                    </button>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit"
+                            class="w-full text-left group flex items-center px-6 py-3 rounded-md transition-all duration-200 ease-in-out
+                            text-red-600 hover:bg-red-50 hover:text-red-700 relative overflow-hidden">
+                            <span
+                                class="absolute left-0 top-2 bottom-2 my-auto w-1 rounded-full
+                                bg-red-600 scale-y-0 group-hover:scale-y-100 opacity-0 group-hover:opacity-100
+                                transition-all duration-300 ease-out origin-top"></span>
+    
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-6 w-6 mr-3 text-red-600 group-hover:text-red-700 transition-all duration-200 transform group-hover:scale-110"
+                                fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M3 4a1 1 0 011-1h6a1 1 0 110 2H5v10h5a1 1 0 110 2H4a1 1 0 01-1-1V4zm13.707 5.293a1 1 0 00-1.414 1.414L17.586 12H9a1 1 0 100 2h8.586l-2.293 2.293a1 1 0 001.414 1.414l4-4a1 1 0 000-1.414l-4-4z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span class="flex-1">Logout</span>
+                        </button>
+                        
+                    </form>
+                    
                 </li>
             </ul>
 
@@ -139,9 +143,11 @@ SVG,
                         class="absolute top-0 right-0 inline-block w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
                 </div>
                 <div>
-                    <img src="https://ui-avatars.com/api/?name=Admin+Kasir&background=4F46E5&color=fff"
-                        alt="Admin Kasir"
-                        class="h-8 w-8 rounded-full border-2 border-indigo-500 animate__animated animate__fadeIn" />
+                    <a href="{{ route('profile.edit') }}">
+                        <img src="https://ui-avatars.com/api/?name=Admin+Kasir&background=4F46E5&color=fff"
+                            alt="Admin Kasir"
+                            class="h-8 w-8 rounded-full border-2 border-indigo-500 animate__animated animate__fadeIn" />
+                    </a>
                 </div>
             </div>
         </header>

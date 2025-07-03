@@ -12,7 +12,7 @@
                 <p id="time" class="text-lg text-gray-700 mt-1 font-mono tracking-widest"></p>
 
                 <p class="mt-4 text-gray-600 leading-relaxed">
-                    Selamat datang kembali, <span class="font-semibold text-indigo-600">Admin Kasir</span>! <br>
+                    Selamat datang kembali, <span class="font-semibold text-indigo-600">{{ Auth::user()->name}}</span>! <br>
                     Semoga harimu menyenangkan dan penuh produktivitas. Silakan lihat statistik harianmu di bawah ini.
                 </p>
             </div>

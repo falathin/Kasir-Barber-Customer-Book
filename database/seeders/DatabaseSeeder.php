@@ -18,5 +18,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\User::factory(1)->create(); // contoh user
         $this->call(CustomerBookSeeder::class);
         $this->call(CapsterSeeder::class); // Panggil CapsterSeeder di sini
+        $this->call(AdminUserSeeder::class);
+
     }
 }
