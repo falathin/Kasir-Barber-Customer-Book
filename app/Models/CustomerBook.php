@@ -18,6 +18,7 @@ class CustomerBook extends Model
         'qr',
         'rincian',
         'created_time',
+        'antrian',
     ];
 
     public function capster()

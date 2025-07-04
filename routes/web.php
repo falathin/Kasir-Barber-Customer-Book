@@ -6,6 +6,7 @@ use App\Http\Controllers\CustomerBookController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CapsterController;
 use App\Http\Controllers\KasirController;
+use App\Http\Controllers\NoteController;
 
 
 // Route::get('/welcome', function () {
@@ -36,6 +37,8 @@ Route::middleware('auth')->group(function () {
         'update'  => 'customer-books.update',
         'destroy' => 'customer-books.destroy',
     ]);
+    Route::resource('notes', NoteController::class)->except(['show']);
+    
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {

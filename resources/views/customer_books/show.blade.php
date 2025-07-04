@@ -15,13 +15,18 @@
                 <p class="text-xs text-gray-500 print:text-black">
                     {{ $customerBook->created_at->format('d M Y') }}
                 </p>
+                @if($customerBook->antrian)
+                    <p class="text-xs text-gray-600 print:text-black">
+                        🪑 Antrian Ke-{{ $customerBook->antrian }}
+                    </p>
+                @endif
             </div>
+
 
             {{-- Detail Items --}}
             <div class="text-xs text-gray-700 space-y-3 print:text-black">
                 @php
                     $asistenNama = null;
-                    // Jika capster() relasi tersedia, dan ingin menampilkan nama lengkap asisten
                     if ($customerBook->asisten) {
                         $capsters = \App\Models\Capster::all()->keyBy('inisial');
                         $asistenNama = $capsters[$customerBook->asisten]->nama ?? $customerBook->asisten;
@@ -79,6 +84,24 @@
                     </p>
                 </div>
 
+                @php
+                    if (empty($customerBook->capster)) {
+                        $status = 'Antri';
+                        $statusColor = 'bg-gray-100 text-gray-600';
+                    } elseif ($customerBook->price == 0 && empty($customerBook->colouring_other)) {
+                        $status = 'Pending';
+                        $statusColor = 'bg-yellow-100 text-yellow-700';
+                    } else {
+                        $status = 'Selesai';
+                        $statusColor = 'bg-green-100 text-green-700';
+                    }
+                @endphp
+
+                <div class="flex justify-between text-xs font-bold {{ $statusColor }} rounded-md px-3 py-1">
+                    <span>Status</span>
+                    <span>{{ $status }}</span>
+                </div>
+
                 {{-- Total & Payment --}}
                 <div class="flex justify-between pt-2 font-bold print:pt-1 print:font-semibold">
                     <span class="uppercase text-sm">Total</span>
@@ -94,17 +117,44 @@
                         {{ \Carbon\Carbon::parse($customerBook->created_time)->translatedFormat('d F Y - H:i') }}
                     </span>
                 </div>
-
             </div>
 
             {{-- Action Buttons --}}
             <div class="mt-6 grid grid-cols-2 gap-2 print:hidden">
                 <a href="{{ route('customer-books.index') }}"
                     class="block text-center py-2 bg-gray-200 rounded text-xs hover:bg-gray-300">Back</a>
+
                 <button onclick="window.print()"
                     class="block text-center py-2 bg-green-600 text-white rounded text-xs hover:bg-green-700">Print</button>
-                <a href="{{ route('customer-books.edit', $customerBook->id) }}"
-                    class="block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">Edit</a>
+
+                    {{-- Tombol Edit --}}
+                    @php
+                        $isPending = $customerBook->price == 0 && empty($customerBook->colouring_other);
+                    @endphp
+
+
+                    @if (auth()->user()->level === 'admin')
+                        {{-- Admin selalu bisa edit --}}
+                        <a href="{{ route('customer-books.edit', $customerBook->id) }}"
+                            class="block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
+                            Execute
+                        </a>
+                    @elseif (auth()->user()->level === 'kasir')
+                        @if ($isPending)
+                            {{-- Kasir bisa edit jika status pending --}}
+                            <a href="{{ route('customer-books.edit', $customerBook->id) }}"
+                                class="block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
+                                Execute
+                            </a>
+                        @else
+                            {{-- Kasir tidak bisa edit jika status lunas --}}
+                            <button disabled
+                                class="block text-center py-2 bg-gray-300 text-gray-500 rounded text-xs cursor-not-allowed">
+                                Execute
+                            </button>
+                        @endif
+                    @endif
+
                 <form action="{{ route('customer-books.destroy', $customerBook->id) }}" method="POST"
                     onsubmit="return confirm('Delete this receipt?');">
                     @csrf

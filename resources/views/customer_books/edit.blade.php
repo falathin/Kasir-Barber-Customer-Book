@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Customer Book')
+@section('title', 'Execute Customer Book')
 
 @section('content')
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
             <div class="p-6">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Edit Customer Book</h2>
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Execute Customer Book</h2>
                 <form action="{{ route('customer-books.update', $customerBook->id) }}" method="POST" class="space-y-5"
                     id="customer-book-form">
                     @csrf
@@ -24,78 +24,78 @@
                         @enderror
                     </label>
 
-{{-- Capster --}}
-<label class="block mb-4">
-    <span class="text-gray-700">✂️ Capster</span>
-    <select name="cap" id="capSelect" required
-        class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <option value="">Pilih Capster</option>
-        @foreach ($capsters as $capster)
-            <option value="{{ $capster->inisial }}"
-                {{ old('cap', $customerBook->cap) == $capster->inisial ? 'selected' : '' }}>
-                {{ $capster->inisial }} - {{ $capster->nama }}
-            </option>
-        @endforeach
-    </select>
-    @error('cap')
-        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-    @enderror
-</label>
+                    {{-- Capster --}}
+                    <label class="block mb-4">
+                        <span class="text-gray-700">✂️ Capster</span>
+                        <select name="cap" id="capSelect" required
+                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">Pilih Capster</option>
+                            @foreach ($capsters as $capster)
+                                <option value="{{ $capster->inisial }}"
+                                    {{ old('cap', $customerBook->cap) == $capster->inisial ? 'selected' : '' }}>
+                                    {{ $capster->inisial }} - {{ $capster->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('cap')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </label>
 
-{{-- Asisten --}}
-<label class="block mb-4">
-    <span class="text-gray-700">🧍 Asisten</span>
-    <select name="asisten" id="asistenSelect"
-        class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <option value="">— Hapus Asisten —</option>
-        @foreach ($capsters as $capster)
-            <option value="{{ $capster->inisial }}"
-                {{ old('asisten', $customerBook->asisten) == $capster->inisial ? 'selected' : '' }}>
-                {{ $capster->inisial }} - {{ $capster->nama }}
-            </option>
-        @endforeach
-    </select>
-    @error('asisten')
-        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-    @enderror
-</label>
+                    {{-- Asisten --}}
+                    <label class="block mb-4">
+                        <span class="text-gray-700">🧍 Asisten</span>
+                        <select name="asisten" id="asistenSelect"
+                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">— Hapus Asisten —</option>
+                            @foreach ($capsters as $capster)
+                                <option value="{{ $capster->inisial }}"
+                                    {{ old('asisten', $customerBook->asisten) == $capster->inisial ? 'selected' : '' }}>
+                                    {{ $capster->inisial }} - {{ $capster->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('asisten')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </label>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const capSelect = document.getElementById('capSelect');
-        const asistenSelect = document.getElementById('asistenSelect');
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const capSelect = document.getElementById('capSelect');
+                            const asistenSelect = document.getElementById('asistenSelect');
 
-        function syncOptions() {
-            const selectedCap = capSelect.value;
-            const selectedAsisten = asistenSelect.value;
+                            function syncOptions() {
+                                const selectedCap = capSelect.value;
+                                const selectedAsisten = asistenSelect.value;
 
-            Array.from(asistenSelect.options).forEach(option => {
-                if (option.value && option.value === selectedCap) {
-                    option.disabled = true;
-                    option.hidden = true;
-                } else {
-                    option.disabled = false;
-                    option.hidden = false;
-                }
-            });
+                                Array.from(asistenSelect.options).forEach(option => {
+                                    if (option.value && option.value === selectedCap) {
+                                        option.disabled = true;
+                                        option.hidden = true;
+                                    } else {
+                                        option.disabled = false;
+                                        option.hidden = false;
+                                    }
+                                });
 
-            Array.from(capSelect.options).forEach(option => {
-                if (option.value && option.value === selectedAsisten) {
-                    option.disabled = true;
-                    option.hidden = true;
-                } else {
-                    option.disabled = false;
-                    option.hidden = false;
-                }
-            });
-        }
+                                Array.from(capSelect.options).forEach(option => {
+                                    if (option.value && option.value === selectedAsisten) {
+                                        option.disabled = true;
+                                        option.hidden = true;
+                                    } else {
+                                        option.disabled = false;
+                                        option.hidden = false;
+                                    }
+                                });
+                            }
 
-        capSelect.addEventListener('change', syncOptions);
-        asistenSelect.addEventListener('change', syncOptions);
+                            capSelect.addEventListener('change', syncOptions);
+                            asistenSelect.addEventListener('change', syncOptions);
 
-        syncOptions(); // Panggil pertama kali
-    });
-</script>
+                            syncOptions(); // Panggil pertama kali
+                        });
+                    </script>
 
                     {{-- Haircut Type --}}
                     <label class="block">
@@ -171,8 +171,7 @@
                     <label class="block">
                         <span class="text-gray-700">📝 Rincian</span>
                         <textarea name="rincian"
-                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            rows="4"
+                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="4"
                             placeholder="Keterangan tambahan, catatan, atau permintaan khusus...">{{ old('rincian', $customerBook->rincian) }}</textarea>
                         @error('rincian')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -235,8 +234,10 @@
                         @enderror
                     </label>
 
+                    @php $isAdmin = auth()->user()->level === 'admin'; @endphp
 
-                    <button type="submit"
+                    <button type="submit" id="updateBtn"
+                        data-level="{{ auth()->user()->level }}"
                         class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
                         Update
                     </button>

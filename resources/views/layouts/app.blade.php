@@ -29,75 +29,75 @@
         </div>
         <nav class="mt-6">
             <ul>
-@php
-$menus = [
-    [
-        'label' => 'Dashboard',
-        'route' => 'dashboard',
-        'icon' => <<<'SVG'
-<path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0
-002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm8-8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0
-002-2V5a2 2 0 00-2-2h-2zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0
-00-2-2h-2z"/>
-SVG,
-    ],
-    [
-        'label' => 'Customer Books',
-        'route' => 'customer-books.index',
-        'icon' => <<<'SVG'
-<path fill-rule="evenodd"
-    d="M10 2a4 4 0 100 8 4 4 0 000-8zM2 16a8 8 0 1116 0H2z"
-    clip-rule="evenodd"/>
-SVG,
-    ],
-    [
-        'label' => 'Capsters',
-        'route' => 'capsters.index',
-        'icon' => <<<'SVG'
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-    d="M12 2v2M12 20v2M15 4H9a1 1 0 00-1 1v14a1 1 0 001 1h6a1 1 0 001-1V5a1 1 0 00-1-1z" />
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-    d="M9 6l6 3-6 3 6 3-6 3" />
-SVG,
-        'stroke' => true,
-    ],
-];
-@endphp
+        @php
+        $menus = [
+            [
+                'label' => 'Dashboard',
+                'route' => 'dashboard',
+                'icon' => <<<'SVG'
+        <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0
+        002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm8-8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0
+        002-2V5a2 2 0 00-2-2h-2zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0
+        00-2-2h-2z"/>
+        SVG,
+            ],
+            [
+                'label' => 'Customer Books',
+                'route' => 'customer-books.index',
+                'icon' => <<<'SVG'
+        <path fill-rule="evenodd"
+            d="M10 2a4 4 0 100 8 4 4 0 000-8zM2 16a8 8 0 1116 0H2z"
+            clip-rule="evenodd"/>
+        SVG,
+            ],
+            [
+                'label' => 'Capsters',
+                'route' => 'capsters.index',
+                'icon' => <<<'SVG'
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+            d="M12 2v2M12 20v2M15 4H9a1 1 0 00-1 1v14a1 1 0 001 1h6a1 1 0 001-1V5a1 1 0 00-1-1z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+            d="M9 6l6 3-6 3 6 3-6 3" />
+        SVG,
+                'stroke' => true,
+            ],
+        ];
+        @endphp
 
-@foreach ($menus as $menu)
-    @php
-        $isCapster = $menu['label'] === 'Capsters';
-        $isAdmin = auth()->user()->level === 'admin';
+        @foreach ($menus as $menu)
+            @php
+                $isCapster = $menu['label'] === 'Capsters';
+                $isAdmin = auth()->user()->level === 'admin';
 
-        // Lewati item jika menu Capsters dan user bukan admin
-        if ($isCapster && !$isAdmin) {
-            continue;
-        }
+                // Lewati item jika menu Capsters dan user bukan admin
+                if ($isCapster && !$isAdmin) {
+                    continue;
+                }
 
-        $isActive = request()->routeIs(str_replace('.index', '*', $menu['route']));
-    @endphp
-    <li class="mb-1">
-        <a href="{{ route($menu['route']) }}"
-           class="group flex items-center px-6 py-3 rounded-md relative overflow-hidden transition-all duration-200 ease-in-out
-           {{ $isActive ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
+                $isActive = request()->routeIs(str_replace('.index', '*', $menu['route']));
+            @endphp
+            <li class="mb-1">
+                <a href="{{ route($menu['route']) }}"
+                class="group flex items-center px-6 py-3 rounded-md relative overflow-hidden transition-all duration-200 ease-in-out
+                {{ $isActive ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
 
-            <span
-                class="absolute left-0 top-2 bottom-2 my-auto w-1 rounded-full
-                bg-indigo-600 scale-y-0 group-hover:scale-y-100 opacity-0 group-hover:opacity-100
-                transition-all duration-300 ease-out origin-top"></span>
+                    <span
+                        class="absolute left-0 top-2 bottom-2 my-auto w-1 rounded-full
+                        bg-indigo-600 scale-y-0 group-hover:scale-y-100 opacity-0 group-hover:opacity-100
+                        transition-all duration-300 ease-out origin-top"></span>
 
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 class="h-6 w-6 mr-3 {{ $isActive ? 'text-indigo-600' : 'text-gray-700 group-hover:text-indigo-600' }}
-                 transition-all duration-200 transform group-hover:scale-110"
-                 viewBox="0 0 20 20"
-                 {{ isset($menu['stroke']) ? 'fill=none stroke=currentColor' : 'fill=currentColor' }}>
-                {!! $menu['icon'] !!}
-            </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        class="h-6 w-6 mr-3 {{ $isActive ? 'text-indigo-600' : 'text-gray-700 group-hover:text-indigo-600' }}
+                        transition-all duration-200 transform group-hover:scale-110"
+                        viewBox="0 0 20 20"
+                        {{ isset($menu['stroke']) ? 'fill=none stroke=currentColor' : 'fill=currentColor' }}>
+                        {!! $menu['icon'] !!}
+                    </svg>
 
-            <span class="flex-1">{{ $menu['label'] }}</span>
-        </a>
-    </li>
-@endforeach
+                    <span class="flex-1">{{ $menu['label'] }}</span>
+                </a>
+            </li>
+        @endforeach
 
                 <!-- Logout -->
                 <li class="mt-6 border-t pt-4">
@@ -105,22 +105,23 @@ SVG,
                         @csrf
                         <button type="submit"
                             class="w-full text-left group flex items-center px-6 py-3 rounded-md transition-all duration-200 ease-in-out
-                            text-red-600 hover:bg-red-50 hover:text-red-700 relative overflow-hidden">
+                                text-red-600 hover:bg-red-50 hover:text-red-700 relative overflow-hidden">
                             <span
                                 class="absolute left-0 top-2 bottom-2 my-auto w-1 rounded-full
-                                bg-red-600 scale-y-0 group-hover:scale-y-100 opacity-0 group-hover:opacity-100
-                                transition-all duration-300 ease-out origin-top"></span>
-    
+                                    bg-red-600 scale-y-0 group-hover:scale-y-100 opacity-0 group-hover:opacity-100
+                                    transition-all duration-300 ease-out origin-top"></span>
+
+                            <!-- Updated Logout Icon -->
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 class="h-6 w-6 mr-3 text-red-600 group-hover:text-red-700 transition-all duration-200 transform group-hover:scale-110"
-                                fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M3 4a1 1 0 011-1h6a1 1 0 110 2H5v10h5a1 1 0 110 2H4a1 1 0 01-1-1V4zm13.707 5.293a1 1 0 00-1.414 1.414L17.586 12H9a1 1 0 100 2h8.586l-2.293 2.293a1 1 0 001.414 1.414l4-4a1 1 0 000-1.414l-4-4z"
-                                    clip-rule="evenodd" />
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                <polyline points="16 17 21 12 16 7"/>
+                                <line x1="21" y1="12" x2="9" y2="12"/>
                             </svg>
+
                             <span class="flex-1">Logout</span>
                         </button>
-                        
                     </form>
                     
                 </li>
@@ -140,19 +141,40 @@ SVG,
             </button>
             <h2 class="ml-2 text-xl font-semibold text-gray-800">@yield('title', 'Dashboard')</h2>
             <div class="flex items-center space-x-4">
+            @if(auth()->user()->level === 'admin')
                 <div class="relative">
-                    <button class="text-gray-600 focus:outline-none">
+                    {{-- Link ke halaman customer books --}}
+                    <a href="{{ route('customer-books.index') }}"
+                        class="block text-gray-600 hover:text-indigo-600 transition duration-200 transform hover:scale-110 relative">
+                        {{-- Bell Icon --}}
                         <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-6 w-6 text-gray-600 hover:text-indigo-600 transition duration-200 transform hover:scale-110"
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            class="h-6 w-6"
+                            fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0a3 3 0 11-6 0h6z" />
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 
+                                0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 
+                                2 0 10-4 0v.341C7.67 6.165 6 8.388 6 
+                                11v3.159c0 .538-.214 1.055-.595 
+                                1.436L4 17h5m6 0a3 3 0 11-6 0h6z" />
                         </svg>
 
-                    </button>
-                    <span
-                        class="absolute top-0 right-0 inline-block w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
+                        {{-- Red Dot Ping Animation --}}
+                        @if($pendingCount > 0)
+                            <span class="absolute top-0 right-0 w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
+                        @endif
+
+                        {{-- Badge Count Number --}}
+                        @if($pendingCount > 0)
+                            <span
+                                class="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow">
+                                {{ $pendingCount }}
+                            </span>
+                        @endif
+                    </a>
                 </div>
+            @endif
+
                 @php
                     // anggap semua route admin dan kasirs.* dianggap aktif
                     $isAdminSection = request()->routeIs('admin.dashboard') 

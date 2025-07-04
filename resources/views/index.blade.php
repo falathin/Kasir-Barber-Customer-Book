@@ -164,48 +164,48 @@
         @endphp
 
 
-@php
-    $role = Auth::user()->role ?? 'kasir';
-@endphp
+        @php
+            $role = Auth::user()->level ?? 'kasir'; // atau 'role' jika memang nama field-nya 'role'
+        @endphp
 
-@if ($role !== 'kasir')
-    <div class="mt-10 bg-white p-6 rounded-xl shadow-xl animate__animated animate__fadeInUp">
-        <h2 class="text-2xl font-bold text-indigo-700 mb-6">📊 Ranking Pendapatan Per Barber</h2>
+        @if ($role === 'admin')
+            <div class="mt-10 bg-white p-6 rounded-xl shadow-xl animate__animated animate__fadeInUp">
+                <h2 class="text-2xl font-bold text-indigo-700 mb-6">📊 Ranking Pendapatan Per Barber</h2>
 
-        @forelse ($pendapatanPerBarber as $index => $item)
-            @php
-                $percentage = round(($item->total / $maxTotal) * 100);
-                $barColor = $colors[$index] ?? 'bg-indigo-500';
-                $medal = $medals[$index] ?? null;
-            @endphp
+                @forelse ($pendapatanPerBarber as $index => $item)
+                    @php
+                        $percentage = round(($item->total / $maxTotal) * 100);
+                        $barColor = $colors[$index] ?? 'bg-indigo-500';
+                        $medal = $medals[$index] ?? null;
+                    @endphp
 
-            <div class="mb-6">
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-2 text-gray-700 font-semibold">
-                        <span class="text-lg">
-                            {{ $medal ?? $index + 1 . '.' }}
-                        </span>
-                        <span>{{ $item->barber_name }}</span>
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2 text-gray-700 font-semibold">
+                                <span class="text-lg">
+                                    {{ $medal ?? $index + 1 . '.' }}
+                                </span>
+                                <span>{{ $item->barber_name }}</span>
+                            </div>
+                            <span class="text-indigo-600 font-bold text-lg">
+                                Rp {{ number_format($item->total, 0, ',', '.') }}
+                            </span>
+                        </div>
+                        <div class="relative w-full bg-gray-100 rounded-full h-5 overflow-hidden group">
+                            <div class="h-5 rounded-full {{ $barColor }} transition-all duration-500"
+                                style="width: {{ $percentage }}%;"></div>
+                            <span
+                                class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-600 opacity-0 group-hover:opacity-100 transition">
+                                {{ $percentage }}%
+                            </span>
+                        </div>
                     </div>
-                    <span class="text-indigo-600 font-bold text-lg">
-                        Rp {{ number_format($item->total, 0, ',', '.') }}
-                    </span>
-                </div>
-                <div class="relative w-full bg-gray-100 rounded-full h-5 overflow-hidden group">
-                    <div class="h-5 rounded-full {{ $barColor }} transition-all duration-500"
-                        style="width: {{ $percentage }}%;">
-                    </div>
-                    <span
-                        class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-600 opacity-0 group-hover:opacity-100 transition">
-                        {{ $percentage }}%
-                    </span>
-                </div>
+                @empty
+                    <p class="text-gray-500 italic">Belum ada data pendapatan.</p>
+                @endforelse
             </div>
-        @empty
-            <p class="text-gray-500 italic">Belum ada data pendapatan.</p>
-        @endforelse
-    </div>
-@endif
+        @endif
+
 
     </main>
 

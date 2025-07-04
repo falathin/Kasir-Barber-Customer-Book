@@ -21,48 +21,57 @@ class CustomerBookController extends Controller
                     ->orWhere('haircut_type', 'like', "%{$search}%")
                     ->orWhere('cap', 'like', "%{$search}%");
             }))
-            ->when($user->level !== 'admin', fn($q) => $q->where('barber_name', $user->name)) // <-- Filter untuk kasir
+            ->when($user->level !== 'admin', fn($q) => $q->where('barber_name', $user->name))
             ->when($user->level === 'admin' && $barber, fn($q) => $q->where('barber_name', $barber))
             ->latest()
             ->paginate(10)
             ->appends(compact('search', 'barber'));
 
-        // Daftar barber_name untuk dropdown filter (jika admin)
         $barbers = $user->level === 'admin'
             ? CustomerBook::select('barber_name')->distinct()->pluck('barber_name')
             : collect([$user->name]);
 
-        return view('customer_books.index', compact('books', 'barbers', 'search', 'barber'));
-    }
+        // hitung pending (price=0 & no service)
+        $pendingCount = CustomerBook::where('price', 0)
+            ->whereNull('colouring_other')
+            ->count();
 
+        return view('customer_books.index', compact('books', 'barbers', 'search', 'barber', 'pendingCount'));
+    }
 
     public function create()
     {
-        $capsters = Capster::all(); // Mengambil semua capster
+        $capsters = Capster::all();
         $filtering = User::where('level', 'kasir')->get();
 
-        return view('customer_books.create', compact('capsters', 'filtering'));
+        // Hitung antrian untuk hari ini
+        $today = now()->startOfDay();
+        $nextAntrian = CustomerBook::whereDate('created_at', $today)->max('antrian') + 1;
+
+        return view('customer_books.create', compact('capsters', 'filtering', 'nextAntrian'));
     }
+
     public function store(Request $request)
     {
         $data = $request->validate([
             'customer' => 'required|string',
             'cap' => 'required|string',
-            'asisten' => 'nullable|string', // <-- tambahkan ini
+            // 'asisten' => 'nullable|string',
             'haircut_type' => 'required|string',
             'barber_name' => 'required|string',
-            'colouring_other' => 'nullable|string',
-            'sell_use_product' => 'nullable|string',
-            'price' => 'required|string',
-            'qr' => 'nullable|string',
-            'rincian' => 'nullable|string',
-            'created_time' => 'nullable|date'
+            // 'colouring_other' => 'nullable|string',
+            // 'sell_use_product' => 'nullable|string',
+            // 'price' => 'required|string',
+            // 'qr' => 'nullable|string',
+            // 'rincian' => 'nullable|string',
+            'created_time' => 'nullable|date',
+            'antrian' => 'nullable|integer|min:1',
         ]);
 
+        $customerBook = CustomerBook::create($data);
 
-        CustomerBook::create($data);
-
-        return redirect()->route('customer-books.index')->with('success', 'Customer book created successfully.');
+        return redirect()->route('customer-books.show', $customerBook->id)
+                        ->with('success', 'Customer book created successfully.');
     }
 
     public function show(CustomerBook $customerBook)
@@ -70,8 +79,6 @@ class CustomerBookController extends Controller
         $customerBook->load('capster');
         return view('customer_books.show', compact('customerBook'));
     }
-
-
     public function edit(CustomerBook $customerBook)
     {
         $capsters = Capster::all();
@@ -82,22 +89,25 @@ class CustomerBookController extends Controller
     public function update(Request $request, CustomerBook $customerBook)
     {
         $data = $request->validate([
-            'customer' => 'required|string',
-            'cap' => 'required|string',
-            'asisten' => 'nullable|string', // <-- tambahkan ini
-            'haircut_type' => 'required|string',
-            'barber_name' => 'required|string',
-            'colouring_other' => 'nullable|string',
+            'customer'         => 'required|string',
+            'cap'              => 'required|string',
+            'asisten'          => 'nullable|string',
+            'haircut_type'     => 'required|string',
+            'barber_name'      => 'required|string',
+            'colouring_other'  => 'nullable|string',
             'sell_use_product' => 'nullable|string',
-            'price' => 'required|string',
-            'qr' => 'nullable|string',
-            'rincian' => 'nullable|string',
-            'created_time' => 'nullable|date'
+            'price'            => 'required|string',
+            'qr'               => 'nullable|string',
+            'rincian'          => 'nullable|string',
+            'created_time'     => 'nullable|date',
         ]);
 
         $customerBook->update($data);
 
-        return redirect()->route('customer-books.index')->with('success', 'Customer book updated successfully.');
+        // Redirect ke halaman 'show' untuk CustomerBook yang di-update
+        return redirect()
+            ->route('customer-books.show', $customerBook->id)
+            ->with('success', 'Customer book updated successfully.');
     }
 
     public function destroy(CustomerBook $customerBook)

@@ -21,78 +21,87 @@
                         @enderror
                     </label>
 
-{{-- Capster --}}
-<label class="block mb-4">
-    <span class="text-gray-700">✂️ Capster</span>
-    <select name="cap" id="capSelect" required
-        class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <option value="">Pilih Capster</option>
-        @foreach ($capsters as $capster)
-            <option value="{{ $capster->inisial }}"
-                {{ old('cap') == $capster->inisial ? 'selected' : '' }}>
-                {{ $capster->inisial }} - {{ $capster->nama }}
-            </option>
-        @endforeach
-    </select>
-    @error('cap')
-        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-    @enderror
-</label>
+                    {{-- Antrian --}}
+                    <label class="block">
+                        <span class="text-gray-700">🪑 Nomor Antrian</span>
+                        <input type="text" value="{{ $nextAntrian }}" disabled
+                            class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
+                        <input type="hidden" name="antrian" value="{{ $nextAntrian }}">
+                    </label>
 
-{{-- Asisten --}}
-<label class="block mb-4">
-    <span class="text-gray-700">🧍 Asisten</span>
-    <select name="asisten" id="asistenSelect"
-        class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <option value="">Pilih Asisten (Opsional)</option>
-        @foreach ($capsters as $capster)
-            <option value="{{ $capster->inisial }}"
-                {{ old('asisten') == $capster->inisial ? 'selected' : '' }}>
-                {{ $capster->inisial }} - {{ $capster->nama }}
-            </option>
-        @endforeach
-    </select>
-    @error('asisten')
-        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-    @enderror
-</label>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const capSelect = document.getElementById('capSelect');
-        const asistenSelect = document.getElementById('asistenSelect');
+                    {{-- Capster --}}
+                    <label class="block mb-4">
+                        <span class="text-gray-700">✂️ Capster</span>
+                        <select name="cap" id="capSelect" 
+                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">Pilih Capster</option>
+                            @foreach ($capsters as $capster)
+                                <option value="{{ $capster->inisial }}"
+                                    {{ old('cap') == $capster->inisial ? 'selected' : '' }}>
+                                    {{ $capster->inisial }} - {{ $capster->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('cap')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </label>
 
-        function syncOptions() {
-            const selectedCap = capSelect.value;
-            const selectedAsisten = asistenSelect.value;
+                    {{-- Asisten --}}
+                    {{-- <label class="block mb-4">
+                        <span class="text-gray-700">🧍 Asisten</span>
+                        <select name="asisten" id="asistenSelect"
+                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="">Pilih Asisten (Opsional)</option>
+                            @foreach ($capsters as $capster)
+                                <option value="{{ $capster->inisial }}"
+                                    {{ old('asisten') == $capster->inisial ? 'selected' : '' }}>
+                                    {{ $capster->inisial }} - {{ $capster->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('asisten')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </label> --}}
+                    
+                    {{-- <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const capSelect = document.getElementById('capSelect');
+                            const asistenSelect = document.getElementById('asistenSelect');
 
-            Array.from(asistenSelect.options).forEach(option => {
-                if (option.value && option.value === selectedCap) {
-                    option.disabled = true;
-                    option.hidden = true;
-                } else {
-                    option.disabled = false;
-                    option.hidden = false;
-                }
-            });
+                            function syncOptions() {
+                                const selectedCap = capSelect.value;
+                                const selectedAsisten = asistenSelect.value;
 
-            Array.from(capSelect.options).forEach(option => {
-                if (option.value && option.value === selectedAsisten) {
-                    option.disabled = true;
-                    option.hidden = true;
-                } else {
-                    option.disabled = false;
-                    option.hidden = false;
-                }
-            });
-        }
+                                Array.from(asistenSelect.options).forEach(option => {
+                                    if (option.value && option.value === selectedCap) {
+                                        option.disabled = true;
+                                        option.hidden = true;
+                                    } else {
+                                        option.disabled = false;
+                                        option.hidden = false;
+                                    }
+                                });
 
-        capSelect.addEventListener('change', syncOptions);
-        asistenSelect.addEventListener('change', syncOptions);
+                                Array.from(capSelect.options).forEach(option => {
+                                    if (option.value && option.value === selectedAsisten) {
+                                        option.disabled = true;
+                                        option.hidden = true;
+                                    } else {
+                                        option.disabled = false;
+                                        option.hidden = false;
+                                    }
+                                });
+                            }
 
-        // Jalankan saat halaman pertama kali load
-        syncOptions();
-    });
-</script>
+                            capSelect.addEventListener('change', syncOptions);
+                            asistenSelect.addEventListener('change', syncOptions);
+
+                            // Jalankan saat halaman pertama kali load
+                            syncOptions();
+                        });
+                    </script> --}}
 
                     {{-- Haircut Type --}}
                     <label class="block">
@@ -111,7 +120,7 @@
                     </label>
 
                     {{-- Barber Services picker --}}
-                    <div id="action-picker" class="mb-4">
+                    {{-- <div id="action-picker" class="mb-4">
                         <label for="action-select" class="block text-gray-700 mb-1">💈 Barber Services</label>
                         <div class="flex items-center space-x-2">
                             <select id="action-select"
@@ -145,22 +154,22 @@
                             </button>
                         </div>
                         <div id="selected-actions" class="mt-3 flex flex-wrap gap-2"></div>
-                    </div>
+                    </div> --}}
 
                     {{-- Hidden field untuk menyimpan barber services ke colouring_other --}}
-                    <input type="hidden" name="colouring_other" id="colouring_other_hidden"
-                        value="{{ old('colouring_other') }}">
+                    {{-- <input type="hidden" name="colouring_other" id="colouring_other_hidden"
+                        value="{{ old('colouring_other') }}"> --}}
 
                     {{-- Sell/Use Product --}}
-                    <label class="block">
+                    {{-- <label class="block">
                         <span class="text-gray-700">🧴 Sell/Use Product</span>
                         <textarea name="sell_use_product" placeholder="e.g. Shampoo X, Conditioner Y"
                             class="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             rows="3">{{ old('sell_use_product') }}</textarea>
-                    </label>
+                    </label> --}}
 
                     {{-- Rincian --}}
-                    <label class="block">
+                    {{-- <label class="block">
                         <span class="text-gray-700">📝 Rincian</span>
                         <textarea name="rincian"
                             class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="4"
@@ -168,10 +177,10 @@
                         @error('rincian')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
-                    </label>
+                    </label> --}}
 
                     {{-- Price --}}
-                    <label class="block">
+                    {{-- <label class="block">
                         <span class="text-gray-700">💰 Price</span>
                         <div class="relative mt-1">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">Rp</div>
@@ -183,10 +192,10 @@
                         @error('price')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
-                    </label>
+                    </label> --}}
 
                     {{-- Payment Method --}}
-                    <label class="block">
+                    {{-- <label class="block">
                         <span class="text-gray-700">💳 Payment Method</span>
                         <select name="qr"
                             class="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -194,7 +203,7 @@
                             <option value="qr_transfer" {{ old('qr') == 'qr_transfer' ? 'selected' : '' }}>QR Transfer
                             </option>
                         </select>
-                    </label>
+                    </label> --}}
 
                     {{-- Barber Name --}}
                     <label class="block">
@@ -224,6 +233,8 @@
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </label>
+
+                    {{-- Waktu dibuat --}}
                     <div class="mb-4">
                         <label for="created_time" class="block text-sm font-medium text-gray-700 mb-1">🕒 Waktu</label>
                         <input type="datetime-local" id="created_time" name="created_time"
