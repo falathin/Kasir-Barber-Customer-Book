@@ -38,12 +38,15 @@ Route::middleware('auth')->group(function () {
     ]);
 });
 
-// Auth admin routes
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', function () {
         return 'ini adalah halaman admin';
     })->name('admin.dashboard');
-     Route::resource('kasirs', KasirController::class)->except(['show']);
+
+    Route::resource('kasirs', KasirController::class)->except(['show']);
+
+    // Pindahkan ke sini agar capsters hanya untuk admin
+    Route::resource('capsters', CapsterController::class);
 });
 
 require __DIR__ . '/auth.php';

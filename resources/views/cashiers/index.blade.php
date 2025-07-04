@@ -1,61 +1,58 @@
+
+<!-- resources/views/kasirs/index.blade.php -->
 @extends('layouts.app')
 
 @section('title', 'Cashier Management')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold text-dark">👥 Cashier Accounts</h4>
-    <a href="{{ route('kasirs.create') }}" class="btn btn-success shadow-sm">
-        + Add Cashier
-    </a>
-</div>
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h2 class="text-3xl font-bold text-gray-800">👥 Cashier Accounts</h2>
+        <a href="{{ route('kasirs.create') }}"
+            class="px-5 py-2 bg-yellow-400 text-white font-semibold rounded-full shadow hover:bg-yellow-500 transition animate__animated animate__fadeInUp">+ Add Cashier</a>
+    </div>
 
-<div class="table-responsive">
-    <table class="table table-hover align-middle shadow-sm border rounded overflow-hidden">
-        <thead class="table-primary">
-            <tr>
-                <th scope="col">👤 Name</th>
-                <th scope="col">📧 Email</th>
-                <th scope="col">⏱️ Last Login</th>
-                <th scope="col" class="text-end">⚙️ Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($cashiers as $kasir)
+    <div class="overflow-x-auto bg-white rounded-2xl shadow">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-yellow-50">
                 <tr>
-                    <td class="fw-medium">{{ $kasir->name }}</td>
-                    <td>{{ $kasir->email }}</td>
-                    <td>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">👤 Name</th>
+                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 uppercase tracking-wider">📧 Email</th>
+                    <th class="px-6 py-3 text-center text-sm font-medium text-gray-600 uppercase tracking-wider">⏱️ Last Login</th>
+                    <th class="px-6 py-3 text-right text-sm font-medium text-gray-600 uppercase tracking-wider">⚙️ Actions</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @forelse ($cashiers as $kasir)
+                <tr class="hover:bg-yellow-50 transition">
+                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-800">{{ $kasir->name }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-600">{{ $kasir->email }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
                         @if ($kasir->last_login_at)
-                            <span class="badge bg-info text-dark">
-                                {{ \Carbon\Carbon::parse($kasir->last_login_at)->translatedFormat('d M Y H:i') }}
-                            </span>
+                        <span
+                            class="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">{{ \Carbon\Carbon::parse($kasir->last_login_at)->translatedFormat('d M Y H:i') }}</span>
                         @else
-                            <span class="badge bg-secondary">Never logged in</span>
+                        <span
+                            class="inline-block px-2 py-1 bg-gray-200 text-gray-600 rounded-full text-xs font-semibold">Never logged in</span>
                         @endif
                     </td>
-                    <td class="text-end">
-                        {{-- <a href="{{ route('kasirs.edit', $kasir) }}" class="btn btn-sm btn-outline-primary me-1">
-                            ✏️ Edit
-                        </a> --}}
-                        <form action="{{ route('kasirs.destroy', $kasir) }}" method="POST" class="d-inline"
+                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                        <form action="{{ route('kasirs.destroy', $kasir) }}" method="POST" class="inline"
                             onsubmit="return confirm('Are you sure you want to delete this cashier?')">
                             @csrf
                             @method('DELETE')
-                            <button class="btn btn-sm btn-outline-danger">
-                                🗑️ Delete
-                            </button>
+                            <button
+                                class="px-3 py-1 bg-red-100 text-red-600 rounded-full text-sm font-semibold hover:bg-red-200 transition">🗑️ Delete</button>
                         </form>
                     </td>
                 </tr>
-            @empty
+                @empty
                 <tr>
-                    <td colspan="4" class="text-center text-muted">
-                        No cashier accounts found.
-                    </td>
+                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">No cashier accounts found.</td>
                 </tr>
-            @endforelse
-        </tbody>
-    </table>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection

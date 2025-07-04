@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CustomerBook;
 use App\Models\Capster;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class CustomerBookController extends Controller
@@ -12,42 +13,52 @@ class CustomerBookController extends Controller
     {
         $search = $request->input('search');
         $barber = $request->input('barber');
+        $user = auth()->user();
 
         $books = CustomerBook::query()
-            ->when($search, function ($query, $search) {
-                $query->where('customer', 'like', '%' . $search . '%')
-                    ->orWhere('haircut_type', 'like', '%' . $search . '%')
-                    ->orWhere('cap', 'like', '%' . $search . '%');
-            })
-            ->when($barber, function ($query, $barber) {
-                $query->where('barber_name', $barber);
-            })
+            ->when($search, fn($q) => $q->where(function ($query) use ($search) {
+                $query->where('customer', 'like', "%{$search}%")
+                    ->orWhere('haircut_type', 'like', "%{$search}%")
+                    ->orWhere('cap', 'like', "%{$search}%");
+            }))
+            ->when($user->level !== 'admin', fn($q) => $q->where('barber_name', $user->name)) // <-- Filter untuk kasir
+            ->when($user->level === 'admin' && $barber, fn($q) => $q->where('barber_name', $barber))
             ->latest()
             ->paginate(10)
-            ->appends(['search' => $search, 'barber' => $barber]);
+            ->appends(compact('search', 'barber'));
 
-        $barbers = CustomerBook::select('barber_name')->distinct()->pluck('barber_name');
+        // Daftar barber_name untuk dropdown filter (jika admin)
+        $barbers = $user->level === 'admin'
+            ? CustomerBook::select('barber_name')->distinct()->pluck('barber_name')
+            : collect([$user->name]);
 
         return view('customer_books.index', compact('books', 'barbers', 'search', 'barber'));
     }
 
+
     public function create()
     {
-        $capsters = Capster::all();
-        return view('customer_books.create', compact('capsters'));
+        $capsters = Capster::all(); // Mengambil semua capster
+        $filtering = User::where('level', 'kasir')->get();
+
+        return view('customer_books.create', compact('capsters', 'filtering'));
     }
     public function store(Request $request)
     {
         $data = $request->validate([
             'customer' => 'required|string',
             'cap' => 'required|string',
+            'asisten' => 'nullable|string', // <-- tambahkan ini
             'haircut_type' => 'required|string',
             'barber_name' => 'required|string',
             'colouring_other' => 'nullable|string',
             'sell_use_product' => 'nullable|string',
             'price' => 'required|string',
             'qr' => 'nullable|string',
+            'rincian' => 'nullable|string',
+            'created_time' => 'nullable|date'
         ]);
+
 
         CustomerBook::create($data);
 
@@ -64,7 +75,8 @@ class CustomerBookController extends Controller
     public function edit(CustomerBook $customerBook)
     {
         $capsters = Capster::all();
-        return view('customer_books.edit', compact('customerBook', 'capsters'));
+        $filtering = User::where('level', 'kasir')->get();
+        return view('customer_books.edit', compact('customerBook', 'capsters', 'filtering'));
     }
 
     public function update(Request $request, CustomerBook $customerBook)
@@ -72,12 +84,15 @@ class CustomerBookController extends Controller
         $data = $request->validate([
             'customer' => 'required|string',
             'cap' => 'required|string',
+            'asisten' => 'nullable|string', // <-- tambahkan ini
             'haircut_type' => 'required|string',
             'barber_name' => 'required|string',
             'colouring_other' => 'nullable|string',
             'sell_use_product' => 'nullable|string',
             'price' => 'required|string',
             'qr' => 'nullable|string',
+            'rincian' => 'nullable|string',
+            'created_time' => 'nullable|date'
         ]);
 
         $customerBook->update($data);

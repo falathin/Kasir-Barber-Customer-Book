@@ -21,23 +21,78 @@
                         @enderror
                     </label>
 
-                    {{-- Capster --}}
-                    <label class="block">
-                        <span class="text-gray-700">✂️ Capster</span>
-                        <select name="cap" required
-                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="">Pilih Capster</option>
-                            @foreach ($capsters as $capster)
-                                <option value="{{ $capster->inisial }}"
-                                    {{ old('cap') == $capster->inisial ? 'selected' : '' }}>
-                                    {{ $capster->inisial }} - {{ $capster->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('cap')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </label>
+{{-- Capster --}}
+<label class="block mb-4">
+    <span class="text-gray-700">✂️ Capster</span>
+    <select name="cap" id="capSelect" required
+        class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="">Pilih Capster</option>
+        @foreach ($capsters as $capster)
+            <option value="{{ $capster->inisial }}"
+                {{ old('cap') == $capster->inisial ? 'selected' : '' }}>
+                {{ $capster->inisial }} - {{ $capster->nama }}
+            </option>
+        @endforeach
+    </select>
+    @error('cap')
+        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+</label>
+
+{{-- Asisten --}}
+<label class="block mb-4">
+    <span class="text-gray-700">🧍 Asisten</span>
+    <select name="asisten" id="asistenSelect"
+        class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="">Pilih Asisten (Opsional)</option>
+        @foreach ($capsters as $capster)
+            <option value="{{ $capster->inisial }}"
+                {{ old('asisten') == $capster->inisial ? 'selected' : '' }}>
+                {{ $capster->inisial }} - {{ $capster->nama }}
+            </option>
+        @endforeach
+    </select>
+    @error('asisten')
+        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+    @enderror
+</label>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const capSelect = document.getElementById('capSelect');
+        const asistenSelect = document.getElementById('asistenSelect');
+
+        function syncOptions() {
+            const selectedCap = capSelect.value;
+            const selectedAsisten = asistenSelect.value;
+
+            Array.from(asistenSelect.options).forEach(option => {
+                if (option.value && option.value === selectedCap) {
+                    option.disabled = true;
+                    option.hidden = true;
+                } else {
+                    option.disabled = false;
+                    option.hidden = false;
+                }
+            });
+
+            Array.from(capSelect.options).forEach(option => {
+                if (option.value && option.value === selectedAsisten) {
+                    option.disabled = true;
+                    option.hidden = true;
+                } else {
+                    option.disabled = false;
+                    option.hidden = false;
+                }
+            });
+        }
+
+        capSelect.addEventListener('change', syncOptions);
+        asistenSelect.addEventListener('change', syncOptions);
+
+        // Jalankan saat halaman pertama kali load
+        syncOptions();
+    });
+</script>
 
                     {{-- Haircut Type --}}
                     <label class="block">
@@ -104,6 +159,17 @@
                             rows="3">{{ old('sell_use_product') }}</textarea>
                     </label>
 
+                    {{-- Rincian --}}
+                    <label class="block">
+                        <span class="text-gray-700">📝 Rincian</span>
+                        <textarea name="rincian"
+                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="4"
+                            placeholder="Keterangan tambahan, catatan, atau permintaan khusus...">{{ old('rincian') }}</textarea>
+                        @error('rincian')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </label>
+
                     {{-- Price --}}
                     <label class="block">
                         <span class="text-gray-700">💰 Price</span>
@@ -133,14 +199,49 @@
                     {{-- Barber Name --}}
                     <label class="block">
                         <span class="text-gray-700">💈 Barber Name</span>
-                        <input type="text" name="barber_name" value="{{ old('barber_name') }}"
-                            placeholder="e.g. BBmen’s Haircut 1"
-                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            required>
+
+                        @if (auth()->user()->level === 'admin')
+                            <select name="barber_name"
+                                class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                required>
+                                <option value="">-- Pilih Nama Kasir --</option>
+                                @foreach ($filtering as $capster)
+                                    <option value="{{ $capster->name }}"
+                                        {{ old('barber_name') === $capster->name ? 'selected' : '' }}>
+                                        {{ $capster->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        @else
+                            {{-- Untuk kasir, tampilkan nama mereka tapi disable --}}
+                            <input type="text" name="barber_name" value="{{ auth()->user()->name }}"
+                                class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" disabled />
+                            {{-- Dan kirimkan tetap lewat input hidden --}}
+                            <input type="hidden" name="barber_name" value="{{ auth()->user()->name }}">
+                        @endif
+
                         @error('barber_name')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </label>
+                    <div class="mb-4">
+                        <label for="created_time" class="block text-sm font-medium text-gray-700 mb-1">🕒 Waktu</label>
+                        <input type="datetime-local" id="created_time" name="created_time"
+                            class="w-full px-3 py-2 border rounded-lg text-sm bg-gray-100 text-gray-700"
+                            disabled>
+                    </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const input = document.getElementById('created_time');
+                            if (input) {
+                                const now = new Date();
+                                const offset = now.getTimezoneOffset();
+                                const local = new Date(now.getTime() - offset * 60000);
+                                input.value = local.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:MM
+                            }
+                        });
+                    </script>
 
                     <button type="submit"
                         class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">

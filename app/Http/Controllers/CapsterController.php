@@ -8,13 +8,13 @@ use Illuminate\Support\Facades\Storage;  // ← import Storage
 
 class CapsterController extends Controller
 {
-    public function index(Request $request) // Inject Request here
+    public function index(Request $request)
     {
         // Get the search term from the request
         $search = $request->input('search');
 
         // Start building the query
-        $query = Capster::orderBy('nama');
+        $query = Capster::orderBy('created_at', 'desc'); // Menampilkan capster terbaru di atas
 
         // If a search term is provided, apply the filter
         if ($search) {

@@ -20,9 +20,12 @@
         class="fixed inset-y-0 left-0 z-20 w-64 transform -translate-x-full bg-white border-r border-gray-200
        transition-transform duration-300 ease-in-out md:translate-x-0">
         <div class="p-6 flex items-center space-x-3">
-            <img src="{{ asset('images/bb-logo.png') }}" alt="Logo" class="w-10 h-10 rounded-full shadow-md">
-            <h1 class="text-2xl font-bold bg-gradient-to-r from-orange-900 via-orange-800 to-yellow-800 bg-clip-text text-transparent"
-                style="font-family: 'Rye', cursive;">Barber Kasir</h1>
+            <img src="{{ asset('images/bb-logo.png') }}" alt="Logo" class="w-15 h-12 rounded-full shadow-md">
+<h3 class="text-center text-2xl font-bold bg-gradient-to-r from-orange-900 via-orange-800 to-yellow-800 bg-clip-text text-transparent"
+    style="font-family: 'Rye', cursive;">
+    <span class="block text-3xl leading-none">BB</span>
+    Hair Studio
+</h3>
         </div>
         <nav class="mt-6">
             <ul>
@@ -61,33 +64,41 @@ SVG,
 ];
 @endphp
 
-                @foreach ($menus as $menu)
-                    @php
-                        $isActive = request()->routeIs(str_replace('.index', '*', $menu['route']));
-                    @endphp
-                    <li class="mb-1">
-                        <a href="{{ route($menu['route']) }}"
-                            class="group flex items-center px-6 py-3 rounded-md relative overflow-hidden transition-all duration-200 ease-in-out
-                {{ $isActive ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
+@foreach ($menus as $menu)
+    @php
+        $isCapster = $menu['label'] === 'Capsters';
+        $isAdmin = auth()->user()->level === 'admin';
 
-                            <span
-                                class="absolute left-0 top-2 bottom-2 my-auto w-1 rounded-full
-                    bg-indigo-600 scale-y-0 group-hover:scale-y-100 opacity-0 group-hover:opacity-100
-                    transition-all duration-300 ease-out origin-top"></span>
+        // Lewati item jika menu Capsters dan user bukan admin
+        if ($isCapster && !$isAdmin) {
+            continue;
+        }
 
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                class="h-6 w-6 mr-3 {{ $isActive ? 'text-indigo-600' : 'text-gray-700 group-hover:text-indigo-600' }}
-                    transition-all duration-200 transform group-hover:scale-110"
-                                viewBox="0 0 20 20"
-                                {{ isset($menu['stroke']) ? 'fill=none stroke=currentColor' : 'fill=currentColor' }}>
-                                {!! $menu['icon'] !!}
-                            </svg>
+        $isActive = request()->routeIs(str_replace('.index', '*', $menu['route']));
+    @endphp
+    <li class="mb-1">
+        <a href="{{ route($menu['route']) }}"
+           class="group flex items-center px-6 py-3 rounded-md relative overflow-hidden transition-all duration-200 ease-in-out
+           {{ $isActive ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' : 'text-gray-700 hover:bg-indigo-50 hover:text-indigo-600' }}">
 
-                            <span class="flex-1">{{ $menu['label'] }}</span>
-                        </a>
-                    </li>
-                @endforeach
-                
+            <span
+                class="absolute left-0 top-2 bottom-2 my-auto w-1 rounded-full
+                bg-indigo-600 scale-y-0 group-hover:scale-y-100 opacity-0 group-hover:opacity-100
+                transition-all duration-300 ease-out origin-top"></span>
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="h-6 w-6 mr-3 {{ $isActive ? 'text-indigo-600' : 'text-gray-700 group-hover:text-indigo-600' }}
+                 transition-all duration-200 transform group-hover:scale-110"
+                 viewBox="0 0 20 20"
+                 {{ isset($menu['stroke']) ? 'fill=none stroke=currentColor' : 'fill=currentColor' }}>
+                {!! $menu['icon'] !!}
+            </svg>
+
+            <span class="flex-1">{{ $menu['label'] }}</span>
+        </a>
+    </li>
+@endforeach
+
                 <!-- Logout -->
                 <li class="mt-6 border-t pt-4">
                     <form id="logout-form" action="{{ route('logout') }}" method="POST">
@@ -142,11 +153,25 @@ SVG,
                     <span
                         class="absolute top-0 right-0 inline-block w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
                 </div>
+                @php
+                    // anggap semua route admin dan kasirs.* dianggap aktif
+                    $isAdminSection = request()->routeIs('admin.dashboard') 
+                                    || request()->routeIs('kasirs.*');
+                @endphp
+
                 <div>
                     <a href="{{ route('profile.edit') }}">
-                        <img src="https://ui-avatars.com/api/?name=Admin+Kasir&background=4F46E5&color=fff"
+                        <img
+                            src="https://ui-avatars.com/api/?name=Admin+Kasir&background=4F46E5&color=fff"
                             alt="Admin Kasir"
-                            class="h-8 w-8 rounded-full border-2 border-indigo-500 animate__animated animate__fadeIn" />
+                            @class([
+                                'h-8 w-8 rounded-full border-2 transition-transform duration-200 ease-out animate__animated animate__fadeIn',
+                                // jika aktif, beri border kuning dan sedikit diperbesar
+                                'border-yellow-400 scale-110' => $isAdminSection,
+                                // jika tidak aktif, pakai border default
+                                'border-indigo-500 scale-100' => ! $isAdminSection,
+                            ]) 
+                        />
                     </a>
                 </div>
             </div>

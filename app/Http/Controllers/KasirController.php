@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class KasirController extends Controller
 {
@@ -86,7 +87,20 @@ class KasirController extends Controller
     public function destroy(string $id)
     {
         $cashier = User::findOrFail($id);
-        $cashier->delete();
-        return redirect()->route('kasirs.index')->with('success', 'Kasir berhasil dihapus.');
+
+        // Hapus semua data terkait user
+        DB::transaction(function () use ($cashier) {
+            // Hapus dari tabel password reset jika ada
+            DB::table('password_reset_tokens')->where('email', $cashier->email)->delete();
+
+            // Hapus sesi login user
+            DB::table('sessions')->where('user_id', $cashier->id)->delete();
+
+            // Terakhir, hapus dari tabel users
+            $cashier->delete();
+        });
+
+        return redirect()->route('kasirs.index')->with('success', 'Kasir berhasil dihapus beserta semua datanya.');
     }
+
 }

@@ -18,33 +18,50 @@ class DashboardController extends Controller
         ]);
     }
 
-
     public function index()
     {
         $today = today();
         $now = now();
+        $user = auth()->user();
 
-        $totalTransaksi = CustomerBook::whereDate('created_at', $today)->count();
-        $totalPendapatan = CustomerBook::whereDate('created_at', $today)->sum('price');
-        $totalPengembalian = CustomerBook::whereDate('created_at', $today)
+        // Ambil query dasar
+        $query = CustomerBook::query();
+
+        // Jika bukan admin, filter berdasarkan barber_name
+        if ($user->level !== 'admin') {
+            $query->where('barber_name', $user->name);
+        }
+
+        $totalTransaksi = (clone $query)->whereDate('created_at', $today)->count();
+        $totalPendapatan = (clone $query)->whereDate('created_at', $today)->sum('price');
+        $totalPengembalian = (clone $query)->whereDate('created_at', $today)
             ->where('price', '<', 0)
             ->sum('price');
 
-        $customersToday = CustomerBook::whereDate('created_at', $today)->count();
-        $customersMonth = CustomerBook::whereMonth('created_at', $now->month)
+        $customersToday = (clone $query)->whereDate('created_at', $today)->count();
+        $customersMonth = (clone $query)->whereMonth('created_at', $now->month)
             ->whereYear('created_at', $now->year)
             ->count();
 
-        $pendapatanBulanan = CustomerBook::whereMonth('created_at', $now->month)
+        $pendapatanBulanan = (clone $query)->whereMonth('created_at', $now->month)
             ->whereYear('created_at', $now->year)
             ->sum('price');
-        $pendapatanTahunan = CustomerBook::whereYear('created_at', $now->year)
-            ->sum('price');
+        $pendapatanTahunan = (clone $query)->whereYear('created_at', $now->year)->sum('price');
 
-        $produkTerjual = CustomerBook::whereDate('created_at', $today)
+        $produkTerjual = (clone $query)->whereDate('created_at', $today)
             ->whereNotNull('sell_use_product')
             ->where('sell_use_product', '!=', '')
             ->count();
+
+        // Jika admin, ambil daftar pendapatan per barber
+        $pendapatanPerBarber = [];
+        if ($user->level === 'admin') {
+            $pendapatanPerBarber = CustomerBook::select('barber_name')
+                ->selectRaw('SUM(price) as total')
+                ->groupBy('barber_name')
+                ->orderByDesc('total')
+                ->get();
+        }
 
         return view('index', compact(
             'totalTransaksi',
@@ -54,7 +71,10 @@ class DashboardController extends Controller
             'pendapatanTahunan',
             'produkTerjual',
             'customersToday',
-            'customersMonth'
+            'customersMonth',
+            'pendapatanPerBarber'
         ));
     }
+
+
 }

@@ -15,20 +15,20 @@ class AdminUserSeeder extends Seeder
     public function run()
 {
     User::updateOrCreate(
-        ['email' => 'ibrahimahmadfalatin@gmail.com'],
+        ['email' => 'afandiafett@gmail.com'],
         [
             'name' => 'Admin Utama',
-            'password' => Hash::make('admin1234'),
+            'password' => Hash::make('BBmen806794'),
             'level' => 'admin',
         ]
     );
-    User::updateOrCreate(
-        ['email' => 'kasir@gmail.com'],
-        [
-            'name' => 'Kasir testing',
-            'password' => Hash::make('admin1234'),
-            'level' => 'kasir',
-        ]
-    );
+    // User::updateOrCreate(
+    //     ['email' => 'kasir@gmail.com'],
+    //     [
+    //         'name' => 'Kasir testing',
+    //         'password' => Hash::make('admin1234'),
+    //         'level' => 'kasir',
+    //     ]
+    // );
 }
 }
