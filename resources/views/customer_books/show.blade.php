@@ -85,17 +85,20 @@
                 </div>
 
                 @php
-                    if (empty($customerBook->capster)) {
+                    $isPending = $customerBook->price == 0 && is_null($customerBook->colouring_other);
+                    
+                    if (is_null($customerBook->cap)) {
                         $status = 'Antri';
                         $statusColor = 'bg-gray-100 text-gray-600';
-                    } elseif ($customerBook->price == 0 && empty($customerBook->colouring_other)) {
-                        $status = 'Pending';
+                    } elseif ($isPending) {
+                        $status = 'Proses';
                         $statusColor = 'bg-yellow-100 text-yellow-700';
                     } else {
                         $status = 'Selesai';
                         $statusColor = 'bg-green-100 text-green-700';
                     }
                 @endphp
+
 
                 <div class="flex justify-between text-xs font-bold {{ $statusColor }} rounded-md px-3 py-1">
                     <span>Status</span>
@@ -119,50 +122,96 @@
                 </div>
             </div>
 
-            {{-- Action Buttons --}}
+            @php
+                // Tentukan status…
+                $isPending = $customerBook->price == 0 && empty($customerBook->colouring_other);
+                $isAntre   = empty($customerBook->cap);
+            @endphp
+
             <div class="mt-6 grid grid-cols-2 gap-2 print:hidden">
                 <a href="{{ route('customer-books.index') }}"
-                    class="block text-center py-2 bg-gray-200 rounded text-xs hover:bg-gray-300">Back</a>
+                    class="w-full block text-center py-2 bg-gray-200 rounded text-xs hover:bg-gray-300">
+                    Back
+                </a>
 
                 <button onclick="window.print()"
-                    class="block text-center py-2 bg-green-600 text-white rounded text-xs hover:bg-green-700">Print</button>
+                    class="w-full block text-center py-2 bg-green-600 text-white rounded text-xs hover:bg-green-700">
+                    Print
+                </button>
 
-                    {{-- Tombol Edit --}}
-                    @php
-                        $isPending = $customerBook->price == 0 && empty($customerBook->colouring_other);
-                    @endphp
+                {{-- Jika status Antri → tombol Proseskan --}}
+                @if($isAntre)
+                    <a href="{{ route('customer-books.createWithCap', $customerBook) }}"
+                        class="w-full block text-center py-2 bg-blue-500 text-white rounded text-xs hover:bg-blue-600">
+                        Proseskan
+                    </a>
+                    <form action="{{ route('customer-books.destroy', $customerBook) }}"
+                        method="POST"
+                        class="w-full"
+                        onsubmit="return confirm('Delete this receipt?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            class="w-full block py-2 bg-red-600 text-white rounded text-xs hover:bg-red-700">
+                            Delete
+                        </button>
+                    </form>
 
-
-                    @if (auth()->user()->level === 'admin')
-                        {{-- Admin selalu bisa edit --}}
-                        <a href="{{ route('customer-books.edit', $customerBook->id) }}"
-                            class="block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
-                            Execute
+                {{-- Lainnya: Done / Delete / disabled --}}
+                @else
+                    @if(auth()->user()->level === 'admin')
+                        {{-- Admin selalu bisa edit & delete --}}
+                        <a href="{{ route('customer-books.edit', $customerBook) }}"
+                            class="w-full block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
+                            Done
                         </a>
-                    @elseif (auth()->user()->level === 'kasir')
-                        @if ($isPending)
-                            {{-- Kasir bisa edit jika status pending --}}
-                            <a href="{{ route('customer-books.edit', $customerBook->id) }}"
-                                class="block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
-                                Execute
+
+                        <form action="{{ route('customer-books.destroy', $customerBook) }}"
+                            method="POST"
+                            class="w-full"
+                            onsubmit="return confirm('Delete this receipt?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="w-full block py-2 bg-red-600 text-white rounded text-xs hover:bg-red-700">
+                                Delete
+                            </button>
+                        </form>
+
+                    @elseif(auth()->user()->level === 'kasir')
+                        @if($isPending)
+                            {{-- Kasir bisa edit & delete saat Pending --}}
+                            <a href="{{ route('customer-books.edit', $customerBook) }}"
+                                class="w-full block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
+                                Done
                             </a>
+
+                            <form action="{{ route('customer-books.destroy', $customerBook) }}"
+                                method="POST"
+                                class="w-full"
+                                onsubmit="return confirm('Delete this receipt?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="w-full block py-2 bg-red-600 text-white rounded text-xs hover:bg-red-700">
+                                    Delete
+                                </button>
+                            </form>
                         @else
-                            {{-- Kasir tidak bisa edit jika status lunas --}}
+                            {{-- Kasir tidak bisa edit/delete selain Pending --}}
                             <button disabled
-                                class="block text-center py-2 bg-gray-300 text-gray-500 rounded text-xs cursor-not-allowed">
-                                Execute
+                                class="w-full block text-center py-2 bg-gray-300 text-gray-500 rounded text-xs cursor-not-allowed">
+                                Done
+                            </button>
+                            <button disabled
+                                class="w-full block py-2 bg-gray-300 text-gray-500 rounded text-xs cursor-not-allowed">
+                                Delete
                             </button>
                         @endif
                     @endif
-
-                <form action="{{ route('customer-books.destroy', $customerBook->id) }}" method="POST"
-                    onsubmit="return confirm('Delete this receipt?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit"
-                        class="w-full py-2 bg-red-600 text-white rounded text-xs hover:bg-red-700">Delete</button>
-                </form>
+                @endif
             </div>
+
         </div>
     </div>
 

@@ -24,27 +24,9 @@
                     {{-- Antrian --}}
                     <label class="block">
                         <span class="text-gray-700">🪑 Nomor Antrian</span>
-                        <input type="text" value="{{ $nextAntrian }}" disabled
+                        <input type="text" id="antrian_display" value="{{ $nextAntrian }}" disabled
                             class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
-                        <input type="hidden" name="antrian" value="{{ $nextAntrian }}">
-                    </label>
-
-                    {{-- Capster --}}
-                    <label class="block mb-4">
-                        <span class="text-gray-700">✂️ Capster</span>
-                        <select name="cap" id="capSelect" 
-                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="">Pilih Capster</option>
-                            @foreach ($capsters as $capster)
-                                <option value="{{ $capster->inisial }}"
-                                    {{ old('cap') == $capster->inisial ? 'selected' : '' }}>
-                                    {{ $capster->inisial }} - {{ $capster->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('cap')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
+                        <input type="hidden" name="antrian" id="antrian_input" value="{{ $nextAntrian }}">
                     </label>
 
                     {{-- Asisten --}}

@@ -37,6 +37,16 @@ Route::middleware('auth')->group(function () {
         'update'  => 'customer-books.update',
         'destroy' => 'customer-books.destroy',
     ]);
+
+
+    // Tampil form proses (GET)
+    Route::get('customer-books/{book}/process', [CustomerBookController::class, 'createWithCapster'])
+        ->name('customer-books.createWithCap');
+
+    // Simpan proses capster (POST) → update `$book`
+    Route::post('customer-books/{book}/process', [CustomerBookController::class, 'storeWithCapster'])
+        ->name('customer-books.storeWithCap');
+
     Route::resource('notes', NoteController::class)->except(['show']);
     
 });

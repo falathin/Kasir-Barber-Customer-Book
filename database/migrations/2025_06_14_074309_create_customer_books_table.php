@@ -12,13 +12,13 @@ return new class extends Migration {
     {
         Schema::create('customer_books', function (Blueprint $table) {
             $table->id();
-            $table->string('customer');
-            $table->string('cap');
-            $table->string('haircut_type');
-            $table->string('barber_name');
+            $table->string('customer')->nullable();
+            $table->string('cap')->nullable();
+            $table->string('haircut_type')->nullable();
+            $table->string('barber_name')->nullable();
             $table->text('colouring_other')->nullable();
             $table->text('sell_use_product')->nullable();
-            $table->string('price')->default(0);
+            $table->string('price')->nullable()->default(0);
             $table->string('qr')->nullable();
             $table->timestamps();
         });

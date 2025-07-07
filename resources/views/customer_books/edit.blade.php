@@ -32,7 +32,7 @@
                             <option value="">Pilih Capster</option>
                             @foreach ($capsters as $capster)
                                 <option value="{{ $capster->inisial }}"
-                                    {{ old('cap', $customerBook->cap) == $capster->inisial ? 'selected' : '' }}>
+                                    {{ (old('cap') ?? $customerBook->cap) == $capster->inisial ? 'selected' : '' }}>
                                     {{ $capster->inisial }} - {{ $capster->nama }}
                                 </option>
                             @endforeach
@@ -44,14 +44,14 @@
 
                     {{-- Asisten --}}
                     <label class="block mb-4">
-                        <span class="text-gray-700">🧍 Asisten</span>
+                        <span class="text-gray-700">🧍 Asisten (Opsional)</span>
                         <select name="asisten" id="asistenSelect"
                             class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="">— Hapus Asisten —</option>
-                            @foreach ($capsters as $capster)
-                                <option value="{{ $capster->inisial }}"
-                                    {{ old('asisten', $customerBook->asisten) == $capster->inisial ? 'selected' : '' }}>
-                                    {{ $capster->inisial }} - {{ $capster->nama }}
+                            <option value="">Pilih Asisten</option>
+                            @foreach ($capsters2 as $capstery)
+                                <option value="{{ $capstery->inisial }}"
+                                    {{ (old('asisten') ?? $customerBook->asisten) == $capstery->inisial ? 'selected' : '' }}>
+                                    {{ $capstery->inisial }} - {{ $capstery->nama }}
                                 </option>
                             @endforeach
                         </select>
@@ -61,41 +61,55 @@
                     </label>
 
                     <script>
-                        document.addEventListener('DOMContentLoaded', function() {
+                        document.addEventListener('DOMContentLoaded', function () {
                             const capSelect = document.getElementById('capSelect');
                             const asistenSelect = document.getElementById('asistenSelect');
 
-                            function syncOptions() {
-                                const selectedCap = capSelect.value;
-                                const selectedAsisten = asistenSelect.value;
+                            function updateDropdownOptions() {
+                                const capVal = capSelect.value;
+                                const asistenVal = asistenSelect.value;
 
-                                Array.from(asistenSelect.options).forEach(option => {
-                                    if (option.value && option.value === selectedCap) {
-                                        option.disabled = true;
-                                        option.hidden = true;
-                                    } else {
-                                        option.disabled = false;
-                                        option.hidden = false;
-                                    }
-                                });
+                                // Aktifkan semua opsi dulu
+                                [...capSelect.options].forEach(o => o.disabled = false);
+                                [...asistenSelect.options].forEach(o => o.disabled = false);
 
-                                Array.from(capSelect.options).forEach(option => {
-                                    if (option.value && option.value === selectedAsisten) {
-                                        option.disabled = true;
-                                        option.hidden = true;
-                                    } else {
-                                        option.disabled = false;
-                                        option.hidden = false;
+                                // Jika cap dipilih, disable itu di asisten
+                                if (capVal) {
+                                    [...asistenSelect.options].forEach(option => {
+                                        if (option.value === capVal && option.value !== '') {
+                                            option.disabled = true;
+                                        }
+                                    });
+                                }
+
+                                // Jika asisten dipilih, disable itu di cap
+                                if (asistenVal) {
+                                    [...capSelect.options].forEach(option => {
+                                        if (option.value === asistenVal && option.value !== '') {
+                                            option.disabled = true;
+                                        }
+                                    });
+                                }
+
+                                // Jika duplikat, kosongkan yang terakhir diubah
+                                if (capVal && capVal === asistenVal) {
+                                    // Kosongkan yang terakhir diubah (jika ada event target)
+                                    if (document.activeElement === capSelect) {
+                                        asistenSelect.value = '';
+                                    } else if (document.activeElement === asistenSelect) {
+                                        capSelect.value = '';
                                     }
-                                });
+                                }
                             }
 
-                            capSelect.addEventListener('change', syncOptions);
-                            asistenSelect.addEventListener('change', syncOptions);
+                            capSelect.addEventListener('change', updateDropdownOptions);
+                            asistenSelect.addEventListener('change', updateDropdownOptions);
 
-                            syncOptions(); // Panggil pertama kali
+                            // Jalankan saat halaman dibuka
+                            updateDropdownOptions();
                         });
                     </script>
+
 
                     {{-- Haircut Type --}}
                     <label class="block">
@@ -234,13 +248,59 @@
                         @enderror
                     </label>
 
-                    @php $isAdmin = auth()->user()->level === 'admin'; @endphp
+                @php $isAdmin = auth()->user()->level === 'admin'; @endphp
 
-                    <button type="submit" id="updateBtn"
-                        data-level="{{ auth()->user()->level }}"
-                        class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                        Update
-                    </button>
+                <button type="button" id="updateBtn"
+                    data-level="{{ auth()->user()->level }}"
+                    class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                    Done
+                </button>
+
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const updateBtn = document.getElementById('updateBtn');
+                        if (!updateBtn) return;
+
+                        updateBtn.addEventListener('click', function (e) {
+                            const level = this.dataset.level;
+                            const form = this.closest('form');
+                            const priceInput = form.querySelector('#price');
+
+                            function stripFormatting() {
+                                if (priceInput) {
+                                    // Hapus semua titik
+                                    priceInput.value = priceInput.value.replace(/\./g, '');
+                                }
+                            }
+
+                            if (level === 'kasir') {
+                                // Kasir: konfirmasi sebelum submit
+                                e.preventDefault();
+                                Swal.fire({
+                                    title: 'Konfirmasi',
+                                    text: 'Anda yakin semua rincian sudah benar? Pastikan semua sudah sesuai dan di-isi dengan benar.',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Ya, lanjutkan',
+                                    cancelButtonText: 'Batal'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        stripFormatting();
+                                        form.submit();
+                                    }
+                                });
+                            } else {
+                                // Admin: langsung submit tanpa konfirmasi
+                                stripFormatting();
+                                form.submit();
+                            }
+                        });
+                    });
+                    </script>
+
                 </form>
             </div>
         </div>
