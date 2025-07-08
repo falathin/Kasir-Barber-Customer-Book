@@ -59,58 +59,7 @@
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </label>
-
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            const capSelect = document.getElementById('capSelect');
-                            const asistenSelect = document.getElementById('asistenSelect');
-
-                            function updateDropdownOptions() {
-                                const capVal = capSelect.value;
-                                const asistenVal = asistenSelect.value;
-
-                                // Aktifkan semua opsi dulu
-                                [...capSelect.options].forEach(o => o.disabled = false);
-                                [...asistenSelect.options].forEach(o => o.disabled = false);
-
-                                // Jika cap dipilih, disable itu di asisten
-                                if (capVal) {
-                                    [...asistenSelect.options].forEach(option => {
-                                        if (option.value === capVal && option.value !== '') {
-                                            option.disabled = true;
-                                        }
-                                    });
-                                }
-
-                                // Jika asisten dipilih, disable itu di cap
-                                if (asistenVal) {
-                                    [...capSelect.options].forEach(option => {
-                                        if (option.value === asistenVal && option.value !== '') {
-                                            option.disabled = true;
-                                        }
-                                    });
-                                }
-
-                                // Jika duplikat, kosongkan yang terakhir diubah
-                                if (capVal && capVal === asistenVal) {
-                                    // Kosongkan yang terakhir diubah (jika ada event target)
-                                    if (document.activeElement === capSelect) {
-                                        asistenSelect.value = '';
-                                    } else if (document.activeElement === asistenSelect) {
-                                        capSelect.value = '';
-                                    }
-                                }
-                            }
-
-                            capSelect.addEventListener('change', updateDropdownOptions);
-                            asistenSelect.addEventListener('change', updateDropdownOptions);
-
-                            // Jalankan saat halaman dibuka
-                            updateDropdownOptions();
-                        });
-                    </script>
-
-
+                    
                     {{-- Haircut Type --}}
                     <label class="block">
                         <span class="text-gray-700">💇‍♀️ Haircut Type</span>

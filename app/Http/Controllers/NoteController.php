@@ -15,20 +15,16 @@ class NoteController extends Controller
         $today = now()->toDateString();
         $user = Auth::user();
 
-        // Ambil semua catatan sesuai role
-        $notes = Note::when($user->level !== 'admin', function ($query) use ($user) {
-            $query->where('kasir_name', $user->name);
-        })
-        ->orderByDesc('created_at')
-        ->get();
+        $notes = Note::when($user->level !== 'admin', fn($q) => $q->where('kasir_name', $user->name))
+            ->orderByDesc('created_at')
+            ->get();
 
-        // Ambil customer hanya sesuai kasir
         $customerBooks = CustomerBook::whereDate('created_time', $today)
             ->when($user->level !== 'admin', fn($q) => $q->where('barber_name', $user->name))
             ->get()
             ->groupBy('barber_name');
 
-        $summary = "Total Customer: " . $customerBooks->flatten()->count();
+        $summary = 'Total Customer: ' . $customerBooks->flatten()->count();
 
         $todayNoteExists = Note::whereDate('created_at', $today)
             ->where('kasir_name', $user->name)
@@ -36,29 +32,37 @@ class NoteController extends Controller
 
         return view('notes.index', compact('notes', 'customerBooks', 'todayNoteExists', 'summary'));
     }
-    
+
     public function store(Request $request)
     {
         $user = Auth::user();
         $today = Carbon::today();
 
-        // Cek apakah kasir sudah membuat catatan hari ini
-        $existingNote = Note::whereDate('created_at', $today)
+        $exists = Note::whereDate('created_at', $today)
             ->where('kasir_name', $user->name)
-            ->first();
+            ->exists();
 
-        if ($existingNote) {
-            return redirect()->route('notes.index')->with('error', 'Catatan hari ini sudah ada.');
+        if ($exists) {
+            return redirect()->route('notes.index')
+                ->with('error', 'Catatan hari ini sudah ada.');
         }
 
-        $request->validate(['note' => 'required|string']);
+        $messages = [
+            'note.required' => 'Catatan tidak boleh kosong.',
+            'note.string'   => 'Format catatan tidak valid.',
+        ];
+
+        $request->validate([
+            'note' => 'required|string',
+        ], $messages);
 
         Note::create([
-            'note' => $request->note,
+            'note'       => $request->note,
             'kasir_name' => $user->name,
         ]);
 
-        return redirect()->route('notes.index')->with('success', 'Catatan berhasil ditambahkan.');
+        return redirect()->route('notes.index')
+            ->with('success', 'Catatan berhasil ditambahkan.');
     }
 
     public function edit(Note $note)
@@ -77,7 +81,7 @@ class NoteController extends Controller
             ->get()
             ->groupBy('barber_name');
 
-        $summary = "Total Customer: " . $customerBooks->flatten()->count();
+        $summary = 'Total Customer: ' . $customerBooks->flatten()->count();
 
         $todayNoteExists = Note::whereDate('created_at', $today)
             ->where('kasir_name', $user->name)
@@ -88,27 +92,34 @@ class NoteController extends Controller
 
     public function update(Request $request, Note $note)
     {
-        $request->validate(['note' => 'required|string']);
-
-        // Optional: hanya pemilik catatan yang bisa update
         if (Auth::user()->name !== $note->kasir_name) {
-            abort(403, 'Unauthorized');
+            abort(403);
         }
+
+        $messages = [
+            'note.required' => 'Catatan tidak boleh kosong.',
+            'note.string'   => 'Format catatan tidak valid.',
+        ];
+
+        $request->validate([
+            'note' => 'required|string',
+        ], $messages);
 
         $note->update($request->only('note'));
 
-        return redirect()->route('notes.index')->with('success', 'Catatan berhasil diupdate.');
+        return redirect()->route('notes.index')
+            ->with('success', 'Catatan berhasil diupdate.');
     }
 
     public function destroy(Note $note)
     {
-        // Optional: hanya pemilik catatan yang bisa hapus
         if (Auth::user()->name !== $note->kasir_name) {
-            abort(403, 'Unauthorized');
+            abort(403);
         }
 
         $note->delete();
 
-        return redirect()->route('notes.index')->with('success', 'Catatan berhasil dihapus.');
+        return redirect()->route('notes.index')
+            ->with('success', 'Catatan berhasil dihapus.');
     }
 }

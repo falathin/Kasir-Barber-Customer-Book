@@ -108,7 +108,7 @@
                         @endphp
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-2">
-                                {{ $totalToday - ($books->currentPage() - 1) * $books->perPage() - $loop->index }}
+                                {{ ($books->total() - (($books->currentPage() - 1) * $books->perPage())) - $loop->index }}
                             </td>
                             <td class="px-4 py-2">{{ $book->customer ?? '-' }}</td>
                             <td class="px-4 py-2">{{ $book->cap ?? '-' }}</td>

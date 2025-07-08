@@ -11,10 +11,9 @@ use Illuminate\Support\Facades\Validator;
 
 class CustomerBookController extends Controller
 {
-
     public function index(Request $request)
     {
-        $showAll = $request->input('show') === 'all'; // tambahkan ini
+        $showAll = $request->input('show') === 'all';
         $today = Carbon::today();
 
         $search = $request->input('search');
@@ -25,7 +24,7 @@ class CustomerBookController extends Controller
         $user = auth()->user();
 
         $query = CustomerBook::query()
-            ->when(!$showAll, fn($q) => $q->whereDate('created_at', $today)) // filter hari ini kalau show != all
+            ->when(!$showAll, fn($q) => $q->whereDate('created_at', $today))
             ->when($search, fn($q) => $q->where(function ($q2) use ($search) {
                 $q2->where('customer', 'like', "%{$search}%")
                     ->orWhere('haircut_type', 'like', "%{$search}%")
@@ -36,20 +35,20 @@ class CustomerBookController extends Controller
             ->when($status, function ($q) use ($status) {
                 if ($status === 'done') {
                     $q->whereNotNull('price')
-                    ->whereNotNull('colouring_other')
-                    ->whereNotNull('qr');
+                      ->whereNotNull('colouring_other')
+                      ->whereNotNull('qr');
                 } elseif ($status === 'proses') {
                     $q->whereNotNull('cap')
-                    ->whereNotNull('customer')
-                    ->whereNotNull('barber_name')   
-                    ->whereNull('colouring_other')
-                    ->whereNull('qr');
+                      ->whereNotNull('customer')
+                      ->whereNotNull('barber_name')
+                      ->whereNull('colouring_other')
+                      ->whereNull('qr');
                 } elseif ($status === 'antre') {
                     $q->whereNull('cap')
-                    ->whereNotNull('customer')
-                    ->whereNotNull('barber_name')
-                    ->whereNotNull('antrian')
-                    ->whereNotNull('haircut_type');
+                      ->whereNotNull('customer')
+                      ->whereNotNull('barber_name')
+                      ->whereNotNull('antrian')
+                      ->whereNotNull('haircut_type');
                 }
             });
 
@@ -73,11 +72,8 @@ class CustomerBookController extends Controller
         $capsters = Capster::all();
         $filtering = User::where('level', 'kasir')->get();
 
-        // Ambil user login saat ini
         $user = auth()->user();
-
-        // Hitung antrian berdasarkan barber_name dan hari ini
-        $today = now()->toDateString(); // tanggal saja
+        $today = now()->toDateString();
         $nextAntrian = CustomerBook::whereDate('created_at', $today)
             ->where('barber_name', $user->name)
             ->max('antrian') + 1;
@@ -85,15 +81,12 @@ class CustomerBookController extends Controller
         return view('customer_books.create', compact('capsters', 'filtering', 'nextAntrian'));
     }
 
-
     public function createWithCapster(CustomerBook $book)
     {
         $capsters = Capster::all();
         $today = now()->startOfDay();
 
-        // Hitung antrian per barber
         $barberName = $book->barber_name;
-
         $nextAntrian = CustomerBook::whereDate('created_at', $today)
             ->where('barber_name', $barberName)
             ->max('antrian') + 1;
@@ -105,50 +98,49 @@ class CustomerBookController extends Controller
         ]);
     }
 
-    /**
-     * Proses update cap & antrian (mirip update())
-     */
     public function storeWithCapster(Request $request, CustomerBook $book)
     {
         $data = $request->validate([
             'cap' => 'required|string',
-            // 'antrian' => 'required|integer|min:1',
+        ], [
+            'cap.required' => 'Capster wajib dipilih.',
+            'cap.string' => 'Format capster tidak valid.',
         ]);
 
-        $book->update([
-            'cap' => $data['cap'],
-            // 'antrian' => $data['antrian'],
-        ]);
+        $book->update(['cap' => $data['cap']]);
 
         return redirect()
             ->route('customer-books.show', $book->id)
             ->with('success', 'Proses capster berhasil disimpan.');
     }
 
-    
     public function store(Request $request)
     {
+        $messages = [
+            'customer.required'    => 'Nama pelanggan wajib diisi.',
+            'customer.string'      => 'Nama pelanggan harus berupa teks.',
+            'haircut_type.required'=> 'Jenis potongan rambut wajib diisi.',
+            'haircut_type.string'  => 'Jenis potongan rambut harus berupa teks.',
+            'barber_name.required' => 'Nama barber wajib diisi.',
+            'barber_name.string'   => 'Nama barber harus berupa teks.',
+            'created_time.date'    => 'Format waktu pembuatan tidak valid.',
+            'antrian.integer'      => 'Nomor antrian harus berupa angka.',
+            'antrian.min'          => 'Nomor antrian minimal :min.',
+        ];
+
         $data = $request->validate([
-            'customer'        => 'required|string',
-            // 'cap'           => 'nullable|string',
-            // 'asisten'       => 'nullable|string',
-            'haircut_type'    => 'required|string',
-            'barber_name'     => 'required|string',
-            // 'colouring_other'=> 'nullable|string',
-            // 'sell_use_product'=>'nullable|string',
-            // 'price'         => 'nullable|string',
-            // 'qr'            => 'nullable|string',
-            // 'rincian'       => 'nullable|string',
-            'created_time'    => 'nullable|date',
-            'antrian'         => 'nullable|integer|min:1',
-        ]);
+            'customer'     => 'required|string',
+            'haircut_type' => 'required|string',
+            'barber_name'  => 'required|string',
+            'created_time' => 'nullable|date',
+            'antrian'      => 'nullable|integer|min:1',
+        ], $messages);
 
-        $customerBook = CustomerBook::create($data);
+        CustomerBook::create($data);
 
-        // Redirect ke halaman index, bukan show
         return redirect()
             ->route('customer-books.index')
-            ->with('success', 'Customer book created successfully.');
+            ->with('success', 'Customer book berhasil dibuat.');
     }
 
     public function show(CustomerBook $customerBook)
@@ -156,17 +148,18 @@ class CustomerBookController extends Controller
         $customerBook->load('capster');
         return view('customer_books.show', compact('customerBook'));
     }
+
     public function edit(CustomerBook $customerBook)
     {
-        $capsters = Capster::all();
-        $capsters2 = Capster::all();
+        $capsters  = Capster::all();
         $filtering = User::where('level', 'kasir')->get();
-        return view('customer_books.edit', compact('customerBook', 'capsters', 'filtering','capsters2'));
+
+        return view('customer_books.edit', compact('customerBook', 'capsters', 'filtering'));
     }
 
     public function update(Request $request, CustomerBook $customerBook)
     {
-        $validator = Validator::make($request->all(), [
+        $rules = [
             'customer'         => 'required|string',
             'cap'              => 'required|string',
             'asisten'          => 'nullable|string',
@@ -178,9 +171,20 @@ class CustomerBookController extends Controller
             'qr'               => 'nullable|string',
             'rincian'          => 'nullable|string',
             'created_time'     => 'nullable|date',
-        ]);
+        ];
 
-        // Validasi tambahan: cap dan asisten tidak boleh sama
+        $messages = [
+            'customer.required'   => 'Nama pelanggan wajib diisi.',
+            'cap.required'        => 'Capster wajib dipilih.',
+            'haircut_type.required'=> 'Jenis potongan rambut wajib diisi.',
+            'barber_name.required'=> 'Nama barber wajib diisi.',
+            'price.required'      => 'Harga wajib diisi.',
+            'price.numeric'       => 'Harga harus berupa angka.',
+            'price.gt'            => 'Harga harus lebih besar dari nol.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
         $validator->after(function ($validator) use ($request) {
             if (
                 $request->filled('cap') &&
@@ -191,7 +195,6 @@ class CustomerBookController extends Controller
             }
         });
 
-        // Jika gagal validasi
         if ($validator->fails()) {
             return redirect()
                 ->back()
@@ -199,17 +202,17 @@ class CustomerBookController extends Controller
                 ->withInput();
         }
 
-        // Validasi sukses, update data
         $customerBook->update($validator->validated());
 
         return redirect()
             ->route('customer-books.show', $customerBook->id)
-            ->with('success', 'Customer book updated successfully.');
+            ->with('success', 'Customer book berhasil diperbarui.');
     }
 
     public function destroy(CustomerBook $customerBook)
     {
         $customerBook->delete();
-        return redirect()->route('customer-books.index')->with('success', 'Customer book deleted.');
+        return redirect()->route('customer-books.index')
+                         ->with('success', 'Customer book berhasil dihapus.');
     }
 }
