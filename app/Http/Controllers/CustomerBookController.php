@@ -66,7 +66,6 @@ class CustomerBookController extends Controller
             'books', 'barbers', 'search', 'barber', 'status', 'totalToday', 'showAll'
         ));
     }
-
     public function create()
     {
         $capsters = Capster::all();

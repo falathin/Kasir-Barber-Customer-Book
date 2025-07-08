@@ -24,9 +24,22 @@
                     {{-- Antrian --}}
                     <label class="block">
                         <span class="text-gray-700">🪑 Nomor Antrian</span>
-                        <input type="text" id="antrian_display" value="{{ $nextAntrian }}" disabled
-                            class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
-                        <input type="hidden" name="antrian" id="antrian_input" value="{{ $nextAntrian }}">
+
+                        @if (auth()->user()->level === 'admin')
+                            {{-- Input manual jika admin --}}
+                            <input type="text" name="antrian" id="antrian_input"
+                                value="{{ old('antrian', $customerBook->antrian ?? $nextAntrian) }}"
+                                class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                        @else
+                            {{-- Tampilkan sebagai disabled dan kirim lewat hidden jika bukan admin --}}
+                            <input type="text" id="antrian_display" value="{{ $nextAntrian }}" disabled
+                                class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" />
+                            <input type="hidden" name="antrian" id="antrian_input" value="{{ $nextAntrian }}">
+                        @endif
+
+                        @error('antrian')
+                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                        @enderror
                     </label>
 
                     {{-- Asisten --}}

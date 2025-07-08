@@ -35,12 +35,16 @@
         [
             'label' => 'Dashboard',
             'route' => 'dashboard',
-            'icon'  => <<<'SVG'
-<path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0
-002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm8-8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0
-002-2V5a2 2 0 00-2-2h-2zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0
-00-2-2h-2z"/>
+'icon' => <<<'SVG'
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M3 3h8v8H3V3z
+           M13 3h8v8h-8V3z
+           M3 13h8v8H3v-8z
+           M13 13h8v8h-8v-8z" />
+</svg>
 SVG,
+
         ],
         [
             'label' => 'Customer Books',
@@ -65,11 +69,11 @@ SVG,
         [
             'label' => 'Notes',
             'route' => 'notes.index',
-            'icon'  => <<<'SVG'
+'icon' => <<<'SVG'
 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-      d="M4 5a2 2 0 012-2h8.586a2 2 0 011.414.586l2.414 2.414A2 2 0 0119 7.414V19a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" />
+      d="M6 3h12a1 1 0 011 1v16l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5V4a1 1 0 011-1z" />
 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-      d="M8 8h8M8 11h8M8 14h6M8 17h4" />
+      d="M9 7h6M9 10h6M9 13h4" />
 SVG,
         ],
     ];

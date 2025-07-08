@@ -48,7 +48,7 @@
                         <select name="asisten" id="asistenSelect"
                             class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <option value="">Pilih Asisten</option>
-                            @foreach ($capsters2 as $capstery)
+                            @foreach ($capsters as $capstery)
                                 <option value="{{ $capstery->inisial }}"
                                     {{ (old('asisten') ?? $customerBook->asisten) == $capstery->inisial ? 'selected' : '' }}>
                                     {{ $capstery->inisial }} - {{ $capstery->nama }}
@@ -60,6 +60,45 @@
                         @enderror
                     </label>
                     
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const capSelect = document.getElementById('capSelect');
+                            const asistenSelect = document.getElementById('asistenSelect');
+
+                            function disableSameOption() {
+                                const selectedCap = capSelect.value;
+                                const selectedAsisten = asistenSelect.value;
+
+                                // Reset semua opsi asisten agar aktif dulu
+                                Array.from(asistenSelect.options).forEach(option => {
+                                    option.disabled = false;
+                                });
+
+                                // Reset semua opsi capster juga
+                                Array.from(capSelect.options).forEach(option => {
+                                    option.disabled = false;
+                                });
+
+                                // Disable opsi yang sama di masing-masing select
+                                if (selectedCap) {
+                                    const sameAsistenOption = asistenSelect.querySelector(`option[value="${selectedCap}"]`);
+                                    if (sameAsistenOption) sameAsistenOption.disabled = true;
+                                }
+
+                                if (selectedAsisten) {
+                                    const sameCapOption = capSelect.querySelector(`option[value="${selectedAsisten}"]`);
+                                    if (sameCapOption) sameCapOption.disabled = true;
+                                }
+                            }
+
+                            capSelect.addEventListener('change', disableSameOption);
+                            asistenSelect.addEventListener('change', disableSameOption);
+
+                            // Jalankan saat awal jika data lama terisi
+                            disableSameOption();
+                        });
+                    </script>
+
                     {{-- Haircut Type --}}
                     <label class="block">
                         <span class="text-gray-700">💇‍♀️ Haircut Type</span>
