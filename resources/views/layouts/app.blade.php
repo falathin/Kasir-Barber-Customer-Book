@@ -35,50 +35,50 @@
         [
             'label' => 'Dashboard',
             'route' => 'dashboard',
-'icon' => <<<'SVG'
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M3 3h8v8H3V3z
-           M13 3h8v8h-8V3z
-           M3 13h8v8H3v-8z
-           M13 13h8v8h-8v-8z" />
+            'icon' => <<<'SVG'
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+  <rect x="3" y="3" width="8" height="8" />
+  <rect x="13" y="3" width="8" height="8" />
+  <rect x="3" y="13" width="8" height="8" />
+  <rect x="13" y="13" width="8" height="8" />
 </svg>
 SVG,
-
         ],
         [
             'label' => 'Customer Books',
             'route' => 'customer-books.index',
-            'icon'  => <<<'SVG'
-<path fill-rule="evenodd"
-    d="M10 2a4 4 0 100 8 4 4 0 000-8zM2 16a8 8 0 1116 0H2z"
-    clip-rule="evenodd"/>
+            'icon' => <<<'SVG'
+<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" class="w-5 h-5">
+  <path fill-rule="evenodd" d="M10 2a4 4 0 100 8 4 4 0 000-8zM2 16a8 8 0 1116 0H2z" clip-rule="evenodd"/>
+</svg>
 SVG,
         ],
         [
             'label' => 'Capsters',
             'route' => 'capsters.index',
-            'icon'  => <<<'SVG'
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
-    d="M12 2v2M12 20v2M15 4H9a1 1 0 00-1 1v14a1 1 0 001 1h6a1 1 0 001-1V5a1 1 0 00-1-1z" />
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-    d="M9 6l6 3-6 3 6 3-6 3" />
+            'icon' => <<<'SVG'
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+  <path d="M12 2v2M12 20v2M15 4H9a1 1 0 00-1 1v14a1 1 0 001 1h6a1 1 0 001-1V5a1 1 0 00-1-1z"/>
+  <path d="M9 6l6 3-6 3 6 3-6 3"/>
+</svg>
 SVG,
-            'stroke'=> true,
+            'stroke' => true,
         ],
         [
             'label' => 'Notes',
             'route' => 'notes.index',
-'icon' => <<<'SVG'
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-      d="M6 3h12a1 1 0 011 1v16l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5V4a1 1 0 011-1z" />
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-      d="M9 7h6M9 10h6M9 13h4" />
+            'icon' => <<<'SVG'
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+     stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+  <path d="M6 3h12a1 1 0 011 1v16l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5V4a1 1 0 011-1z"/>
+  <path d="M9 7h6M9 10h6M9 13h4"/>
+</svg>
 SVG,
         ],
     ];
 @endphp
-
         @foreach ($menus as $menu)
             @php
                 $isCapster = $menu['label'] === 'Capsters';
