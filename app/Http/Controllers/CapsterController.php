@@ -18,13 +18,14 @@ class CapsterController extends Controller
                 $q->where('nama', 'like', "%{$search}%")
                   ->orWhere('inisial', 'like', "%{$search}%")
                   ->orWhere('no_hp', 'like', "%{$search}%")
+                  ->orWhere('no_hp_keluarga', 'like', "%{$search}%")  // ← include keluarga
                   ->orWhere('asal', 'like', "%{$search}%")
                   ->orWhere('status', $search);
             });
         }
 
         $capsters = $query->paginate(10);
-        return view('capsters.index', compact('capsters'));
+        return view('capsters.index', compact('capsters', 'search'));
     }
 
     public function create()
@@ -51,6 +52,9 @@ class CapsterController extends Controller
             'no_hp.string'             => 'Nomor handphone harus berupa teks.',
             'no_hp.max'                => 'Nomor handphone maksimal :max karakter.',
 
+            'no_hp_keluarga.string'    => 'Nomor HP keluarga harus berupa teks.',
+            'no_hp_keluarga.max'       => 'Nomor HP keluarga maksimal :max karakter.',
+
             'tgl_lahir.required'       => 'Tanggal lahir wajib diisi.',
             'tgl_lahir.date'           => 'Tanggal lahir tidak valid.',
 
@@ -66,14 +70,15 @@ class CapsterController extends Controller
         ];
 
         $data = $request->validate([
-            'nama'           => 'required|string|max:255',
-            'inisial'        => 'required|string|max:10|unique:capsters,inisial',
-            'jenis_kelamin'  => 'required|in:L,P',
-            'no_hp'          => 'required|string|max:20',
-            'tgl_lahir'      => 'required|date',
-            'asal'           => 'required|string|max:255',
-            'foto'           => 'nullable|image|max:2048',
-            'status'         => 'required|in:Aktif,sudah keluar',
+            'nama'               => 'required|string|max:255',
+            'inisial'            => 'required|string|max:10|unique:capsters,inisial',
+            'jenis_kelamin'      => 'required|in:L,P',
+            'no_hp'              => 'required|string|max:20',
+            'no_hp_keluarga'     => 'nullable|string|max:20',   // ← validasi keluarga
+            'tgl_lahir'          => 'required|date',
+            'asal'               => 'required|string|max:255',
+            'foto'               => 'nullable|image|max:2048',
+            'status'             => 'required|in:Aktif,sudah keluar',
         ], $messages);
 
         if ($request->hasFile('foto')) {
@@ -116,6 +121,9 @@ class CapsterController extends Controller
             'no_hp.string'             => 'Nomor handphone harus berupa teks.',
             'no_hp.max'                => 'Nomor handphone maksimal :max karakter.',
 
+            'no_hp_keluarga.string'    => 'Nomor HP keluarga harus berupa teks.',
+            'no_hp_keluarga.max'       => 'Nomor HP keluarga maksimal :max karakter.',
+
             'tgl_lahir.required'       => 'Tanggal lahir wajib diisi.',
             'tgl_lahir.date'           => 'Tanggal lahir tidak valid.',
 
@@ -131,14 +139,15 @@ class CapsterController extends Controller
         ];
 
         $data = $request->validate([
-            'nama'           => 'required|string|max:255',
-            'inisial'        => 'required|string|max:10|unique:capsters,inisial,' . $capster->id,
-            'jenis_kelamin'  => 'required|in:L,P',
-            'no_hp'          => 'required|string|max:20',
-            'tgl_lahir'      => 'required|date',
-            'asal'           => 'required|string|max:255',
-            'foto'           => 'nullable|image|max:2048',
-            'status'         => 'required|in:Aktif,sudah keluar',
+            'nama'               => 'required|string|max:255',
+            'inisial'            => 'required|string|max:10|unique:capsters,inisial,' . $capster->id,
+            'jenis_kelamin'      => 'required|in:L,P',
+            'no_hp'              => 'required|string|max:20',
+            'no_hp_keluarga'     => 'nullable|string|max:20',
+            'tgl_lahir'          => 'required|date',
+            'asal'               => 'required|string|max:255',
+            'foto'               => 'nullable|image|max:2048',
+            'status'             => 'required|in:Aktif,sudah keluar',
         ], $messages);
 
         if ($request->hasFile('foto')) {

@@ -14,6 +14,7 @@ class Capster extends Model
         'inisial',
         'jenis_kelamin',
         'no_hp',
+        'no_hp_keluarga',
         'tgl_lahir',
         'asal',
         'foto',

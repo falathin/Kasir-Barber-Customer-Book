@@ -200,10 +200,9 @@
                         <span class="text-gray-700">💳 Payment Method</span>
                         <select name="qr"
                             class="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="cash" {{ old('qr', $customerBook->qr) == 'cash' ? 'selected' : '' }}>Cash
-                            </option>
-                            <option value="qr_transfer"
-                                {{ old('qr', $customerBook->qr) == 'qr_transfer' ? 'selected' : '' }}>QR Transfer</option>
+                            <option value="cash" {{ old('qr', $customerBook->qr) == 'cash' ? 'selected' : '' }}>Cash</option>
+                            <option value="qr_transfer" {{ old('qr', $customerBook->qr) == 'qr_transfer' ? 'selected' : '' }}>QR Transfer</option>
+                            <option value="no revenue" {{ old('qr', $customerBook->qr) == 'no revenue' ? 'selected' : '' }}>No Revenue</option>
                         </select>
                     </label>
 

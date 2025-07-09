@@ -13,15 +13,14 @@ class CustomerBookController extends Controller
 {
     public function index(Request $request)
     {
-        $showAll = $request->input('show') === 'all';
-        $today = Carbon::today();
-
         $search = $request->input('search');
         $barber = $request->input('barber');
-        $status = in_array($request->input('status'), ['antre', 'proses', 'done'])
-            ? $request->input('status')
-            : null;
+        $status = in_array($request->input('status'), ['antre', 'proses', 'done']) ? $request->input('status') : null;
         $user = auth()->user();
+
+        // Ubah logika showAll agar search juga menampilkan semua data
+        $showAll = $request->input('show') === 'all' || $search;
+        $today = Carbon::today();
 
         $query = CustomerBook::query()
             ->when(!$showAll, fn($q) => $q->whereDate('created_at', $today))
@@ -35,20 +34,20 @@ class CustomerBookController extends Controller
             ->when($status, function ($q) use ($status) {
                 if ($status === 'done') {
                     $q->whereNotNull('price')
-                      ->whereNotNull('colouring_other')
-                      ->whereNotNull('qr');
+                    ->whereNotNull('colouring_other')
+                    ->whereNotNull('qr');
                 } elseif ($status === 'proses') {
                     $q->whereNotNull('cap')
-                      ->whereNotNull('customer')
-                      ->whereNotNull('barber_name')
-                      ->whereNull('colouring_other')
-                      ->whereNull('qr');
+                    ->whereNotNull('customer')
+                    ->whereNotNull('barber_name')
+                    ->whereNull('colouring_other')
+                    ->whereNull('qr');
                 } elseif ($status === 'antre') {
                     $q->whereNull('cap')
-                      ->whereNotNull('customer')
-                      ->whereNotNull('barber_name')
-                      ->whereNotNull('antrian')
-                      ->whereNotNull('haircut_type');
+                    ->whereNotNull('customer')
+                    ->whereNotNull('barber_name')
+                    ->whereNotNull('antrian')
+                    ->whereNotNull('haircut_type');
                 }
             });
 
@@ -66,6 +65,7 @@ class CustomerBookController extends Controller
             'books', 'barbers', 'search', 'barber', 'status', 'totalToday', 'showAll'
         ));
     }
+
     public function create()
     {
         // Ambil hanya capster yang masih aktif
