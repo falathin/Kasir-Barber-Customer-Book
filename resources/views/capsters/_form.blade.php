@@ -1,88 +1,225 @@
 @csrf
 
-<div class="space-y-6 p-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-            <label for="nama" class="block text-sm font-medium text-gray-700">Nama</label>
-            <input type="text" name="nama" id="nama"
-                   value="{{ old('nama', $capster->nama ?? '') }}"
-                   class="mt-1 block w-full border border-gray-300 rounded-lg form-input focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                   placeholder="Masukkan nama capster" required>
-            @error('nama')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-        </div>
+<div class="application-form">
+  <h2 class="form-title">Formulir Pendaftaran Capster</h2>
+  <p class="form-subtitle">Silakan isi data berikut dengan lengkap</p>
 
-        <div>
-            <label for="inisial" class="block text-sm font-medium text-gray-700">Inisial</label>
-            <input type="text" name="inisial" id="inisial"
-                   value="{{ old('inisial', $capster->inisial ?? '') }}"
-                   class="mt-1 block w-full border border-gray-300 rounded-lg form-input focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                   placeholder="Contoh: AB" required>
-            @error('inisial')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-        </div>
+  <div class="form-card">
+    <div class="form-grid">
 
-        <div class="col-span-full">
-            <span class="block text-sm font-medium text-gray-700">Jenis Kelamin</span>
-            <div class="mt-2 flex items-center space-x-6">
-                <label class="inline-flex items-center">
-                    <input type="radio" name="jenis_kelamin" value="L"
-                           class="form-radio h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                        {{ old('jenis_kelamin', $capster->jenis_kelamin ?? '') == 'L' ? 'checked' : '' }}>
-                    <span class="ml-2 text-gray-700">Laki‑laki</span>
-                </label>
-                <label class="inline-flex items-center">
-                    <input type="radio" name="jenis_kelamin" value="P"
-                           class="form-radio h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300"
-                        {{ old('jenis_kelamin', $capster->jenis_kelamin ?? '') == 'P' ? 'checked' : '' }}>
-                    <span class="ml-2 text-gray-700">Perempuan</span>
-                </label>
-            </div>
-            @error('jenis_kelamin')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-        </div>
+      {{-- Nama --}}
+      <div class="form-group">
+        <label for="nama">Nama Lengkap</label>
+        <input type="text" name="nama" id="nama"
+               value="{{ old('nama', $capster->nama ?? '') }}"
+               placeholder="Contoh: Budi Santoso" required>
+        @error('nama')<div class="error">{{ $message }}</div>@enderror
+      </div>
 
-        <div>
-            <label for="no_hp" class="block text-sm font-medium text-gray-700">No. HP</label>
-            <input type="text" name="no_hp" id="no_hp"
-                   value="{{ old('no_hp', $capster->no_hp ?? '') }}"
-                   class="mt-1 block w-full border border-gray-300 rounded-lg form-input focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                   placeholder="08xxxxxxxxxx" required>
-            @error('no_hp')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-        </div>
+      {{-- Inisial --}}
+      <div class="form-group">
+        <label for="inisial">Inisial</label>
+        <input type="text" name="inisial" id="inisial"
+               value="{{ old('inisial', $capster->inisial ?? '') }}"
+               placeholder="Contoh: BS" required>
+        @error('inisial')<div class="error">{{ $message }}</div>@enderror
+      </div>
 
-        <div>
-            <label for="tgl_lahir" class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
-            <input type="date" name="tgl_lahir" id="tgl_lahir"
-                   value="{{ old('tgl_lahir', isset($capster) ? $capster->tgl_lahir->toDateString() : '') }}"
-                   class="mt-1 block w-full border border-gray-300 rounded-lg form-input focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                   required>
-            @error('tgl_lahir')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-        </div>
+      {{-- Jenis Kelamin --}}
+      <fieldset class="form-group full-width">
+        <legend>Jenis Kelamin</legend>
+        <label class="radio-label"><input type="radio" name="jenis_kelamin" value="L"
+          {{ old('jenis_kelamin', $capster->jenis_kelamin ?? '')=='L'?'checked':'' }}> Laki-laki</label>
+        <label class="radio-label"><input type="radio" name="jenis_kelamin" value="P"
+          {{ old('jenis_kelamin', $capster->jenis_kelamin ?? '')=='P'?'checked':'' }}> Perempuan</label>
+        @error('jenis_kelamin')<div class="error">{{ $message }}</div>@enderror
+      </fieldset>
 
-        <div>
-            <label for="asal" class="block text-sm font-medium text-gray-700">Asal</label>
-            <input type="text" name="asal" id="asal"
-                   value="{{ old('asal', $capster->asal ?? '') }}"
-                   class="mt-1 block w-full border border-gray-300 rounded-lg form-input focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                   placeholder="Kota asal" required>
-            @error('asal')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
-        </div>
+      {{-- No. HP --}}
+      <div class="form-group">
+        <label for="no_hp">No. HP</label>
+        <input type="text" name="no_hp" id="no_hp"
+               value="{{ old('no_hp', $capster->no_hp ?? '') }}"
+               placeholder="08xxxxxxxxxx" required>
+        @error('no_hp')<div class="error">{{ $message }}</div>@enderror
+      </div>
 
-        <div class="col-span-full">
-            <label for="foto" class="block text-sm font-medium text-gray-700">Foto</label>
-<input
-    type="file"
-    name="foto"
-    id="foto"
-    class="mt-1 block w-full border border-gray-300 rounded-lg form-input focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-    accept="image/*"
->
-@error('foto')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror  
-            {{-- Preview jika edit --}}
-            @isset($capster)
-                <div class="mt-4">
-                    <span class="text-sm text-gray-600">Preview saat ini:</span>
-                    <img src="{{ $capster->foto_url }}" alt="Avatar" class="mt-2 h-24 w-24 object-cover rounded-full border">
-                </div>
-            @endisset
-        </div>
+      {{-- Tanggal Lahir --}}
+      <div class="form-group">
+        <label for="tgl_lahir">Tanggal Lahir</label>
+        <input type="date" name="tgl_lahir" id="tgl_lahir"
+               value="{{ old('tgl_lahir', isset($capster)?$capster->tgl_lahir->toDateString():'') }}"
+               required>
+        @error('tgl_lahir')<div class="error">{{ $message }}</div>@enderror
+      </div>
+
+      {{-- Asal --}}
+      <div class="form-group">
+        <label for="asal">Asal</label>
+        <input type="text" name="asal" id="asal"
+               value="{{ old('asal', $capster->asal ?? '') }}"
+               placeholder="Kota asal" required>
+        @error('asal')<div class="error">{{ $message }}</div>@enderror
+      </div>
+
+      {{-- Foto --}}
+      <div class="form-group full-width">
+        <label for="foto">Foto (opsional)</label>
+        <input type="file" name="foto" id="foto" accept="image/*">
+        @error('foto')<div class="error">{{ $message }}</div>@enderror
+
+        @isset($capster)
+          <div class="photo-preview">
+            <span>Preview saat ini:</span>
+            <img src="{{ $capster->foto_url }}" alt="Avatar">
+          </div>
+        @endisset
+      </div>
+
+      {{-- Status --}}
+      <div class="form-group full-width">
+        <label for="status">Status</label>
+        <select name="status" id="status" required>
+          <option value="Aktif" {{ old('status',$capster->status??'')=='Aktif'?'selected':'' }}>Aktif</option>
+          <option value="sudah keluar" {{ old('status',$capster->status??'')=='sudah keluar'?'selected':'' }}>Sudah Keluar</option>
+        </select>
+        @error('status')<div class="error">{{ $message }}</div>@enderror
+      </div>
+
     </div>
+  </div>
 </div>
+
+<style>
+/* Background like letterhead */
+.application-form {
+  background: #faf8f4 url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="50" height="50"%3E%3Ctext x="0" y="40" font-family="serif" font-size="40" fill="%23eee" opacity="0.1"%3E✒️%3C/text%3E%3C/svg%3E') repeat;
+  padding: 40px;
+  max-width: 900px;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: 'Times New Roman', serif;
+}
+
+/* Form title */
+.form-title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 0.2rem;
+  color: #333;
+  font-weight: bold;
+}
+/* Subtitle */
+.form-subtitle {
+  text-align: center;
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+/* Individual card */
+.form-card {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* Two-column grid */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 768px) {
+  .form-grid { grid-template-columns: repeat(2,1fr); }
+  .full-width { grid-column: span 2; }
+}
+
+/* Field styling */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+.form-group label {
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  color: #444;
+}
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group select,
+.form-group input[type="file"] {
+  padding: 8px 10px;
+  font-size: 1rem;
+  border: 1px solid #999;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color .2s;
+}
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #555;
+}
+
+/* Fieldset */
+fieldset.form-group {
+  border: 1px solid #999;
+  padding: 12px;
+  border-radius: 4px;
+}
+fieldset.form-group legend {
+  padding: 0 6px;
+  font-weight: bold;
+  color: #444;
+}
+
+/* Radios */
+.radio-label {
+  margin-right: 16px;
+  font-size: 1rem;
+  color: #333;
+}
+.radio-label input {
+  margin-right: 4px;
+}
+
+/* Photo preview */
+.photo-preview {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+}
+.photo-preview span {
+  margin-right: 10px;
+  font-size: 0.9rem;
+  color: #555;
+}
+.photo-preview img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Error messages */
+.error {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #b00;
+}
+
+/* Scrollbar style for long forms */
+.application-form::-webkit-scrollbar {
+  width: 8px;
+}
+.application-form::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+.application-form::-webkit-scrollbar-track {
+  background: transparent;
+}
+</style>

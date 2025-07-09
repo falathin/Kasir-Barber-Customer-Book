@@ -68,9 +68,10 @@ class CustomerBookController extends Controller
     }
     public function create()
     {
-        $capsters = Capster::all();
-        $filtering = User::where('level', 'kasir')->get();
+        // Ambil hanya capster yang masih aktif
+        $capsters = Capster::where('status', 'Aktif')->get();
 
+        $filtering = User::where('level', 'kasir')->get();
         $user = auth()->user();
         $today = now()->toDateString();
         $nextAntrian = CustomerBook::whereDate('created_at', $today)
@@ -82,10 +83,14 @@ class CustomerBookController extends Controller
 
     public function createWithCapster(CustomerBook $book)
     {
-        $capsters = Capster::all();
         $today = now()->startOfDay();
-
         $barberName = $book->barber_name;
+
+        // Ambil semua capster yang aktif, atau capster yang sedang digunakan oleh `$book`
+        $capsters = Capster::where('status', 'Aktif')
+            ->orWhere('id', $book->capster_id)
+            ->get();
+
         $nextAntrian = CustomerBook::whereDate('created_at', $today)
             ->where('barber_name', $barberName)
             ->max('antrian') + 1;
@@ -96,6 +101,7 @@ class CustomerBookController extends Controller
             'nextAntrian' => $nextAntrian,
         ]);
     }
+
 
     public function storeWithCapster(Request $request, CustomerBook $book)
     {
@@ -150,7 +156,11 @@ class CustomerBookController extends Controller
 
     public function edit(CustomerBook $customerBook)
     {
-        $capsters  = Capster::all();
+        // Ambil semua capster yang aktif
+        $capsters = Capster::where('status', 'Aktif')
+            ->orWhere('id', $customerBook->capster_id) // Tambahkan capster yang sedang digunakan
+            ->get();
+
         $filtering = User::where('level', 'kasir')->get();
 
         return view('customer_books.edit', compact('customerBook', 'capsters', 'filtering'));

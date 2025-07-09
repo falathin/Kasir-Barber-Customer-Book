@@ -99,7 +99,6 @@
                     }
                 @endphp
 
-
                 <div class="flex justify-between text-xs font-bold {{ $statusColor }} rounded-md px-3 py-1">
                     <span>Status</span>
                     <span>{{ $status }}</span>
