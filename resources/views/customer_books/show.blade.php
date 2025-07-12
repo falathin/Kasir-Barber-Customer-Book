@@ -22,7 +22,6 @@
                 @endif
             </div>
 
-
             {{-- Detail Items --}}
             <div class="text-xs text-gray-700 space-y-3 print:text-black">
                 @php
@@ -34,11 +33,11 @@
 
                     $items = [
                         'Booking ID' => $customerBook->id,
-                        'Customer' => $customerBook->customer,
-                        'Capster' => $customerBook->capster?->nama ?? $customerBook->cap,
-                        'Asisten' => $asistenNama ?? '-',
-                        'Style' => $customerBook->haircut_type,
-                        'Shop' => $customerBook->barber_name,
+                        'Customer'   => $customerBook->customer,
+                        'Capster'    => $customerBook->capster?->nama ?? $customerBook->cap,
+                        'Asisten'    => $asistenNama ?? '-',
+                        'Style'      => $customerBook->haircut_type,
+                        'Shop'       => $customerBook->barber_name,
                     ];
                 @endphp
                 @foreach ($items as $k => $v)
@@ -76,17 +75,16 @@
                     </ul>
                 </div>
 
-                {{-- Rincian --}}
-                <div class="border-b border-dashed pb-1 print:border-b print:border-black">
+                {{-- Rincian (hidden on print) --}}
+                <div class="border-b border-dashed pb-1 print:hidden">
                     <span class="uppercase">Rincian</span>
-                    <p class="mt-1 break-words whitespace-pre-line print:mt-0">
+                    <p class="mt-1 break-words whitespace-pre-line">
                         {{ $customerBook->rincian ?? '-' }}
                     </p>
                 </div>
 
                 @php
                     $isPending = $customerBook->price == 0 && is_null($customerBook->colouring_other);
-                    
                     if (is_null($customerBook->cap)) {
                         $status = 'Antri';
                         $statusColor = 'bg-gray-100 text-gray-600';
@@ -115,14 +113,11 @@
                 </div>
                 <div class="flex justify-between text-xs text-gray-600 print:text-black">
                     <span>Time</span>
-                    <span>
-                        {{ \Carbon\Carbon::parse($customerBook->created_time)->translatedFormat('d F Y - H:i') }}
-                    </span>
+                    <span>{{ \Carbon\Carbon::parse($customerBook->created_time)->translatedFormat('d F Y - H:i') }}</span>
                 </div>
             </div>
 
             @php
-                // Tentukan status…
                 $isPending = $customerBook->price == 0 && empty($customerBook->colouring_other);
                 $isAntre   = empty($customerBook->cap);
             @endphp
