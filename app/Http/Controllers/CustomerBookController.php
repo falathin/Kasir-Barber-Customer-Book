@@ -11,58 +11,71 @@ use Illuminate\Support\Facades\Validator;
 
 class CustomerBookController extends Controller
 {
+
     public function index(Request $request)
     {
-        $search = $request->input('search');
-        $barber = $request->input('barber');
-        $status = in_array($request->input('status'), ['antre', 'proses', 'done']) ? $request->input('status') : null;
-        $user = auth()->user();
-
-        // Ubah logika showAll agar search juga menampilkan semua data
+        $search     = $request->input('search');
+        $barber     = $request->input('barber');
+        $status     = in_array($request->input('status'), ['antre', 'proses', 'done']) ? $request->input('status') : null;
+        $startDate  = $request->input('start_date');
+        $endDate    = $request->input('end_date');
+        $user       = auth()->user();
+    
+        // Show all if explicitly asked or searching
         $showAll = $request->input('show') === 'all' || $search;
-        $today = Carbon::today();
-
+        $today   = Carbon::today();
+    
         $query = CustomerBook::query()
-            ->when(!$showAll, fn($q) => $q->whereDate('created_at', $today))
-            ->when($search, fn($q) => $q->where(function ($q2) use ($search) {
-                $q2->where('customer', 'like', "%{$search}%")
-                    ->orWhere('haircut_type', 'like', "%{$search}%")
-                    ->orWhere('cap', 'like', "%{$search}%");
-            }))
+            // Date filters
+            ->when($startDate && $endDate, function($q) use ($startDate, $endDate) {
+                $q->whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($endDate)->endOfDay()]);
+            }, function($q) use ($today, $showAll) {
+                // Default: only today if not showing all
+                if (! $showAll) {
+                    $q->whereDate('created_at', $today);
+                }
+            })
+            ->when($search, function($q) use ($search) {
+                $q->where(function ($q2) use ($search) {
+                    $q2->where('customer', 'like', "%{$search}%")
+                        ->orWhere('haircut_type', 'like', "%{$search}%")
+                        ->orWhere('cap', 'like', "%{$search}%");
+                });
+            })
             ->when($user->level !== 'admin', fn($q) => $q->where('barber_name', $user->name))
             ->when($user->level === 'admin' && $barber, fn($q) => $q->where('barber_name', $barber))
             ->when($status, function ($q) use ($status) {
                 if ($status === 'done') {
                     $q->whereNotNull('price')
-                    ->whereNotNull('colouring_other')
-                    ->whereNotNull('qr');
+                      ->whereNotNull('colouring_other')
+                      ->whereNotNull('qr');
                 } elseif ($status === 'proses') {
                     $q->whereNotNull('cap')
-                    ->whereNotNull('customer')
-                    ->whereNotNull('barber_name')
-                    ->whereNull('colouring_other')
-                    ->whereNull('qr');
+                      ->whereNotNull('customer')
+                      ->whereNotNull('barber_name')
+                      ->whereNull('colouring_other')
+                      ->whereNull('qr');
                 } elseif ($status === 'antre') {
                     $q->whereNull('cap')
-                    ->whereNotNull('customer')
-                    ->whereNotNull('barber_name')
-                    ->whereNotNull('antrian')
-                    ->whereNotNull('haircut_type');
+                      ->whereNotNull('customer')
+                      ->whereNotNull('barber_name')
+                      ->whereNotNull('antrian')
+                      ->whereNotNull('haircut_type');
                 }
             });
-
+    
         $totalToday = CustomerBook::whereDate('created_at', $today)->count();
-
+    
         $books = $query->latest()
-            ->paginate(10)
-            ->appends($request->query());
-
+                       ->paginate(15)
+                       ->appends($request->query());
+    
         $barbers = $user->level === 'admin'
             ? CustomerBook::select('barber_name')->distinct()->pluck('barber_name')
             : collect([$user->name]);
-
+    
         return view('customer_books.index', compact(
-            'books', 'barbers', 'search', 'barber', 'status', 'totalToday', 'showAll'
+            'books', 'barbers', 'search', 'barber', 'status', 'totalToday', 'showAll', 'startDate', 'endDate'
         ));
     }
 

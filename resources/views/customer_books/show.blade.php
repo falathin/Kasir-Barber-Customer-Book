@@ -22,7 +22,6 @@
                 @endif
             </div>
 
-
             {{-- Detail Items --}}
             <div class="text-xs text-gray-700 space-y-3 print:text-black">
                 @php
@@ -34,11 +33,11 @@
 
                     $items = [
                         'Booking ID' => $customerBook->id,
-                        'Customer' => $customerBook->customer,
-                        'Capster' => $customerBook->capster?->nama ?? $customerBook->cap,
-                        'Asisten' => $asistenNama ?? '-',
-                        'Style' => $customerBook->haircut_type,
-                        'Shop' => $customerBook->barber_name,
+                        'Customer'   => $customerBook->customer,
+                        'Capster'    => $customerBook->capster?->nama ?? $customerBook->cap,
+                        'Asisten'    => $asistenNama ?? '-',
+                        'Style'      => $customerBook->haircut_type,
+                        'Shop'       => $customerBook->barber_name,
                     ];
                 @endphp
                 @foreach ($items as $k => $v)
@@ -76,17 +75,16 @@
                     </ul>
                 </div>
 
-                {{-- Rincian --}}
-                <div class="border-b border-dashed pb-1 print:border-b print:border-black">
+                {{-- Rincian (Rahasia: disembunyikan saat print) --}}
+                <div class="border-b border-dashed pb-1 print:hidden">
                     <span class="uppercase">Rincian</span>
-                    <p class="mt-1 break-words whitespace-pre-line print:mt-0">
+                    <p class="mt-1 break-words whitespace-pre-line">
                         {{ $customerBook->rincian ?? '-' }}
                     </p>
                 </div>
 
                 @php
                     $isPending = $customerBook->price == 0 && is_null($customerBook->colouring_other);
-                    
                     if (is_null($customerBook->cap)) {
                         $status = 'Antri';
                         $statusColor = 'bg-gray-100 text-gray-600';
@@ -110,8 +108,30 @@
                     <span class="text-sm">Rp {{ number_format($customerBook->price, 0, ',', '.') }}</span>
                 </div>
                 <div class="flex justify-between text-xs text-gray-600 print:text-black">
-                    <span>Payment</span>
-                    <span>{{ $customerBook->qr === 'qr_transfer' ? 'QR Transfer' : 'Cash' }}</span>
+                <span>Payment</span>
+                    <span class="px-3 py-1 text-xs font-semibold rounded-full 
+                      @if($customerBook->qr === 'qr_transfer')
+                        bg-purple-100 text-purple-800
+                      @elseif($customerBook->qr === 'cash')
+                        bg-gray-100 text-gray-800
+                      @elseif($customerBook->qr === 'no revenue' || $customerBook->qr === null || $customerBook->qr === '')
+                        bg-red-100 text-red-800
+                      @else
+                        bg-blue-100 text-blue-800
+                      @endif
+                    ">
+                      @php use Illuminate\Support\Str; @endphp
+                    
+                      @if($customerBook->qr === 'qr_transfer')
+                        QR Transfer
+                      @elseif($customerBook->qr === 'cash')
+                        Cash
+                      @elseif($customerBook->qr === 'no revenue' || $customerBook->qr === null || $customerBook->qr === '')
+                        No Revenue
+                      @else
+                        {{ Str::title($customerBook->qr) }}
+                      @endif
+                    </span>
                 </div>
                 <div class="flex justify-between text-xs text-gray-600 print:text-black">
                     <span>Time</span>
@@ -122,7 +142,6 @@
             </div>
 
             @php
-                // Tentukan status…
                 $isPending = $customerBook->price == 0 && empty($customerBook->colouring_other);
                 $isAntre   = empty($customerBook->cap);
             @endphp
@@ -138,7 +157,6 @@
                     Print
                 </button>
 
-                {{-- Jika status Antri → tombol Proseskan --}}
                 @if($isAntre)
                     <a href="{{ route('customer-books.createWithCap', $customerBook) }}"
                         class="w-full block text-center py-2 bg-blue-500 text-white rounded text-xs hover:bg-blue-600">
@@ -155,11 +173,8 @@
                             Delete
                         </button>
                     </form>
-
-                {{-- Lainnya: Done / Delete / disabled --}}
                 @else
                     @if(auth()->user()->level === 'admin')
-                        {{-- Admin selalu bisa edit & delete --}}
                         <a href="{{ route('customer-books.edit', $customerBook) }}"
                             class="w-full block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
                             Done
@@ -176,10 +191,8 @@
                                 Delete
                             </button>
                         </form>
-
                     @elseif(auth()->user()->level === 'kasir')
                         @if($isPending)
-                            {{-- Kasir bisa edit & delete saat Pending --}}
                             <a href="{{ route('customer-books.edit', $customerBook) }}"
                                 class="w-full block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
                                 Done
@@ -197,7 +210,6 @@
                                 </button>
                             </form>
                         @else
-                            {{-- Kasir tidak bisa edit/delete selain Pending --}}
                             <button disabled
                                 class="w-full block text-center py-2 bg-gray-300 text-gray-500 rounded text-xs cursor-not-allowed">
                                 Done
@@ -210,7 +222,6 @@
                     @endif
                 @endif
             </div>
-
         </div>
     </div>
 
@@ -229,43 +240,43 @@
                 background: transparent !important;
             }
 
-            .print\:hidden {
+            .print\\:hidden {
                 display: none !important;
             }
 
-            .print\:text-black {
+            .print\\:text-black {
                 color: black !important;
             }
 
-            .print\:border-black {
+            .print\\:border-black {
                 border-color: black !important;
             }
 
-            .print\:rounded-none {
+            .print\\:rounded-none {
                 border-radius: 0 !important;
             }
 
-            .print\:shadow-none {
+            .print\\:shadow-none {
                 box-shadow: none !important;
             }
 
-            .print\:p-0 {
+            .print\\:p-0 {
                 padding: 0 !important;
             }
 
-            .print\:max-w-full {
+            .print\\:max-w-full {
                 max-width: 100% !important;
             }
 
-            .print\:w-\[58mm\] {
+            .print\\:w-\[58mm\] {
                 width: 58mm !important;
             }
 
-            .print\:font-normal {
+            .print\\:font-normal {
                 font-weight: normal !important;
             }
 
-            .print\:text-sm {
+            .print\\:text-sm {
                 font-size: 11px !important;
             }
         }

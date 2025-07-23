@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 </head>
 
-<body class="flex h-full flex-col bg-gray-100">
+<body class="flex h-full flex-col bg-[url('https://wallpaperaccess.com/full/1332228.jpg')] bg-cover bg-center">
     <!-- Sidebar -->
 {{-- resources/views/components/sidebar.blade.php --}}
 <aside id="sidebar"
@@ -178,31 +178,29 @@ SVG,
             <div class="flex items-center space-x-4">
             @if(auth()->user()->level === 'admin')
                 <div class="relative">
-                    {{-- Link ke halaman customer books --}}
                     <a href="{{ route('customer-books.index') }}"
-                        class="block text-gray-600 hover:text-indigo-600 transition duration-200 transform hover:scale-110 relative">
-                        {{-- Bell Icon --}}
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-6 w-6"
-                            fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
+                       class="block text-gray-600 hover:text-indigo-600 transition duration-200 transform hover:scale-110 relative">
+                        <!-- Icon bell -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 
-                                0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 
-                                2 0 10-4 0v.341C7.67 6.165 6 8.388 6 
-                                11v3.159c0 .538-.214 1.055-.595 
-                                1.436L4 17h5m6 0a3 3 0 11-6 0h6z" />
+                                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 
+                                     0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 
+                                     2 0 10-4 0v.341C7.67 6.165 6 8.388 6 
+                                     11v3.159c0 .538-.214 1.055-.595 
+                                     1.436L4 17h5m6 0a3 3 0 11-6 0h6z" />
                         </svg>
-
-                        {{-- Red Dot Ping Animation --}}
+            
+                        {{-- Ping animation kalau ada notif --}}
                         @if($pendingCount > 0)
                             <span class="absolute top-0 right-0 w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
                         @endif
-
-                        {{-- Badge Count Number --}}
+            
+                        {{-- Badge count --}}
                         @if($pendingCount > 0)
-                            <span
-                                class="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow">
+                            <span class="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 bg-red-600
+                                          text-white text-xs font-bold rounded-full flex items-center
+                                          justify-center shadow">
                                 {{ $pendingCount }}
                             </span>
                         @endif

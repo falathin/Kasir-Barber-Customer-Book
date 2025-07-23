@@ -75,9 +75,12 @@ class NoteController extends Controller
         $today = now()->toDateString();
         $user = Auth::user();
 
-        $notes = Note::orderByDesc('created_at')->get();
+        $notes = Note::when($user->level !== 'admin', fn($q) => $q->where('kasir_name', $user->name))
+            ->orderByDesc('created_at')
+            ->get();
 
         $customerBooks = CustomerBook::whereDate('created_time', $today)
+            ->when($user->level !== 'admin', fn($q) => $q->where('barber_name', $user->name))
             ->get()
             ->groupBy('barber_name');
 

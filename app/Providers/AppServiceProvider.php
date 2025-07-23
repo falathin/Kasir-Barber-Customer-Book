@@ -17,22 +17,24 @@ class AppServiceProvider extends ServiceProvider
         //
     }
 
-    
     /**
      * Bootstrap any application services.
-     */public function boot(): void
-        {
-            Carbon::setLocale('id');
+     */
+    public function boot(): void
+    {
+        // Set lokal tanggal ke Indonesia
+        Carbon::setLocale('id');
 
-        View::composer('*', function ($view) {
-            if (auth()->check() && auth()->user()->level === 'admin') {
-                $pendingCount = CustomerBook::where('price', 0)
-                    ->whereNull('colouring_other')
-                    ->count();
+View::composer('*', function ($view) {
+    $pendingCount = 0;
 
-                $view->with('pendingCount', $pendingCount);
-            }
-    });
+    if (auth()->check() && auth()->user()->level === 'admin') {
+        // CAST ke DECIMAL lalu bandingkan = 0
+        $pendingCount = CustomerBook::whereRaw('CAST(price AS DECIMAL) = 0')->count();
+    }
 
-        }
+    $view->with('pendingCount', $pendingCount);
+});
+
+    }
 }

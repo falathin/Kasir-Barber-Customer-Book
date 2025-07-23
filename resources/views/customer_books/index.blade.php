@@ -1,95 +1,114 @@
-<!-- resources/views/customer_books/index.blade.php -->
 @extends('layouts.app')
 
 @section('title', 'Customer Books')
 
 @section('content')
 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <!-- Header -->
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-    <h1 class="text-3xl font-extrabold text-gray-800">📚 Customer Books</h1>
-
-    @if(auth()->user()->level === 'admin')
+<!-- Header -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+  <h1 class="text-3xl font-extrabold text-gray-800">📚 Customer Books</h1>
+  @if(auth()->user()->level === 'admin')
+    <div class="flex flex-wrap gap-2">
       @if($showAll)
         <a href="{{ route('customer-books.index') }}"
-           class="px-5 py-2 bg-gray-300 text-gray-800 rounded-full shadow hover:bg-gray-400 transition">
+           class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-full shadow hover:bg-gray-400 transition duration-200">
           🔙 Hari Ini
         </a>
       @else
         <a href="{{ route('customer-books.index', array_merge(request()->query(), ['show' => 'all'])) }}"
-           class="px-5 py-2 bg-indigo-600 text-white rounded-full shadow hover:bg-indigo-700 transition">
+           class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-full shadow hover:bg-indigo-700 transition duration-200">
           📅 Lihat Semua
         </a>
       @endif
-    @endif
-  </div>
-
-  <!-- Filters & Actions -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-    <form method="GET" class="flex flex-wrap gap-3 flex-1">
-      <input type="text" name="search" placeholder="Search..."
-             value="{{ $search }}"
-             class="flex-1 min-w-[150px] px-4 py-2 border border-gray-300 rounded-full shadow-sm
-                    focus:outline-none focus:ring-2 focus:ring-indigo-500">
-
-      @if(auth()->user()->level === 'admin')
-        <select name="barber"
-                class="px-4 py-2 border border-gray-300 rounded-full shadow-sm
-                       focus:outline-none focus:ring-2 focus:ring-indigo-500">
-          <option value="">-- All Barbers --</option>
-          @foreach($barbers as $name)
-            <option value="{{ $name }}" {{ $barber === $name ? 'selected' : '' }}>
-              {{ $name }}
-            </option>
-          @endforeach
-        </select>
-      @else
-        <div class="px-4 py-2 bg-gray-100 rounded-full text-sm">
-          Barber: <strong>{{ auth()->user()->name }}</strong>
-        </div>
-        <input type="hidden" name="barber" value="{{ auth()->user()->name }}">
-      @endif
-
-      <select name="status"
-              class="px-4 py-2 border border-gray-300 rounded-full shadow-sm
-                     focus:outline-none focus:ring-2 focus:ring-indigo-500">
-        <option value="">-- All Status --</option>
-        <option value="antre"  {{ request('status')==='antre'  ? 'selected':'' }}>Antre</option>
-        <option value="proses" {{ request('status')==='proses' ? 'selected':'' }}>Proses</option>
-        <option value="done"  {{ request('status')==='done'  ? 'selected':'' }}>Done</option>
-      </select>
-
-      <button type="submit"
-              class="px-6 py-2 bg-indigo-600 text-white rounded-full shadow hover:bg-indigo-700 transition">
-        🔍 Filter
-      </button>
-    </form>
-
-    <a href="{{ route('customer-books.create') }}"
-       class="inline-flex items-center px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-full shadow transition">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
-           viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 4v16m8-8H4"/>
-      </svg>
-      Create
-    </a>
-  </div>
-
-  @if($showAll)
-    <p class="text-sm text-gray-500 mb-4">Menampilkan <strong>semua</strong> data customer book.</p>
-  @else
-    <p class="text-sm text-gray-500 mb-4">
-      Menampilkan data untuk <strong>hari ini</strong> ({{ \Carbon\Carbon::today()->format('d M Y') }})
-    </p>
+    </div>
   @endif
+</div>
+
+<!-- Filters & Actions -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 flex-wrap">
+  @php
+    use Carbon\Carbon;
+    $defaultStart = request('start_date', Carbon::today()->toDateString());
+    $defaultEnd   = request('end_date', Carbon::tomorrow()->toDateString());
+  @endphp
+
+  <form method="GET" class="flex flex-wrap gap-3 items-end">
+    <!-- Search -->
+    <input type="text" name="search" placeholder="Search..."
+          value="{{ request('search') }}"
+          class="flex-1 min-w-[150px] px-4 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+
+    <!-- Barber Filter -->
+    @if(auth()->user()->level === 'admin')
+      <select name="barber"
+              class="px-4 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="">-- All Barbers --</option>
+        @foreach($barbers as $name)
+          <option value="{{ $name }}" {{ request('barber') === $name ? 'selected' : '' }}>{{ $name }}</option>
+        @endforeach
+      </select>
+    @else
+      <div class="px-4 py-2 bg-gray-100 rounded-full text-sm">
+        Barber: <strong>{{ auth()->user()->name }}</strong>
+      </div>
+      <input type="hidden" name="barber" value="{{ auth()->user()->name }}">
+    @endif
+
+    <!-- Status Filter -->
+    <select name="status"
+            class="px-4 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <option value="">-- All Status --</option>
+      <option value="antre" {{ request('status')==='antre' ? 'selected':'' }}>Antre</option>
+      <option value="proses" {{ request('status')==='proses' ? 'selected':'' }}>Proses</option>
+      <option value="done" {{ request('status')==='done' ? 'selected':'' }}>Done</option>
+    </select>
+
+    <!-- Date Filters -->
+    <div class="flex items-center gap-2">
+      <label for="start_date" class="text-sm">From:</label>
+      <input type="date" id="start_date" name="start_date" value="{{ $defaultStart }}"
+            class="px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    </div>
+    <div class="flex items-center gap-2">
+      <label for="end_date" class="text-sm">To:</label>
+      <input type="date" id="end_date" name="end_date" value="{{ $defaultEnd }}"
+            class="px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+    </div>
+
+    <!-- Filter Button -->
+    <button type="submit"
+            class="inline-flex items-center px-6 py-2 bg-indigo-600 text-white rounded-full shadow hover:bg-indigo-700 transition duration-200">
+      🔍 Filter
+    </button>
+  </form>
+
+  <!-- Create Button -->
+  <a href="{{ route('customer-books.create') }}"
+     class="inline-flex items-center px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-full shadow transition duration-200">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
+         viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 4v16m8-8H4" />
+    </svg>
+    Create
+  </a>
+</div>
+
+<!-- Info Text -->
+@if($showAll)
+  <p class="text-sm text-gray-500 mb-4">Menampilkan <strong>semua</strong> data customer book.</p>
+@else
+  <p class="text-sm text-gray-500 mb-4">
+    Menampilkan data untuk <strong>hari ini</strong> ({{ \Carbon\Carbon::today()->format('d M Y') }})
+  </p>
+@endif
 
   <!-- Table -->
   <div class="overflow-x-auto bg-white shadow-lg rounded-lg">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
-          @foreach(['#','Customer','Inisial','Antrian','Haircut','Coloring','Produk','Barber','Price','Status','Aksi'] as $col)
+          @foreach(['#','Customer','C&A','Antrian','Haircut','Coloring','Produk','Barber','Price','Payment','Status','Aksi'] as $col)
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
               {{ $col }}
             </th>
@@ -108,13 +127,27 @@
               {{ ($books->total() - (($books->currentPage()-1)*$books->perPage())) - $loop->index }}
             </td>
             <td class="px-4 py-2">{{ $book->customer ?? '-' }}</td>
-            <td class="px-4 py-2">{{ $book->cap      ?? '-' }}</td>
+            <td class="px-4 py-2">
+              {{ $book->cap ?? '-' }} &nbsp; {{ $book->asisten }}
+            </td>
             <td class="px-4 py-2">{{ $book->antrian  ?? '-' }}</td>
             <td class="px-4 py-2">{{ $book->haircut_type    ?? '-' }}</td>
             <td class="px-4 py-2">{{ $book->colouring_other ?? '-' }}</td>
             <td class="px-4 py-2">{{ $book->sell_use_product ?? '-' }}</td>
             <td class="px-4 py-2">{{ $book->barber_name      ?? '-' }}</td>
             <td class="px-4 py-2 rupiah" data-price="{{ $book->price }}"></td>
+            <td class="px-4 py-2">
+              @if($book->qr === 'qr_transfer')
+                <span class="px-3 py-1 text-xs font-semibold bg-purple-100 text-purple-800 rounded-full">QR Transfer</span>
+              @elseif($book->qr === 'cash')
+                <span class="px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-800 rounded-full">Cash</span>
+              @elseif($book->qr === 'no revenue' || $book->qr === null)
+                <span class="px-3 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">No Revenue</span>
+              @else
+                <span class="px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-800 rounded-full">{{ Str::title($book->qr) }}</span>
+              @endif
+            </td>
+
             <td class="px-4 py-2">
               @if($isDone)
                 <span class="px-3 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">Done</span>
@@ -192,7 +225,7 @@
           </tr>
         @empty
           <tr>
-            <td colspan="11" class="py-6 text-center text-gray-500">
+            <td colspan="12" class="py-6 text-center text-gray-500">
               Tidak ada data ditemukan.
             </td>
           </tr>

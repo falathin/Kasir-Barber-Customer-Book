@@ -188,10 +188,9 @@
                     @if ($isToday && $item->kasir_name === auth()->user()->name)
                         <div class="note-actions">
                             <a href="{{ route('notes.edit', $item) }}">Edit</a>
-                            <form action="{{ route('notes.destroy', $item) }}" method="POST" style="display:inline"
-                                onsubmit="return confirm('Hapus catatan ini?');">
+                            <form data-delete-form action="{{ route('notes.destroy', $item) }}" method="POST" style="display:inline">
                                 @csrf @method('DELETE')
-                                <button type="submit">Hapus</button>
+                                <button type="button" class="btn-delete">Hapus</button>
                             </form>
                         </div>
                     @endif
@@ -204,6 +203,8 @@
         </ul>
     </div>
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const todayNoteExists = @json($todayNoteExists);
@@ -212,6 +213,43 @@
                 document.getElementById('noteTextarea').disabled = true;
                 document.getElementById('submitBtn').disabled = true;
             }
+
+            // Intercept form submit untuk SweetAlert
+            const noteForm = document.getElementById('noteForm');
+            noteForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const action = '{{ isset($note) ? 'update' : 'store' }}';
+                Swal.fire({
+                    title: action === 'store' ? 'Simpan catatan?' : 'Perbarui catatan?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: action === 'store' ? 'Ya, simpan!' : 'Ya, perbarui!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        noteForm.submit();
+                    }
+                });
+            });
+
+            // Hapus dengan SweetAlert
+            document.querySelectorAll('.btn-delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const form = this.closest('form[data-delete-form]');
+                    Swal.fire({
+                        title: 'Hapus catatan ini?',
+                        text: 'Tindakan ini tidak dapat dibatalkan.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Ya, hapus!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
         });
     </script>
 @endsection
