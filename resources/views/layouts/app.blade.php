@@ -209,26 +209,38 @@ SVG,
             @endif
 
                 @php
-                    // anggap semua route admin dan kasirs.* dianggap aktif
                     $isAdminSection = request()->routeIs('admin.dashboard') 
                                     || request()->routeIs('kasirs.*');
+
+                    $user = auth()->user();
+
+                    // tentukan avatar
+                    if ($user->level === 'admin') {
+                        // admin pakai nama asli
+                        $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user->name) . "&background=4F46E5&color=fff";
+                    } elseif ($user->level === 'kasir') {
+                        // kasir pakai "AK"
+                        $avatarUrl = "https://ui-avatars.com/api/?name=AK&background=F59E0B&color=fff";
+                    } else {
+                        // fallback kalau level lain
+                        $avatarUrl = "https://ui-avatars.com/api/?name=User&background=6B7280&color=fff";
+                    }
                 @endphp
 
                 <div>
                     <a href="{{ route('profile.edit') }}">
                         <img
-                            src="https://ui-avatars.com/api/?name=Admin+Kasir&background=4F46E5&color=fff"
-                            alt="Admin Kasir"
+                            src="{{ $avatarUrl }}"
+                            alt="{{ $user->name }}"
                             @class([
                                 'h-8 w-8 rounded-full border-2 transition-transform duration-200 ease-out animate__animated animate__fadeIn',
-                                // jika aktif, beri border kuning dan sedikit diperbesar
                                 'border-yellow-400 scale-110' => $isAdminSection,
-                                // jika tidak aktif, pakai border default
                                 'border-indigo-500 scale-100' => ! $isAdminSection,
                             ]) 
                         />
                     </a>
                 </div>
+
             </div>
         </header>
 

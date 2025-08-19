@@ -90,7 +90,6 @@ class KasirController extends Controller
 
         // Hapus semua data terkait user
         DB::transaction(function () use ($cashier) {
-            // Hapus dari tabel password reset jika ada
             DB::table('password_reset_tokens')->where('email', $cashier->email)->delete();
 
             // Hapus sesi login user
