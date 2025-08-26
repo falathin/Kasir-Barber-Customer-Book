@@ -199,15 +199,15 @@
 
         </div>
         @php
-            $pendapatanPerBarber = collect($pendapatanPerBarber); // pastikan ini Collection
+            $pendapatanPerBarber = collect($pendapatanPerBarber);
             $maxTotal = $pendapatanPerBarber->max('total') ?: 1;
             $medals = ['🥇', '🥈', '🥉'];
-            $colors = ['bg-yellow-400', 'bg-gray-400', 'bg-orange-400']; // Top 3 colors
+            $colors = ['bg-yellow-400', 'bg-gray-400', 'bg-orange-400']; 
         @endphp
 
 
         @php
-            $role = Auth::user()->level ?? 'kasir'; // atau 'role' jika memang nama field-nya 'role'
+            $role = Auth::user()->level ?? 'kasir';
         @endphp
 
         @if ($role === 'admin')
