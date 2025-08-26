@@ -51,6 +51,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Log in | {{ config('app.name') }}</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ asset('images/bb-logo.png') }}">
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
