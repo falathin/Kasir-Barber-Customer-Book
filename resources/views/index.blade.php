@@ -45,8 +45,8 @@
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" 
                                         d="M3 3h2l.4 2m0 0L7 13h10l4-8H5.4z" />
-                                <circle cx="9" cy="17" r="1.5" fill="currentColor"/>
-                                <circle cx="17" cy="17" r="1.5" fill="currentColor"/>
+                                <circle cx="9" cy="18" r="1.5" fill="currentColor"/>
+                                <circle cx="17" cy="18" r="1.5" fill="currentColor"/>
                                 </svg>
                             </div>
                         </div>
