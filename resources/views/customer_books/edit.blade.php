@@ -235,7 +235,7 @@
                         @enderror
                     </label>
 
-                @php $isAdmin = auth()->user()->level === 'admin'; @endphp
+                    @php $isAdmin = auth()->user()->level === 'admin'; @endphp
 
                 <button type="button" id="updateBtn"
                     data-level="{{ auth()->user()->level }}"
