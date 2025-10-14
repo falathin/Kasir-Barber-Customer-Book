@@ -25,6 +25,42 @@
             {{-- Detail Items --}}
             <div class="text-xs text-gray-700 space-y-3 print:text-black">
                 @php
+                    // Mapping harga standar untuk menampilkan keterangan
+                    $priceMap = [
+                        "Haircut Reguler" => 50000,
+                        "Ladies Only Haircut" => 60000,
+                        "Baby Haircut" => 30000,
+                        "Poni" => 15000,
+                        "Fading Haircut" => 60000,
+                        "Shaving" => 20000,
+                        "Hair Tatto" => 35000,
+                        "Hair Styling" => 40000,
+                        "Hair Treatment" => 120000,
+                        "Hair Bleaching" => 250000,
+                        "Hair Coloring" => 200000,
+                        "Hair Toning" => 150000,
+                        "Highlight" => 180000,
+                        "Hair Smoothing" => 200000,
+                        "Perming" => 180000,
+                        "Downperm" => 120000,
+                        "Hair Extension" => 300000,
+                        "Hair Extension services" => 350000,
+                        "Facial" => 80000,
+                        "Eyelash" => 150000,
+                        "Eyelash Retouch" => 70000
+                    ];
+
+                    // helper format rupiah & short form
+                    function rupiah($n) {
+                        return number_format((int)$n, 0, ',', '.');
+                    }
+                    function shortForm($n) {
+                        $n = (int)$n;
+                        if ($n >= 1000) return round($n / 1000) . 'rb';
+                        return (string)$n;
+                    }
+
+                    // Resolve assistant name (sama seperti sebelumnya)
                     $asistenNama = null;
                     if ($customerBook->asisten) {
                         $capsters = \App\Models\Capster::all()->keyBy('inisial');
@@ -39,7 +75,25 @@
                         'Style'      => $customerBook->haircut_type,
                         'Shop'       => $customerBook->barber_name,
                     ];
+
+                    // Prepare services array + compute breakdownTotal for keterangan
+                    $services = [];
+                    $breakdownParts = [];
+                    $breakdownTotal = 0;
+                    if (!empty($customerBook->colouring_other)) {
+                        // accept both ", " or "," separators
+                        $raw = preg_split('/\s*,\s*/', trim($customerBook->colouring_other));
+                        foreach ($raw as $s) {
+                            $s = trim($s);
+                            if ($s === '') continue;
+                            $price = $priceMap[$s] ?? 0;
+                            $services[] = ['name' => $s, 'price' => $price];
+                            $breakdownParts[] = ($price ? 'Rp ' . rupiah($price) . ' · ' . $s : $s);
+                            $breakdownTotal += $price;
+                        }
+                    }
                 @endphp
+
                 @foreach ($items as $k => $v)
                     <div class="flex justify-between border-b border-dashed pb-1 print:border-b print:border-black">
                         <span class="uppercase">{{ $k }}</span>
@@ -47,18 +101,40 @@
                     </div>
                 @endforeach
 
-                {{-- Services --}}
+                {{-- Services (dengan keterangan harga per-item) --}}
                 <div class="border-b border-dashed pb-1 print:border-b print:border-black">
-                    <span class="uppercase">Services</span>
+                    <div class="flex items-center justify-between">
+                        <span class="uppercase">Services</span>
+                        {{-- optional small badge showing number of services --}}
+                        <span class="text-xs text-gray-500">{{ count($services) ?: '-' }}</span>
+                    </div>
+
                     <ul class="mt-1 pl-4 list-disc list-inside print:pl-2 print:list-none print:mt-0">
-                        @if ($customerBook->colouring_other)
-                            @foreach (explode(', ', $customerBook->colouring_other) as $s)
-                                <li class="break-words">{{ $s }}</li>
+                        @if (!empty($services))
+                            @foreach ($services as $svc)
+                                <li class="break-words flex justify-between items-center">
+                                    <span class="truncate">{{ $svc['name'] }}</span>
+                                    <span class="ml-2 text-right">
+                                        <span class="text-xs font-medium text-indigo-700">Rp {{ rupiah($svc['price']) }}</span>
+                                        <span class="text-xs text-indigo-600 ml-1">({{ shortForm($svc['price']) }})</span>
+                                    </span>
+                                </li>
                             @endforeach
                         @else
                             <li>-</li>
                         @endif
                     </ul>
+
+                    {{-- Keterangan ringkasan (mis. "Rp 50.000 · Haircut Reguler + Rp 35.000 · Hair Tatto = Rp 85.000") --}}
+                    @if (!empty($services))
+                        <p class="mt-2 text-xs text-gray-600">
+                            <span class="font-semibold">Keterangan:</span>
+                            <span class="ml-1">
+                                {!! implode(' + ', array_map(function($p){ return e($p); }, $breakdownParts)) !!}
+                                <span class="font-semibold"> = Rp {{ rupiah($breakdownTotal) }}</span>
+                            </span>
+                        </p>
+                    @endif
                 </div>
 
                 {{-- Products --}}
@@ -107,8 +183,17 @@
                     <span class="uppercase text-sm">Total</span>
                     <span class="text-sm">Rp {{ number_format($customerBook->price, 0, ',', '.') }}</span>
                 </div>
+
+                {{-- Jika total layanan yang dihitung dari keterangan berbeda dengan price yang tersimpan,
+                     tampilkan catatan kecil (berguna untuk debugging atau penjelasan) --}}
+                @if (!empty($services) && $breakdownTotal != (int)$customerBook->price)
+                    <div class="text-xs text-red-600">
+                        <small>Catatan: jumlah dari keterangan layanan (Rp {{ rupiah($breakdownTotal) }}) berbeda dengan total yang tersimpan (Rp {{ rupiah($customerBook->price) }}).</small>
+                    </div>
+                @endif
+
                 <div class="flex justify-between text-xs text-gray-600 print:text-black">
-                <span>Payment</span>
+                    <span>Payment</span>
                     <span class="px-3 py-1 text-xs font-semibold rounded-full 
                       @if($customerBook->qr === 'qr_transfer')
                         bg-purple-100 text-purple-800

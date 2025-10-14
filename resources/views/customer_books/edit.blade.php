@@ -180,15 +180,18 @@
                         @enderror
                     </label>
 
-                    {{-- Price --}}
+                    {{-- Price (display disabled + hidden actual price for submission) --}}
                     <label class="block">
                         <span class="text-gray-700">💰 Price</span>
                         <div class="relative mt-1">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">Rp</div>
-                            <input type="text" name="price" id="price" inputmode="numeric"
-                                value="{{ old('price', $customerBook->price) }}" placeholder="e.g. 150000"
+                            <!-- Visible disabled input (no name) supaya user tidak bisa ubah -->
+                            <input type="text" id="price_display" inputmode="numeric"
+                                value="{{ old('price', $customerBook->price) ? number_format($customerBook->price,0,',','.') : '0' }}" placeholder="e.g. 150000"
                                 class="w-full pl-12 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                required>
+                                disabled>
+                            <!-- Hidden input dengan name="price" yang dikirim ke server -->
+                            <input type="hidden" name="price" id="price_hidden" value="{{ old('price', $customerBook->price) }}">
                         </div>
                         @error('price')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -293,70 +296,148 @@
         </div>
     </div>
 
-    <script>
+<script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Price formatting
-            const priceInput = document.getElementById('price');
-
-            function formatNumber(n) {
-                return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            }
-
-            function plainNumber(n) {
-                return n.replace(/\./g, '');
-            }
-            if (priceInput) {
-                priceInput.addEventListener('input', e => {
-                    const raw = plainNumber(e.target.value.replace(/\D/g, ''));
-                    e.target.value = formatNumber(raw);
-                });
-                priceInput.closest('form').addEventListener('submit', () => {
-                    priceInput.value = plainNumber(priceInput.value);
-                });
-            }
-
-            // Barber services picker ← preload dari hidden
+            // Elements
+            const displayInput = document.getElementById('price_display'); // terlihat & disabled
+            const hiddenInput = document.getElementById('price_hidden'); // dikirim ke server
             const select = document.getElementById('action-select');
             const addBtn = document.getElementById('add-action-btn');
             const listDiv = document.getElementById('selected-actions');
-            const coloringIn = document.getElementById('colouring_other_hidden');
+
+            // hidden untuk menyimpan daftar selected (mirip colouring_other_hidden dari kode sebelumnya)
+            let coloringIn = document.getElementById('colouring_other_hidden');
+            const form = displayInput.closest('form');
+
+            if (!coloringIn) {
+                coloringIn = document.createElement('input');
+                coloringIn.type = 'hidden';
+                coloringIn.id = 'colouring_other_hidden';
+                coloringIn.name = 'colouring_other_hidden';
+                if (form) form.appendChild(coloringIn);
+            }
+
+            // Pemetaan harga standar (dalam Rupiah, integer)
+            const priceMap = {
+                "Haircut Reguler": 50000,
+                "Ladies Only Haircut": 60000,
+                "Baby Haircut": 30000,
+                "Poni": 15000,
+                "Fading Haircut": 60000,
+                "Shaving": 20000,
+                "Hair Tatto": 35000,
+                "Hair Styling": 40000,
+                "Hair Treatment": 120000,
+                "Hair Bleaching": 250000,
+                "Hair Coloring": 200000,
+                "Hair Toning": 150000,
+                "Highlight": 180000,
+                "Hair Smoothing": 200000,
+                "Perming": 180000,
+                "Downperm": 120000,
+                "Hair Extension": 300000,
+                "Hair Extension services": 350000,
+                "Facial": 80000,
+                "Eyelash": 150000,
+                "Eyelash Retouch": 70000
+            };
+
+            // util formatting
+            function formatNumber(n) {
+                if (n === null || n === undefined) return '0';
+                const s = String(n);
+                const digits = s.replace(/\D/g, '');
+                if (!digits) return '0';
+                return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+            function plainNumber(n) {
+                return String(n).replace(/\./g, '').replace(/\D/g, '') || '0';
+            }
+            // ringkasan singkat: 50000 -> 50rb, 15000 -> 15rb
+            function formatShort(n) {
+                n = Number(n) || 0;
+                if (n >= 1000) return Math.round(n / 1000) + 'rb';
+                return String(n); // kalau kecil
+            }
+
+            // selected set (menyimpan nama layanan)
             const selected = new Set();
 
-            // Inisialisasi dari existing colouring_other
+            // Inisialisasi dari existing colouring_other_hidden (jika ada)
             if (coloringIn.value) {
                 coloringIn.value.split(',').map(s => s.trim()).filter(s => s).forEach(s => selected.add(s));
+            }
+
+            function updateTotalAndInputs() {
+                // hitung total dari selected
+                let total = 0;
+                selected.forEach(action => {
+                    const p = priceMap[action] || 0;
+                    total += p;
+                });
+                // update tampilan terformat
+                displayInput.value = formatNumber(total);
+                // update hidden value (numeric tanpa titik) untuk submission
+                hiddenInput.value = String(total);
+                // update colouring hidden
+                coloringIn.value = Array.from(selected).join(', ');
             }
 
             function renderTags() {
                 listDiv.innerHTML = '';
                 selected.forEach(action => {
-                    const span = document.createElement('span');
-                    span.className =
-                        'px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full flex items-center space-x-1';
-                    span.innerHTML = `
-                    <span>${action}</span>
-                    <button type="button" data-action="${action}" class="remove-action text-indigo-600 hover:text-indigo-900">&times;</button>
-                `;
-                    listDiv.appendChild(span);
+                    const p = priceMap[action] || 0;
+                    const tag = document.createElement('span');
+                    // styling masih sama, tambahkan price di dalam tag
+                    tag.className = 'px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full flex items-center space-x-2';
+                    tag.innerHTML = `
+                        <span class="text-xs font-medium text-indigo-700">Rp ${formatNumber(p)}</span>
+                        <span class="text-sm">${action}</span>
+                        <span class="text-xs text-indigo-600 ml-2">(${formatShort(p)})</span>
+                        <button type="button" data-action="${action}" class="remove-action text-indigo-600 hover:text-indigo-900 ml-2">&times;</button>
+                    `;
+                    listDiv.appendChild(tag);
                 });
-                coloringIn.value = Array.from(selected).join(', ');
+                // attach remove listeners
                 listDiv.querySelectorAll('.remove-action').forEach(btn => {
                     btn.addEventListener('click', e => {
-                        selected.delete(e.target.dataset.action);
+                        const act = e.currentTarget.dataset.action;
+                        selected.delete(act);
                         renderTags();
+                        updateTotalAndInputs();
                     });
                 });
             }
 
-            // render awal
+            // render awal dari selected kalau ada pada load
             renderTags();
+            updateTotalAndInputs();
 
+            // add action
             addBtn.addEventListener('click', () => {
                 const val = select.value;
-                if (!val || selected.has(val)) return;
+                if (!val) return;
+                if (selected.has(val)) return; // sudah ada
                 selected.add(val);
                 renderTags();
+                updateTotalAndInputs();
             });
+
+            // jika user tekan enter pada select (opsional), tambahkan juga
+            select.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addBtn.click();
+                }
+            });
+
+            // Pastikan saat form disubmit, hiddenInput berisi angka polos (sudah diupdate oleh updateTotalAndInputs)
+            if (form) {
+                form.addEventListener('submit', () => {
+                    hiddenInput.value = plainNumber(hiddenInput.value);
+                    // displayInput tetap disabled agar user tidak manipulasi di UI
+                });
+            }
         });
     </script>
 @endsection

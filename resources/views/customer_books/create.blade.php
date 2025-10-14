@@ -209,19 +209,27 @@
                                 class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 required>
                                 <option value="">-- Pilih Nama Kasir --</option>
-                                @foreach ($filtering as $capster)
+                                @forelse ($filtering as $capster)
                                     <option value="{{ $capster->name }}"
                                         {{ old('barber_name') === $capster->name ? 'selected' : '' }}>
                                         {{ $capster->name }}
                                     </option>
-                                @endforeach
+                                @empty
+                                    <option value="" disabled>-- Belum ada barber/kasir terdaftar --</option>
+                                @endforelse
                             </select>
                         @else
-                            {{-- Untuk kasir, tampilkan nama mereka tapi disable --}}
-                            <input type="text" name="barber_name" value="{{ auth()->user()->name }}"
-                                class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" disabled />
-                            {{-- Dan kirimkan tetap lewat input hidden --}}
-                            <input type="hidden" name="barber_name" value="{{ auth()->user()->name }}">
+                            @if (auth()->user()->name)
+                                {{-- Untuk kasir, tampilkan nama mereka tapi disable --}}
+                                <input type="text" name="barber_name" value="{{ auth()->user()->name }}"
+                                    class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" disabled />
+                                {{-- Dan kirimkan tetap lewat input hidden --}}
+                                <input type="hidden" name="barber_name" value="{{ auth()->user()->name }}">
+                            @else
+                                {{-- Kalau nama user kosong --}}
+                                <input type="text" value="-- Belum ada barber name --"
+                                    class="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-100 cursor-not-allowed" disabled />
+                            @endif
                         @endif
 
                         @error('barber_name')
