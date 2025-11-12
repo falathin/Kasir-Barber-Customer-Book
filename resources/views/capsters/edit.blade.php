@@ -4,8 +4,6 @@
 
 @section('content')
 <div class="max-w-3xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-    <h1 class="text-3xl font-extrabold text-gray-800 mb-8 text-center">Edit Capster</h1>
-
     <div class="bg-white border border-gray-200 rounded-2xl shadow-xl p-8">
         <form action="{{ route('capsters.update', $capster) }}" method="POST" enctype="multipart/form-data" novalidate class="space-y-6">
             @csrf

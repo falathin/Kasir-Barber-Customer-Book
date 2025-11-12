@@ -169,11 +169,37 @@ SVG,
     <div class="flex flex-1 flex-col overflow-auto ml-0 md:ml-64">
         <header class="flex items-center justify-between bg-white p-4 border-b border-gray-200">
             <button id="btn-toggle" class="text-gray-700 md:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                <svg id="icon-toggle" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
+            <script>
+                const btnToggle = document.getElementById('btn-toggle');
+                const iconToggle = document.getElementById('icon-toggle');
+                let isOpen = false;
+
+                btnToggle.addEventListener('click', () => {
+                    isOpen = !isOpen;
+
+                    // animasi halus
+                    iconToggle.style.transition = 'all 0.25s ease';
+
+                    // ubah ikon
+                    if (isOpen) {
+                        iconToggle.innerHTML = `
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        `;
+                    } else {
+                        iconToggle.innerHTML = `
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        `;
+                    }
+                });
+            </script>
             <h2 class="ml-2 text-xl font-semibold text-gray-800">@yield('title', 'Dashboard')</h2>
             <div class="flex items-center space-x-4">
             @if(auth()->user()->level === 'admin')
