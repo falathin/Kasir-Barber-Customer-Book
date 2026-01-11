@@ -152,7 +152,8 @@
                                         id="action-select"
                                         class="w-full px-3 py-2 border rounded-lg bg-white/90 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     >
-                                        <option value="" disabled>Select a service</option>
+                                        <!-- select kosong -->
+                                        <option value="">-- Pilih layanan --</option>
 
                                         <optgroup label="Haircut">
                                             <option value="Men Haircut Reguler">Men Haircut Reguler</option>
@@ -204,7 +205,6 @@
                                             <option value="Eyelash Retouch">Eyelash Retouch</option>
                                         </optgroup>
                                     </select>
-
                                     <button
                                         type="button"
                                         id="add-action-btn"
