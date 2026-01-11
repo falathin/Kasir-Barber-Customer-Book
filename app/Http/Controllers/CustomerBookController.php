@@ -78,7 +78,6 @@ class CustomerBookController extends Controller
             'books', 'barbers', 'search', 'barber', 'status', 'totalToday', 'showAll', 'startDate', 'endDate'
         ));
     }
-
     public function create()
     {
         // Ambil hanya capster yang masih aktif
@@ -181,6 +180,25 @@ class CustomerBookController extends Controller
 
     public function update(Request $request, CustomerBook $customerBook)
     {
+        // Manual price field names (these should match the input hidden names)
+        $manualFields = [
+            'hair_coloring_price',
+            'hair_extension_price',
+            'hair_extension_services_price'
+        ];
+
+        // Normalize manual fields: keep digits-only or null
+        foreach ($manualFields as $f) {
+            $val = $request->input($f, null);
+            if ($val !== null && $val !== '') {
+                // remove non-digits
+                $clean = preg_replace('/\D/', '', (string)$val);
+                $request->merge([$f => ($clean === '' ? null : $clean)]);
+            } else {
+                $request->merge([$f => null]);
+            }
+        }
+
         $rules = [
             'customer'         => 'required|string',
             'cap'              => 'required|string',
@@ -193,6 +211,10 @@ class CustomerBookController extends Controller
             'qr'               => 'nullable|string',
             'rincian'          => 'nullable|string',
             'created_time'     => 'nullable|date',
+            // manual columns: store as string (digits) or null
+            'hair_coloring_price' => 'nullable|string',
+            'hair_extension_price' => 'nullable|string',
+            'hair_extension_services_price' => 'nullable|string',
         ];
 
         $messages = [
@@ -224,6 +246,7 @@ class CustomerBookController extends Controller
                 ->withInput();
         }
 
+        // Save validated data. The manual fields are digits-only strings or null.
         $customerBook->update($validator->validated());
 
         return redirect()

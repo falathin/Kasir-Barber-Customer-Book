@@ -59,9 +59,9 @@
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </label>
-                    
+
                     <script>
-                        document.addEventListener('DOMContentLoaded', function () {
+                        document.addEventListener('DOMContentLoaded', function() {
                             const capSelect = document.getElementById('capSelect');
                             const asistenSelect = document.getElementById('asistenSelect');
 
@@ -120,42 +120,174 @@
                         @enderror
                     </label>
 
-                    {{-- Barber Services picker --}}
-                    <div id="action-picker" class="mb-4">
-                        <label for="action-select" class="block text-gray-700 mb-1">💈 Barber Services</label>
-                        <div class="flex items-center space-x-2">
-                            <select id="action-select"
-                                class="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <option value="" disabled selected>Select an action…</option>
-                                <option value="Haircut Reguler">Haircut Reguler</option>
-                                <option value="Ladies Only Haircut">Ladies Only Haircut</option>
-                                <option value="Baby Haircut">Baby Haircut</option>
-                                <option value="Poni">Poni</option>
-                                <option value="Fading Haircut">Fading Haircut</option>
-                                <option value="Shaving">Shaving</option>
-                                <option value="Hair Tatto">Hair Tatto</option>
-                                <option value="Hair Styling">Hair Styling</option>
-                                <option value="Hair Treatment">Hair Treatment</option>
-                                <option value="Hair Bleaching">Hair Bleaching</option>
-                                <option value="Hair Coloring">Hair Coloring</option>
-                                <option value="Hair Toning">Hair Toning</option>
-                                <option value="Highlight">Highlight</option>
-                                <option value="Hair Smoothing">Hair Smoothing</option>
-                                <option value="Perming">Perming</option>
-                                <option value="Downperm">Downperm</option>
-                                <option value="Hair Extension">Hair Extension</option>
-                                <option value="Hair Extension services">Hair Extension services</option>
-                                <option value="Facial">Facial</option>
-                                <option value="Eyelash">Eyelash</option>
-                                <option value="Eyelash Retouch">Eyelash Retouch</option>
-                            </select>
-                            <button type="button" id="add-action-btn"
-                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
-                                Add
-                            </button>
+                    {{-- SERVICES & PAYMENT PANEL --}}
+                    <div class="relative overflow-hidden rounded-2xl p-[1px] bg-gradient-to-br from-indigo-200 via-sky-200 to-purple-200">
+
+                        <!-- subtle glow layer -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-indigo-300/30 via-sky-200/20 to-purple-300/30 blur-2xl"></div>
+
+                        <div class="relative border border-white/60 rounded-2xl p-4 md:p-6 bg-white/80 backdrop-blur-md space-y-5 shadow-lg">
+
+                            <!-- Header -->
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-lg font-semibold text-gray-800">Barber Services</h2>
+                                    <p class="text-sm text-gray-500">Select services and calculate payment</p>
+                                </div>
+
+                                <!-- Animated GIF slot -->
+                                <div class="w-14 h-14 rounded-xl overflow-hidden border border-white shadow">
+                                    <img
+                                        src="https://static.vecteezy.com/system/resources/previews/044/855/219/original/barbershop-pole-pixel-art-illustration-vector.jpg"
+                                        class="w-full h-full object-cover"
+                                        alt="animation"
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- SERVICES -->
+                            <div>
+                                <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
+                                    <select
+                                        id="action-select"
+                                        class="w-full px-3 py-2 border rounded-lg bg-white/90 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    >
+                                        <option value="" disabled>Select a service</option>
+
+                                        <optgroup label="Haircut">
+                                            <option value="Men Haircut Reguler">Men Haircut Reguler</option>
+                                            <option value="Ladies Haircut Reguler">Ladies Haircut Reguler</option>
+                                            <option value="Baby Haircut">Baby Haircut</option>
+                                            <option value="Kids Haircut">Kids Haircut</option>
+                                            <option value="Kids Haircut Female">Kids Haircut Female</option>
+                                            <option value="Poni">Poni</option>
+                                        </optgroup>
+
+                                        <optgroup label="Keratin">
+                                            <option value="Keratin For Men">Keratin For Men</option>
+                                            <option value="Keratin S">Keratin S</option>
+                                            <option value="Keratin M">Keratin M</option>
+                                            <option value="Keratin L">Keratin L</option>
+                                            <option value="Keratin XL">Keratin XL</option>
+                                            <option value="Keratin XXL">Keratin XXL</option>
+                                        </optgroup>
+
+                                        <optgroup label="Treatment">
+                                            <option value="Men Hair Treatment">Men Hair Treatment</option>
+                                            <option value="Ladies Hair Treatment">Ladies Hair Treatment</option>
+                                            <option value="Facial">Facial</option>
+                                        </optgroup>
+
+                                        <optgroup label="Coloring and Styling">
+                                            <option value="Hair Toning For Men">Hair Toning For Men</option>
+                                            <option value="Highlight For Men">Highlight For Men</option>
+                                            <option value="Hair Styling">Hair Styling</option>
+                                            <option value="Hair Tatto">Hair Tatto</option>
+                                        </optgroup>
+
+                                        <optgroup label="Smoothing">
+                                            <option value="Hair Smoothing For Men">Hair Smoothing For Men</option>
+                                            <option value="Hair Smoothing S">Hair Smoothing S</option>
+                                            <option value="Hair Smoothing M">Hair Smoothing M</option>
+                                            <option value="Hair Smoothing L">Hair Smoothing L</option>
+                                            <option value="Hair Smoothing XL">Hair Smoothing XL</option>
+                                            <option value="Hair Smoothing XXL">Hair Smoothing XXL</option>
+                                            <option value="Hair Smoothing XXXL">Hair Smoothing XXXL</option>
+                                            <option value="Hair Smoothing Over">Hair Smoothing Over</option>
+                                        </optgroup>
+
+                                        <optgroup label="Others">
+                                            <option value="Shaving">Shaving</option>
+                                            <option value="Perming">Perming</option>
+                                            <option value="Downperm">Downperm</option>
+                                            <option value="Eyelash">Eyelash</option>
+                                            <option value="Eyelash Retouch">Eyelash Retouch</option>
+                                        </optgroup>
+                                    </select>
+
+                                    <button
+                                        type="button"
+                                        id="add-action-btn"
+                                        class="w-full md:w-auto px-5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg shadow hover:opacity-90 transition"
+                                    >
+                                        Add
+                                    </button>
+                                </div>
+
+                                <!-- Selected services -->
+                                <div id="selected-actions" class="mt-3 flex flex-wrap gap-2">
+                                    @if(old('services', $customerBook->services))
+                                        @foreach(old('services', $customerBook->services) as $service)
+                                            <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm flex items-center gap-2 shadow-sm">
+                                                {{ $service }}
+                                                <input type="hidden" name="services[]" value="{{ $service }}">
+                                                <button type="button" class="remove-service text-red-500 hover:text-red-700">×</button>
+                                            </span>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+
+                            <hr class="border-indigo-300/40">
+
+                            <!-- PRICE & PAYMENT -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Total Price</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">Rp</div>
+                                        <input
+                                            type="text"
+                                            id="price_display"
+                                            value="{{ old('price', $customerBook->price) ? number_format(old('price', $customerBook->price),0,',','.') : '0' }}"
+                                            class="w-full pl-12 pr-4 py-2 border rounded-lg bg-gray-100 font-semibold"
+                                            disabled
+                                        >
+                                        <input type="hidden" name="price" id="price_hidden" value="{{ old('price', $customerBook->price) }}">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-1">Payment Method</label>
+                                    <select name="qr" class="w-full px-4 py-2 border rounded-lg bg-white">
+                                        <option value="cash" {{ old('qr',$customerBook->qr)=='cash'?'selected':'' }}>Cash</option>
+                                        <option value="qr_transfer" {{ old('qr',$customerBook->qr)=='qr_transfer'?'selected':'' }}>QR Transfer</option>
+                                        <option value="no revenue" {{ old('qr',$customerBook->qr)=='no revenue'?'selected':'' }}>No Revenue</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- MANUAL PRICE -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                @foreach([
+                                    ['Hair Coloring','hair_coloring_price'],
+                                    ['Hair Extension','hair_extension_price'],
+                                    ['Hair Extension Services','hair_extension_services_price']
+                                ] as [$label,$id])
+                                <div>
+                                    <label class="text-sm text-gray-700 mb-1 block">{{ $label }}</label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">Rp</div>
+                                        <input
+                                            type="text"
+                                            id="{{ $id }}_input"
+                                            class="w-full pl-12 pr-3 py-2 border rounded-lg bg-white"
+                                            value="{{ old($id,$customerBook->$id) ? number_format(old($id,$customerBook->$id),0,',','.') : '' }}"
+                                        >
+                                        <input
+                                            type="hidden"
+                                            name="{{ $id }}"
+                                            id="{{ $id }}_hidden"
+                                            value="{{ old($id,$customerBook->$id) }}"
+                                        >
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+
                         </div>
-                        <div id="selected-actions" class="mt-3 flex flex-wrap gap-2"></div>
                     </div>
+
 
                     {{-- Hidden field untuk menyimpan barber services ke colouring_other --}}
                     <input type="hidden" name="colouring_other" id="colouring_other_hidden"
@@ -173,40 +305,11 @@
                     <label class="block">
                         <span class="text-gray-700">📝 Rincian</span>
                         <textarea name="rincian"
-                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="4"
-                            placeholder="Keterangan tambahan, catatan, atau permintaan khusus...">{{ old('rincian', $customerBook->rincian) }}</textarea>
+                            class="w-full mt-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            rows="4" placeholder="Keterangan tambahan, catatan, atau permintaan khusus...">{{ old('rincian', $customerBook->rincian) }}</textarea>
                         @error('rincian')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
-                    </label>
-
-                    {{-- Price (display disabled + hidden actual price for submission) --}}
-                    <label class="block">
-                        <span class="text-gray-700">💰 Price</span>
-                        <div class="relative mt-1">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">Rp</div>
-                            <!-- Visible disabled input (no name) supaya user tidak bisa ubah -->
-                            <input type="text" id="price_display" inputmode="numeric"
-                                value="{{ old('price', $customerBook->price) ? number_format($customerBook->price,0,',','.') : '0' }}" placeholder="e.g. 150000"
-                                class="w-full pl-12 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                disabled>
-                            <!-- Hidden input dengan name="price" yang dikirim ke server -->
-                            <input type="hidden" name="price" id="price_hidden" value="{{ old('price', $customerBook->price) }}">
-                        </div>
-                        @error('price')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </label>
-
-                    {{-- Payment Method --}}
-                    <label class="block">
-                        <span class="text-gray-700">💳 Payment Method</span>
-                        <select name="qr"
-                            class="w-full mt-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="cash" {{ old('qr', $customerBook->qr) == 'cash' ? 'selected' : '' }}>Cash</option>
-                            <option value="qr_transfer" {{ old('qr', $customerBook->qr) == 'qr_transfer' ? 'selected' : '' }}>QR Transfer</option>
-                            <option value="no revenue" {{ old('qr', $customerBook->qr) == 'no revenue' ? 'selected' : '' }}>No Revenue</option>
-                        </select>
                     </label>
 
                     {{-- Barber Name --}}
@@ -240,55 +343,54 @@
 
                     @php $isAdmin = auth()->user()->level === 'admin'; @endphp
 
-                <button type="button" id="updateBtn"
-                    data-level="{{ auth()->user()->level }}"
-                    class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                    Done
-                </button>
+                    <button type="button" id="updateBtn" data-level="{{ auth()->user()->level }}"
+                        class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                        Done
+                    </button>
 
                     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
                     <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const updateBtn = document.getElementById('updateBtn');
-                        if (!updateBtn) return;
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const updateBtn = document.getElementById('updateBtn');
+                            if (!updateBtn) return;
 
-                        updateBtn.addEventListener('click', function (e) {
-                            const level = this.dataset.level;
-                            const form = this.closest('form');
-                            const priceInput = form.querySelector('#price');
+                            updateBtn.addEventListener('click', function(e) {
+                                const level = this.dataset.level;
+                                const form = this.closest('form');
+                                const priceInput = form.querySelector('#price');
 
-                            function stripFormatting() {
-                                if (priceInput) {
-                                    // Hapus semua titik
-                                    priceInput.value = priceInput.value.replace(/\./g, '');
-                                }
-                            }
-
-                            if (level === 'kasir') {
-                                // Kasir: konfirmasi sebelum submit
-                                e.preventDefault();
-                                Swal.fire({
-                                    title: 'Konfirmasi',
-                                    text: 'Anda yakin semua rincian sudah benar? Pastikan semua sudah sesuai dan di-isi dengan benar.',
-                                    icon: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonColor: '#3085d6',
-                                    cancelButtonColor: '#d33',
-                                    confirmButtonText: 'Ya, lanjutkan',
-                                    cancelButtonText: 'Batal'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        stripFormatting();
-                                        form.submit();
+                                function stripFormatting() {
+                                    if (priceInput) {
+                                        // Hapus semua titik
+                                        priceInput.value = priceInput.value.replace(/\./g, '');
                                     }
-                                });
-                            } else {
-                                // Admin: langsung submit tanpa konfirmasi
-                                stripFormatting();
-                                form.submit();
-                            }
+                                }
+
+                                if (level === 'kasir') {
+                                    // Kasir: konfirmasi sebelum submit
+                                    e.preventDefault();
+                                    Swal.fire({
+                                        title: 'Konfirmasi',
+                                        text: 'Anda yakin semua rincian sudah benar? Pastikan semua sudah sesuai dan di-isi dengan benar.',
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#3085d6',
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Ya, lanjutkan',
+                                        cancelButtonText: 'Batal'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            stripFormatting();
+                                            form.submit();
+                                        }
+                                    });
+                                } else {
+                                    // Admin: langsung submit tanpa konfirmasi
+                                    stripFormatting();
+                                    form.submit();
+                                }
+                            });
                         });
-                    });
                     </script>
 
                 </form>
@@ -297,147 +399,173 @@
     </div>
 
 <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Elements
-            const displayInput = document.getElementById('price_display'); // terlihat & disabled
-            const hiddenInput = document.getElementById('price_hidden'); // dikirim ke server
-            const select = document.getElementById('action-select');
-            const addBtn = document.getElementById('add-action-btn');
-            const listDiv = document.getElementById('selected-actions');
+document.addEventListener('DOMContentLoaded', function () {
 
-            // hidden untuk menyimpan daftar selected (mirip colouring_other_hidden dari kode sebelumnya)
-            let coloringIn = document.getElementById('colouring_other_hidden');
-            const form = displayInput.closest('form');
+  const select = document.getElementById('action-select');
+  const addBtn = document.getElementById('add-action-btn');
+  const listDiv = document.getElementById('selected-actions');
+  const displayTotal = document.getElementById('price_display');
+  const hiddenTotal  = document.getElementById('price_hidden');
+  const form = document.querySelector('form');
 
-            if (!coloringIn) {
-                coloringIn = document.createElement('input');
-                coloringIn.type = 'hidden';
-                coloringIn.id = 'colouring_other_hidden';
-                coloringIn.name = 'colouring_other_hidden';
-                if (form) form.appendChild(coloringIn);
-            }
+  const manualFields = [
+    { inputId: 'hair_coloring_price_input', hiddenId: 'hair_coloring_price_hidden' },
+    { inputId: 'hair_extension_price_input', hiddenId: 'hair_extension_price_hidden' },
+    { inputId: 'hair_extension_services_price_input', hiddenId: 'hair_extension_services_price_hidden' }
+  ];
 
-            // Pemetaan harga standar (dalam Rupiah, integer)
-            const priceMap = {
-                "Haircut Reguler": 50000,
-                "Ladies Only Haircut": 60000,
-                "Baby Haircut": 30000,
-                "Poni": 15000,
-                "Fading Haircut": 60000,
-                "Shaving": 20000,
-                "Hair Tatto": 35000,
-                "Hair Styling": 40000,
-                "Hair Treatment": 120000,
-                "Hair Bleaching": 250000,
-                "Hair Coloring": 200000,
-                "Hair Toning": 150000,
-                "Highlight": 180000,
-                "Hair Smoothing": 200000,
-                "Perming": 180000,
-                "Downperm": 120000,
-                "Hair Extension": 300000,
-                "Hair Extension services": 350000,
-                "Facial": 80000,
-                "Eyelash": 150000,
-                "Eyelash Retouch": 70000
-            };
+  const priceMap = {
+    "Men Haircut Reguler": 50000,
+    "Ladies Haircut Reguler": 60000,
+    "Baby Haircut": 30000,
+    "Poni": 25000,
+    "Keratin For Men": 350000,
+    "Keratin S": 400000,
+    "Keratin M": 600000,
+    "Keratin L": 800000,
+    "Keratin XL": 950000,
+    "Keratin XXL": 1000000,
+    "Kids Haircut": 40000,
+    "Kids Haircut Female": 65000,
+    "Shaving": 10000,
+    "Hair Tatto": 35000,
+    "Hair Styling": 50000,
+    "Men Hair Treatment": 85000,
+    "Ladies Hair Treatment": 100000,
+    "Hair Toning For Men": 85000,
+    "Highlight For Men": 300000,
+    "Hair Smoothing For Men": 250000,
+    "Hair Smoothing S": 300000,
+    "Hair Smoothing M": 350000,
+    "Hair Smoothing L": 400000,
+    "Hair Smoothing XL": 450000,
+    "Hair Smoothing XXL": 500000,
+    "Hair Smoothing XXXL": 600000,
+    "Hair Smoothing Over": 700000,
+    "Perming": 300000,
+    "Downperm": 150000,
+    "Facial": 80000,
+    "Eyelash": 150000,
+    "Eyelash Retouch": 50000
+  };
 
-            // util formatting
-            function formatNumber(n) {
-                if (n === null || n === undefined) return '0';
-                const s = String(n);
-                const digits = s.replace(/\D/g, '');
-                if (!digits) return '0';
-                return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            }
-            function plainNumber(n) {
-                return String(n).replace(/\./g, '').replace(/\D/g, '') || '0';
-            }
-            // ringkasan singkat: 50000 -> 50rb, 15000 -> 15rb
-            function formatShort(n) {
-                n = Number(n) || 0;
-                if (n >= 1000) return Math.round(n / 1000) + 'rb';
-                return String(n); // kalau kecil
-            }
+  const groups = {
+    keratin: [
+      "Keratin For Men","Keratin S","Keratin M","Keratin L","Keratin XL","Keratin XXL"
+    ],
+    smoothing: [
+      "Hair Smoothing For Men","Hair Smoothing S","Hair Smoothing M","Hair Smoothing L",
+      "Hair Smoothing XL","Hair Smoothing XXL","Hair Smoothing XXXL","Hair Smoothing Over"
+    ]
+  };
 
-            // selected set (menyimpan nama layanan)
-            const selected = new Set();
+  const digitsOnly = s => String(s || '').replace(/\D/g, '');
+  const formatRp = n => String(Number(n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 
-            // Inisialisasi dari existing colouring_other_hidden (jika ada)
-            if (coloringIn.value) {
-                coloringIn.value.split(',').map(s => s.trim()).filter(s => s).forEach(s => selected.add(s));
-            }
+  let serviceHidden = document.querySelector('input[name="colouring_other"]');
+  if (!serviceHidden) {
+    serviceHidden = document.createElement('input');
+    serviceHidden.type = 'hidden';
+    serviceHidden.name = 'colouring_other';
+    form.appendChild(serviceHidden);
+  }
 
-            function updateTotalAndInputs() {
-                // hitung total dari selected
-                let total = 0;
-                selected.forEach(action => {
-                    const p = priceMap[action] || 0;
-                    total += p;
-                });
-                // update tampilan terformat
-                displayInput.value = formatNumber(total);
-                // update hidden value (numeric tanpa titik) untuk submission
-                hiddenInput.value = String(total);
-                // update colouring hidden
-                coloringIn.value = Array.from(selected).join(', ');
-            }
+  const manualHiddenMap = {};
+  manualFields.forEach(f => {
+    let el = document.getElementById(f.hiddenId);
+    if (!el) {
+      el = document.createElement('input');
+      el.type = 'hidden';
+      el.id = f.hiddenId;
+      el.name = f.hiddenId.replace('_hidden','');
+      form.appendChild(el);
+    }
+    manualHiddenMap[f.hiddenId] = el;
+  });
 
-            function renderTags() {
-                listDiv.innerHTML = '';
-                selected.forEach(action => {
-                    const p = priceMap[action] || 0;
-                    const tag = document.createElement('span');
-                    // styling masih sama, tambahkan price di dalam tag
-                    tag.className = 'px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full flex items-center space-x-2';
-                    tag.innerHTML = `
-                        <span class="text-xs font-medium text-indigo-700">Rp ${formatNumber(p)}</span>
-                        <span class="text-sm">${action}</span>
-                        <span class="text-xs text-indigo-600 ml-2">(${formatShort(p)})</span>
-                        <button type="button" data-action="${action}" class="remove-action text-indigo-600 hover:text-indigo-900 ml-2">&times;</button>
-                    `;
-                    listDiv.appendChild(tag);
-                });
-                // attach remove listeners
-                listDiv.querySelectorAll('.remove-action').forEach(btn => {
-                    btn.addEventListener('click', e => {
-                        const act = e.currentTarget.dataset.action;
-                        selected.delete(act);
-                        renderTags();
-                        updateTotalAndInputs();
-                    });
-                });
-            }
+  const selected = [];
 
-            // render awal dari selected kalau ada pada load
-            renderTags();
-            updateTotalAndInputs();
+  function getManualTotal() {
+    let sum = 0;
+    Object.values(manualHiddenMap).forEach(h => {
+      const d = digitsOnly(h.value);
+      if (d) sum += Number(d);
+    });
+    return sum;
+  }
 
-            // add action
-            addBtn.addEventListener('click', () => {
-                const val = select.value;
-                if (!val) return;
-                if (selected.has(val)) return; // sudah ada
-                selected.add(val);
-                renderTags();
-                updateTotalAndInputs();
-            });
+  function updateTotal() {
+    let total = 0;
+    selected.forEach(s => total += priceMap[s] || 0);
+    total += getManualTotal();
+    displayTotal.value = formatRp(total);
+    hiddenTotal.value = total;
+    serviceHidden.value = selected.join(', ');
+  }
 
-            // jika user tekan enter pada select (opsional), tambahkan juga
-            select.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addBtn.click();
-                }
-            });
+  function render() {
+    listDiv.innerHTML = '';
+    selected.forEach(svc => {
+      const span = document.createElement('span');
+      span.className = 'px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full flex gap-2 items-center';
+      span.innerHTML = `<span class="text-xs">Rp ${formatRp(priceMap[svc]||0)}</span><span>${svc}</span><button data-svc="${svc}">&times;</button>`;
+      span.querySelector('button').onclick = () => {
+        const i = selected.indexOf(svc);
+        if (i !== -1) selected.splice(i,1);
+        render();
+        updateTotal();
+      };
+      listDiv.appendChild(span);
+    });
+  }
 
-            // Pastikan saat form disubmit, hiddenInput berisi angka polos (sudah diupdate oleh updateTotalAndInputs)
-            if (form) {
-                form.addEventListener('submit', () => {
-                    hiddenInput.value = plainNumber(hiddenInput.value);
-                    // displayInput tetap disabled agar user tidak manipulasi di UI
-                });
-            }
+  function removeGroupIfNeeded(svc) {
+    Object.values(groups).forEach(group => {
+      if (group.includes(svc)) {
+        group.forEach(g => {
+          const i = selected.indexOf(g);
+          if (i !== -1) selected.splice(i,1);
         });
-    </script>
+      }
+    });
+  }
+
+  addBtn.onclick = () => {
+    const svc = select.value;
+    if (!svc) return;
+    removeGroupIfNeeded(svc);
+    if (!selected.includes(svc)) selected.push(svc);
+    render();
+    updateTotal();
+  };
+
+  manualFields.forEach(f => {
+    const input = document.getElementById(f.inputId);
+    const hidden = document.getElementById(f.hiddenId);
+    if (!input || !hidden) return;
+    input.addEventListener('input', () => {
+      const d = digitsOnly(input.value);
+      input.value = d ? formatRp(d) : '';
+      hidden.value = d;
+      updateTotal();
+    });
+    if (hidden.value) input.value = formatRp(hidden.value);
+  });
+
+  form.addEventListener('submit', () => {
+    Object.values(manualHiddenMap).forEach(h => h.value = digitsOnly(h.value));
+    serviceHidden.value = selected.join(', ');
+    updateTotal();
+  });
+
+  if (serviceHidden.value) {
+    serviceHidden.value.split(/\s*,\s*/).forEach(s => selected.push(s));
+  }
+
+  render();
+  updateTotal();
+
+});
+</script>
+
 @endsection

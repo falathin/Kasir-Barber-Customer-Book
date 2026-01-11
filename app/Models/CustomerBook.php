@@ -19,6 +19,10 @@ class CustomerBook extends Model
         'rincian',
         'created_time',
         'antrian',
+        // manual columns
+        'hair_coloring_price',
+        'hair_extension_price',
+        'hair_extension_services_price',
     ];
 
     public function capster()
