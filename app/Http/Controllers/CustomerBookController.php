@@ -14,83 +14,155 @@ class CustomerBookController extends Controller
 
     public function index(Request $request)
     {
-        $search     = $request->input('search');
-        $barber     = $request->input('barber');
-        $status     = in_array($request->input('status'), ['antre', 'proses', 'done']) ? $request->input('status') : null;
-        $startDate  = $request->input('start_date');
-        $endDate    = $request->input('end_date');
-        $user       = auth()->user();
-    
-        // Show all if explicitly asked or searching
-        $showAll = $request->input('show') === 'all' || $search;
-        $today   = Carbon::today();
-    
-        $query = CustomerBook::query()
-            // Date filters
-            ->when($startDate && $endDate, function($q) use ($startDate, $endDate) {
-                $q->whereBetween('created_at', [Carbon::parse($startDate)->startOfDay(), Carbon::parse($endDate)->endOfDay()]);
-            }, function($q) use ($today, $showAll) {
-                // Default: only today if not showing all
+        $user = auth()->user();
+        $today = \Carbon\Carbon::today();
+
+        // ======================
+        // REQUEST PARAMS
+        // ======================
+        $search    = $request->search;
+        $barber    = $request->barber;
+        $status    = in_array($request->status, ['antre', 'proses', 'done']) ? $request->status : null;
+        $startDate = $request->start_date;
+        $endDate   = $request->end_date;
+        $showAll   = $request->show === 'all' || $search;
+
+        // ======================
+        // BASE QUERY
+        // ======================
+        $query = \App\Models\CustomerBook::query()
+
+            // DATE FILTER
+            ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('created_at', [
+                    \Carbon\Carbon::parse($startDate)->startOfDay(),
+                    \Carbon\Carbon::parse($endDate)->endOfDay(),
+                ]);
+            }, function ($q) use ($today, $showAll) {
                 if (! $showAll) {
                     $q->whereDate('created_at', $today);
                 }
             })
-            ->when($search, function($q) use ($search) {
-                $q->where(function ($q2) use ($search) {
-                    $q2->where('customer', 'like', "%{$search}%")
-                        ->orWhere('haircut_type', 'like', "%{$search}%")
-                        ->orWhere('cap', 'like', "%{$search}%");
+
+            // SEARCH (ALL COLUMNS)
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($s) use ($search) {
+                    $s->where('customer', 'like', "%{$search}%")
+                    ->orWhere('cap', 'like', "%{$search}%")
+                    ->orWhere('asisten', 'like', "%{$search}%")
+                    ->orWhere('haircut_type', 'like', "%{$search}%")
+                    ->orWhere('barber_name', 'like', "%{$search}%")
+                    ->orWhere('colouring_other', 'like', "%{$search}%")
+                    ->orWhere('sell_use_product', 'like', "%{$search}%")
+                    ->orWhere('antrian', 'like', "%{$search}%")
+                    ->orWhere('qr', 'like', "%{$search}%")
+                    ->orWhere('price', 'like', "%{$search}%")
+                    ->orWhere('hair_coloring_price', 'like', "%{$search}%")
+                    ->orWhere('hair_extension_price', 'like', "%{$search}%")
+                    ->orWhere('hair_extension_services_price', 'like', "%{$search}%");
                 });
             })
-            ->when($user->level !== 'admin', fn($q) => $q->where('barber_name', $user->name))
-            ->when($user->level === 'admin' && $barber, fn($q) => $q->where('barber_name', $barber))
+
+            // ROLE FILTER
+            ->when($user->level !== 'admin', fn ($q) =>
+                $q->where('barber_name', $user->name)
+            )
+
+            ->when($user->level === 'admin' && $barber, fn ($q) =>
+                $q->where('barber_name', $barber)
+            )
+
+            // STATUS FILTER (FIX & CONSISTENT)
             ->when($status, function ($q) use ($status) {
+
+                // DONE
                 if ($status === 'done') {
                     $q->whereNotNull('price')
-                      ->whereNotNull('colouring_other')
-                      ->whereNotNull('qr');
-                } elseif ($status === 'proses') {
+                    ->whereNotNull('qr')
+                    ->where(function ($s) {
+                        $s->whereNotNull('colouring_other')
+                            ->orWhereNotNull('hair_coloring_price')
+                            ->orWhereNotNull('hair_extension_price')
+                            ->orWhereNotNull('hair_extension_services_price');
+                    });
+                }
+
+                // PROSES
+                if ($status === 'proses') {
                     $q->whereNotNull('cap')
-                      ->whereNotNull('customer')
-                      ->whereNotNull('barber_name')
-                      ->whereNull('colouring_other')
-                      ->whereNull('qr');
-                } elseif ($status === 'antre') {
+                    ->whereNull('price')
+                    ->whereNull('qr');
+                }
+
+                // ANTRE
+                if ($status === 'antre') {
                     $q->whereNull('cap')
-                      ->whereNotNull('customer')
-                      ->whereNotNull('barber_name')
-                      ->whereNotNull('antrian')
-                      ->whereNotNull('haircut_type');
+                    ->whereNotNull('customer')
+                    ->whereNotNull('barber_name')
+                    ->whereNotNull('antrian');
                 }
             });
-    
-        $totalToday = CustomerBook::whereDate('created_at', $today)->count();
-    
+
+        // ======================
+        // RESULT
+        // ======================
         $books = $query->latest()
-                       ->paginate(15)
-                       ->appends($request->query());
-    
+            ->paginate(15)
+            ->appends($request->query());
+
+        // ======================
+        // SUPPORT DATA
+        // ======================
+        $totalToday = \App\Models\CustomerBook::whereDate('created_at', $today)->count();
+
         $barbers = $user->level === 'admin'
-            ? CustomerBook::select('barber_name')->distinct()->pluck('barber_name')
+            ? \App\Models\CustomerBook::select('barber_name')
+                ->whereNotNull('barber_name')
+                ->distinct()
+                ->pluck('barber_name')
             : collect([$user->name]);
-    
+
+        // ======================
+        // VIEW
+        // ======================
         return view('customer_books.index', compact(
-            'books', 'barbers', 'search', 'barber', 'status', 'totalToday', 'showAll', 'startDate', 'endDate'
+            'books',
+            'barbers',
+            'search',
+            'barber',
+            'status',
+            'totalToday',
+            'showAll',
+            'startDate',
+            'endDate'
         ));
     }
+
     public function create()
     {
-        // Ambil hanya capster yang masih aktif
+        // Ambil capster aktif
         $capsters = Capster::where('status', 'Aktif')->get();
 
+        // Ambil user kasir
         $filtering = User::where('level', 'kasir')->get();
+
         $user = auth()->user();
         $today = now()->toDateString();
-        $nextAntrian = CustomerBook::whereDate('created_at', $today)
-            ->where('barber_name', $user->name)
-            ->max('antrian') + 1;
 
-        return view('customer_books.create', compact('capsters', 'filtering', 'nextAntrian'));
+        $query = CustomerBook::whereDate('created_at', $today);
+
+        // Kalau BUKAN admin & kasir → baru difilter barber_name
+        if (!in_array($user->level, ['admin', 'kasir'])) {
+            $query->where('barber_name', $user->name);
+        }
+
+        $nextAntrian = ($query->max('antrian') ?? 0) + 1;
+
+        return view('customer_books.create', compact(
+            'capsters',
+            'filtering',
+            'nextAntrian'
+        ));
     }
 
     public function createWithCapster(CustomerBook $book)
@@ -113,7 +185,6 @@ class CustomerBookController extends Controller
             'nextAntrian' => $nextAntrian,
         ]);
     }
-
 
     public function storeWithCapster(Request $request, CustomerBook $book)
     {

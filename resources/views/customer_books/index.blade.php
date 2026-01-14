@@ -117,7 +117,12 @@
                 <tbody class="bg-white divide-y divide-gray-100 text-sm">
                     @forelse($books as $book)
                         @php
-                            $isDone = $book->price && $book->colouring_other && $book->qr;
+                            $isDone = $book->price && $book->qr && (
+                                $book->colouring_other ||
+                                $book->hair_coloring_price ||
+                                $book->hair_extension_price ||
+                                $book->hair_extension_services_price
+                            );
                             $isProses = !$isDone && $book->cap;
                             $isAntre =
                                 !$isDone && !$isProses && $book->customer && $book->barber_name && $book->antrian;
@@ -286,11 +291,34 @@
             <div class="space-y-6 md:hidden px-4 pb-10">
                 @forelse($books as $book)
                     @php
-                        $isDone = $book->price && $book->colouring_other && $book->qr;
-                        $isProses = !$isDone && $book->cap;
-                        $isAntre = !$isDone && !$isProses && $book->customer && $book->barber_name && $book->antrian;
+                        // DONE jika: price + qr ada, dan ADA salah satu data coloring / harga
+                        $isDone = $book->price && $book->qr && (
+                            $book->colouring_other ||
+                            $book->hair_coloring_price ||
+                            $book->hair_extension_price ||
+                            $book->hair_extension_services_price
+                        );
 
-                        $status = $isDone ? 'DONE' : ($isProses ? 'PROSES' : ($isAntre ? 'ANTRE' : 'PENDING'));
+                        // PROSES jika belum done tapi sudah ada cap
+                        $isProses = !$isDone && $book->cap;
+
+                        // ANTRE jika belum done & proses
+                        $isAntre = !$isDone
+                            && !$isProses
+                            && $book->customer
+                            && $book->barber_name
+                            && $book->antrian;
+
+                        // Label status
+                        $status = $isDone
+                            ? 'DONE'
+                            : ($isProses
+                                ? 'PROSES'
+                                : ($isAntre
+                                    ? 'ANTRE'
+                                    : 'PENDING'));
+
+                        // Warna status
                         $statusColor = $isDone
                             ? 'bg-green-100 text-green-700 border-green-500'
                             : ($isProses
@@ -299,7 +327,6 @@
                                     ? 'bg-yellow-100 text-yellow-700 border-yellow-500'
                                     : 'bg-gray-100 text-gray-500 border-gray-400'));
                     @endphp
-
                     <div
                         class="relative bg-gradient-to-br from-white via-slate-50 to-gray-100 border border-gray-200 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
                         <!-- Top & Bottom perforated edge -->

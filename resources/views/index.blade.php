@@ -4,26 +4,47 @@
 
 @section('content')
     <main class="space-y-6 p-4">
-        <!-- Greeting Section -->
+    {{-- ===================== GREETING CARD ===================== --}}
+    <div class="rounded-2xl overflow-hidden shadow-2xl">
+
+        {{-- Barber stripe --}}
+        <div class="flex h-1">
+            <div class="w-1/3 bg-red-600"></div>
+            <div class="w-1/3 bg-white"></div>
+            <div class="w-1/3 bg-blue-600"></div>
+        </div>
+
         <div id="greeting-card"
-            class="p-6 rounded-2xl shadow-lg animate__animated animate__fadeInUp flex flex-col md:flex-row items-center justify-between gap-6 bg-yellow-50">
-            <div>
+            class="p-6 rounded-b-2xl animate__animated animate__fadeInUp
+                   flex flex-col md:flex-row items-center justify-between gap-6 bg-yellow-50">
+
+            <div class="flex-1 min-w-0">
                 <h2 id="greeting" class="text-2xl font-semibold text-gray-800"></h2>
                 <p id="time" class="text-lg text-gray-700 mt-1 font-mono tracking-widest"></p>
 
                 <p class="mt-4 text-gray-600 leading-relaxed">
-                    Hai <span class="font-semibold text-indigo-600">
-                        {{ auth()->user()->level === 'admin' ? 'Admin Barber' : 'Kasir' }}
-                    </span> <span class="font-semibold text-indigo-600">{{ auth()->user()->name }}</span>! <br>
-                    Semoga harimu menyenangkan dan penuh produktivitas. Silakan lihat statistik harianmu di bawah ini.
+                    @if (auth()->user()->level === 'admin')
+                        Hai <span class="font-semibold text-indigo-600">Admin</span> 👋
+                    @else
+                        Hai
+                        <span class="font-semibold text-indigo-600">
+                            Kasir {{ auth()->user()->name }}
+                        </span> 👋
+                    @endif
+                    <br>
+                    Semoga harimu lancar dan produktif. Statistik hari ini ada di bawah.
                 </p>
 
             </div>
-            <div class="w-32 h-32 md:w-40 md:h-40">
-                <img id="greeting-icon" src="https://cdn-icons-png.flaticon.com/512/869/869869.png" alt="Welcome"
-                    class="w-full h-full object-cover animate__animated animate__fadeInRight" />
+
+            <div class="w-28 h-28 md:w-36 md:h-36 flex-shrink-0">
+                <img id="greeting-icon"
+                    src="https://cdn-icons-png.flaticon.com/512/869/869869.png"
+                    class="w-full h-full object-cover rounded-xl shadow-sm animate__animated animate__fadeInRight"
+                    alt="Greeting">
             </div>
         </div>
+    </div>
 
         <!-- Toggleable Stats Section -->
         <div class="bg-white p-6 rounded-2xl shadow-lg animate__animated animate__fadeInUp">
