@@ -37,7 +37,7 @@
                         Semoga harimu lancar dan produktif. Statistik hari ini ada di bawah.
                     </p>
                 </div>
-
+                
                 {{-- Bagian ikon greeting --}}
                 <div class="w-28 h-28 md:w-36 md:h-36 flex-shrink-0">
                     <img id="greeting-icon" src="https://cdn-icons-png.flaticon.com/512/869/869869.png"
