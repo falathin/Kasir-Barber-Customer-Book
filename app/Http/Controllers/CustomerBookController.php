@@ -239,14 +239,20 @@ class CustomerBookController extends Controller
 
     public function edit(CustomerBook $customerBook)
     {
-        // Ambil semua capster yang aktif
         $capsters = Capster::where('status', 'Aktif')
-            ->orWhere('id', $customerBook->capster_id) // Tambahkan capster yang sedang digunakan
+            ->orWhere('id', $customerBook->capster_id)
             ->get();
 
         $filtering = User::where('level', 'kasir')->get();
 
-        return view('customer_books.edit', compact('customerBook', 'capsters', 'filtering'));
+        $canInputManualPrice = auth()->user()->level === 'admin';
+
+        return view('customer_books.edit', compact(
+            'customerBook',
+            'capsters',
+            'filtering',
+            'canInputManualPrice'
+        ));
     }
 
     public function update(Request $request, CustomerBook $customerBook)

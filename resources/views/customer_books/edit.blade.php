@@ -258,7 +258,7 @@
                   </div>
                 </div>
 
-                <!-- MANUAL PRICE FIELDS -->
+                @if($canInputManualPrice)
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                   @foreach([
                     ['Hair Coloring','hair_coloring_price'],
@@ -272,11 +272,13 @@
                         <input type="text" id="{{ $id }}_input"
                           class="w-full pl-12 pr-3 py-2 border rounded-xl bg-white"
                           value="{{ old($id,$customerBook->$id) ? number_format(old($id,$customerBook->$id),0,',','.') : '' }}">
-                        <input type="hidden" name="{{ $id }}" id="{{ $id }}_hidden" value="{{ old($id,$customerBook->$id) ?? '' }}">
+                        <input type="hidden" name="{{ $id }}" id="{{ $id }}_hidden"
+                          value="{{ old($id,$customerBook->$id) ?? '' }}">
                       </div>
                     </div>
                   @endforeach
                 </div>
+                @endif
 
               </div>
             </div>
@@ -595,7 +597,6 @@
           }
         });
       }
-
     });
   </script>
 @endsection
