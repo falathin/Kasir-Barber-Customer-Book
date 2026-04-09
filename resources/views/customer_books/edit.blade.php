@@ -161,8 +161,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
                     <select id="action-select"
                       class="w-full px-3 py-2 border rounded-xl bg-white/90 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                      <option value="">-- Pilih layanan --</option>
-
+                      <option value="">-- Pilih layanan atau produk --</option>
                       <optgroup label="Haircut">
                         <option value="Men Haircut Reguler">Men Haircut Reguler</option>
                         <option value="Ladies Haircut Reguler">Ladies Haircut Reguler</option>
@@ -216,6 +215,12 @@
                         <option value="Downperm Up And Side">Downperm Up And Side</option>
                         <option value="Eyelash">Eyelash</option>
                         <option value="Eyelash Retouch">Eyelash Retouch</option>
+                      </optgroup>
+
+                      <optgroup label="Products">
+                        <option value="Pomade">Pomade</option>
+                        <option value="Clay">Clay</option>
+                        <option value="Hair Powder">Hair Powder</option>
                       </optgroup>
                     </select>
 
@@ -292,7 +297,7 @@
             <input type="hidden" name="colouring_other" id="colouring_other_hidden" value="{{ old('colouring_other', $customerBook->colouring_other) }}">
 
             {{-- Sell/Use Product --}}
-            <label class="block">
+            {{-- <label class="block">
               <span class="inline-flex items-center gap-2 text-gray-700">
                 <span class="text-indigo-600 font-mono">»</span>
                 <span class="font-medium">Sell/Use Product</span>
@@ -300,7 +305,9 @@
               <textarea name="sell_use_product" placeholder="e.g. Shampoo X, Conditioner Y"
                 class="w-full mt-2 px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
                 rows="3">{{ old('sell_use_product', $customerBook->sell_use_product) }}</textarea>
-            </label>
+            </label> --}}
+
+            {{-- Pomade 85k, clay 85k, hairpowder 25k --}}
 
             {{-- Rincian --}}
             <label class="block">
@@ -380,7 +387,6 @@
         { inputId: 'hair_extension_services_price_input', hiddenId: 'hair_extension_services_price_hidden' }
       ];
 
-      // Price map (sama seperti yang kamu punya)
       const priceMap = {
         "Men Haircut Reguler": 50000,
         "Long Haircut For Men": 60000,
@@ -418,7 +424,11 @@
         "Downperm Up And Side": 250000,
         "Facial": 80000,
         "Eyelash": 150000,
-        "Eyelash Retouch": 50000
+        "Eyelash Retouch": 50000,
+
+        "Pomade": 85000,
+        "Clay": 85000,
+        "Hair Powder": 25000
       };
 
       const groups = {

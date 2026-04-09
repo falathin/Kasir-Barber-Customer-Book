@@ -6,18 +6,21 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Header -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <h1 class="text-3xl font-extrabold text-gray-800">📚 Customer Books</h1>
+            <h1 class="text-3xl font-extrabold text-gray-800">
+                <i class="fa-solid fa-book mr-2"></i> Customer Books
+            </h1>
+
             @if (auth()->user()->level === 'admin')
                 <div class="flex flex-wrap gap-2">
                     @if ($showAll)
                         <a href="{{ route('customer-books.index') }}"
                             class="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-800 rounded-full shadow hover:bg-gray-400 transition duration-200">
-                            🔙 Hari Ini
+                            <i class="fa-solid fa-arrow-left mr-2"></i> Hari Ini
                         </a>
                     @else
                         <a href="{{ route('customer-books.index', array_merge(request()->query(), ['show' => 'all'])) }}"
                             class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-full shadow hover:bg-indigo-700 transition duration-200">
-                            📅 Lihat Semua
+                            <i class="fa-solid fa-calendar-days mr-2"></i> Lihat Semua
                         </a>
                     @endif
                 </div>
@@ -44,7 +47,8 @@
                         <option value="">-- All Barbers --</option>
                         @foreach ($barbers as $name)
                             <option value="{{ $name }}" {{ request('barber') === $name ? 'selected' : '' }}>
-                                {{ $name }}</option>
+                                {{ $name }}
+                            </option>
                         @endforeach
                     </select>
                 @else
@@ -69,6 +73,7 @@
                     <input type="date" id="start_date" name="start_date" value="{{ $defaultStart }}"
                         class="px-3 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                 </div>
+
                 <div class="flex items-center gap-2">
                     <label for="end_date" class="text-sm">To:</label>
                     <input type="date" id="end_date" name="end_date" value="{{ $defaultEnd }}"
@@ -78,18 +83,14 @@
                 <!-- Filter Button -->
                 <button type="submit"
                     class="inline-flex items-center px-6 py-2 bg-indigo-600 text-white rounded-full shadow hover:bg-indigo-700 transition duration-200">
-                    🔍 Filter
+                    <i class="fa-solid fa-magnifying-glass mr-2"></i> Filter
                 </button>
             </form>
 
             <!-- Create Button -->
             <a href="{{ route('customer-books.create') }}"
                 class="inline-flex items-center px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-full shadow transition duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Create
+                <i class="fa-solid fa-plus mr-2"></i> Create
             </a>
         </div>
 
@@ -102,31 +103,89 @@
             </p>
         @endif
 
+        @php
+            $productNames = ['Pomade', 'Clay', 'Hair Powder'];
+
+            $normalizeKey = function ($s) {
+                $s = (string) $s;
+                $s = trim($s);
+                $s = preg_replace('/\s*\(.*?\)\s*/', ' ', $s);
+                $s = preg_replace('/[^\p{L}\p{N}\s\-\/]+/u', '', $s);
+                $s = preg_replace('/\s+/', ' ', $s);
+                return mb_strtolower(trim($s));
+            };
+
+            $toArrayList = function ($value) {
+                if (is_array($value)) {
+                    return array_values(array_filter(array_map('trim', $value), fn($v) => $v !== ''));
+                }
+
+                if (is_string($value) && $value !== '') {
+                    $decoded = json_decode($value, true);
+                    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                        return array_values(array_filter(array_map('trim', $decoded), fn($v) => $v !== ''));
+                    }
+
+                    return array_values(array_filter(array_map('trim', preg_split('/\s*,\s*/', $value)), fn($v) => $v !== ''));
+                }
+
+                return [];
+            };
+        @endphp
+
         <!-- Table -->
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200 hidden md:table">
                 <thead class="bg-gray-50">
                     <tr>
-                        @foreach (['#', 'Customer', 'C&A', 'Antrian', 'Haircut', 'Coloring', 'Produk', 'Barber', 'Price', 'Payment', 'Status', 'Aksi'] as $col)
+                        @foreach (['#', 'Customer', 'C&A', 'Antrian', 'Haircut', 'Services', 'Products', 'Barber', 'Price', 'Payment', 'Status', 'Aksi'] as $col)
                             <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                                 {{ $col }}
                             </th>
                         @endforeach
                     </tr>
                 </thead>
+
                 <tbody class="bg-white divide-y divide-gray-100 text-sm">
                     @forelse($books as $book)
                         @php
+                            $serviceItems = [];
+                            if (!empty($book->services)) {
+                                $serviceItems = $toArrayList($book->services);
+                            } elseif (!empty($book->colouring_other)) {
+                                $serviceItems = $toArrayList($book->colouring_other);
+                            }
+
+                            $productItems = [];
+                            if (!empty($book->products)) {
+                                $productItems = $toArrayList($book->products);
+                            } elseif (!empty($book->sell_use_product)) {
+                                $productItems = $toArrayList($book->sell_use_product);
+                            }
+
+                            // produk yang dulu sempat nyangkut di services dipindah ke products
+                            $fixedServices = [];
+                            foreach ($serviceItems as $item) {
+                                if (in_array($normalizeKey($item), array_map($normalizeKey, $productNames), true)) {
+                                    $productItems[] = $item;
+                                } else {
+                                    $fixedServices[] = $item;
+                                }
+                            }
+                            $serviceItems = $fixedServices;
+
                             $isDone = $book->price && $book->qr && (
-                                $book->colouring_other ||
+                                !empty($serviceItems) ||
                                 $book->hair_coloring_price ||
                                 $book->hair_extension_price ||
-                                $book->hair_extension_services_price
+                                $book->hair_extension_services_price ||
+                                !empty($productItems)
                             );
+
                             $isProses = !$isDone && $book->cap;
-                            $isAntre =
-                                !$isDone && !$isProses && $book->customer && $book->barber_name && $book->antrian;
+                            $isAntre = !$isDone && !$isProses && $book->customer && $book->barber_name && $book->antrian;
                         @endphp
+
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-2">
                                 {{ $books->total() - ($books->currentPage() - 1) * $books->perPage() - $loop->index }}
@@ -136,100 +195,120 @@
                             <td class="px-4 py-2">{{ $book->antrian ?? '-' }}</td>
                             <td class="px-4 py-2">{{ $book->haircut_type ?? '-' }}</td>
 
-                            <!-- COLORING: gabungkan colouring_other + 3 kolom harga (hair_coloring_price, hair_extension_price, hair_extension_services_price) -->
                             <td class="px-4 py-2 align-top">
                                 <div class="text-sm">
-                                    {{-- colouring_other --}}
-                                    <div class="mb-1">
-                                        <strong>Coloring:</strong>
-                                        <div class="text-gray-700 text-sm">
-                                            {{ $book->colouring_other ?? '-' }}
+                                    @if (!empty($serviceItems))
+                                        <div class="space-y-1">
+                                            @foreach ($serviceItems as $item)
+                                                <div class="text-gray-700">{{ $item }}</div>
+                                            @endforeach
                                         </div>
-                                    </div>
+                                    @else
+                                        <div class="text-xs text-gray-400 mt-1">No service details</div>
+                                    @endif
 
-                                    {{-- Hair coloring price --}}
                                     @if ($book->hair_coloring_price)
-                                        <div class="text-xs text-gray-500">
+                                        <div class="text-xs text-gray-500 mt-1">
                                             <span>Hair Coloring Price:</span>
-                                            <span class="rupiah font-medium"
-                                                data-price="{{ $book->hair_coloring_price }}"></span>
+                                            <span class="rupiah font-medium" data-price="{{ $book->hair_coloring_price }}"></span>
                                         </div>
                                     @endif
 
-                                    {{-- Hair extension price --}}
                                     @if ($book->hair_extension_price)
                                         <div class="text-xs text-gray-500">
                                             <span>Hair Extension Price:</span>
-                                            <span class="rupiah font-medium"
-                                                data-price="{{ $book->hair_extension_price }}"></span>
+                                            <span class="rupiah font-medium" data-price="{{ $book->hair_extension_price }}"></span>
                                         </div>
                                     @endif
 
-                                    {{-- Hair extension services price --}}
                                     @if ($book->hair_extension_services_price)
                                         <div class="text-xs text-gray-500">
                                             <span>Extension Services:</span>
-                                            <span class="rupiah font-medium"
-                                                data-price="{{ $book->hair_extension_services_price }}"></span>
+                                            <span class="rupiah font-medium" data-price="{{ $book->hair_extension_services_price }}"></span>
                                         </div>
                                     @endif
 
-                                    {{-- jika tidak ada harga sama sekali, tampilkan '-' di bawah --}}
-                                    @if (!$book->hair_coloring_price && !$book->hair_extension_price && !$book->hair_extension_services_price)
+                                    @if (!$book->hair_coloring_price && !$book->hair_extension_price && !$book->hair_extension_services_price && empty($serviceItems))
                                         <div class="text-xs text-gray-400 mt-1">No price details</div>
                                     @endif
                                 </div>
                             </td>
 
-                            <td class="px-4 py-2">{{ $book->sell_use_product ?? '-' }}</td>
+                            <td class="px-4 py-2 align-top">
+                                <div class="text-sm">
+                                    @if (!empty($productItems))
+                                        <div class="space-y-1">
+                                            @foreach ($productItems as $item)
+                                                @php
+                                                    $productPrice = match ($item) {
+                                                        'Pomade' => 85000,
+                                                        'Clay' => 85000,
+                                                        'Hair Powder' => 25000,
+                                                        default => null,
+                                                    };
+                                                @endphp
+                                                <div class="text-gray-700">
+                                                    {{ $item }}
+                                                    @if ($productPrice)
+                                                        <span class="text-xs text-emerald-600">
+                                                            — <span class="rupiah" data-price="{{ $productPrice }}"></span>
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="text-xs text-gray-400 mt-1">-</div>
+                                    @endif
+                                </div>
+                            </td>
+
                             <td class="px-4 py-2">{{ $book->barber_name ?? '-' }}</td>
                             <td class="px-4 py-2 rupiah" data-price="{{ $book->price }}"></td>
-                            <td class="px-4 py-2">
+                            <td class="px-4 py-2 whitespace-nowrap">
                                 @if ($book->qr === 'qr_transfer')
-                                    <span
-                                        class="px-3 py-1 text-xs font-semibold bg-purple-100 text-purple-800 rounded-full">QR
-                                        Transfer</span>
+                                    <span class="inline-flex items-center whitespace-nowrap shrink-0 px-3 py-1 text-xs font-semibold bg-purple-100 text-purple-800 rounded-full">
+                                        QR Transfer
+                                    </span>
                                 @elseif($book->qr === 'cash')
-                                    <span
-                                        class="px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-800 rounded-full">Cash</span>
+                                    <span class="inline-flex items-center whitespace-nowrap shrink-0 px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-800 rounded-full">
+                                        Cash
+                                    </span>
                                 @elseif($book->qr === 'no revenue' || $book->qr === null)
-                                    <span class="px-3 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">No
-                                        Revenue</span>
+                                    <span class="inline-flex items-center whitespace-nowrap shrink-0 px-3 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">
+                                        No Revenue
+                                    </span>
                                 @else
-                                    <span
-                                        class="px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-800 rounded-full">{{ Str::title($book->qr) }}</span>
+                                    <span class="inline-flex items-center whitespace-nowrap shrink-0 px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-800 rounded-full">
+                                        {{ Str::title($book->qr) }}
+                                    </span>
                                 @endif
                             </td>
                             <td class="px-4 py-2">
                                 @if ($isDone)
-                                    <span
-                                        class="px-3 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">Done</span>
+                                    <span class="px-3 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">Done</span>
                                 @elseif($isProses)
-                                    <span
-                                        class="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">Proses</span>
+                                    <span class="px-3 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full">Proses</span>
                                 @elseif($isAntre)
-                                    <span
-                                        class="px-3 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">Antre</span>
+                                    <span class="px-3 py-1 text-xs font-semibold bg-yellow-100 text-yellow-800 rounded-full">Antre</span>
                                 @else
                                     <span class="text-gray-400">-</span>
                                 @endif
                             </td>
                             <td class="px-4 py-2 whitespace-nowrap">
                                 <div class="flex items-center space-x-2">
-                                    <!-- Show -->
                                     <a href="{{ route('customer-books.show', $book) }}"
                                         class="p-2 bg-green-500 hover:bg-green-600 text-white rounded-full transition"
                                         title="Show">
-                                        <!-- svg... -->
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268
-                                  2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
                                         </svg>
                                     </a>
-                                    <!-- Proses -->
+
                                     @if (auth()->user()->level === 'admin' || $isAntre)
                                         <a href="{{ route('customer-books.createWithCap', $book) }}"
                                             class="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition"
@@ -240,36 +319,33 @@
                                             </svg>
                                         </a>
                                     @endif
-                                    <!-- Edit -->
+
                                     @if (auth()->user()->level === 'admin' || $isProses)
                                         <a href="{{ route('customer-books.edit', $book) }}"
                                             class="p-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-full transition"
                                             title="Edit">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002
-                                    2h11a2 2 0 002-2v-5m-1.414-9.414a2.121
-                                    2.121 0 113 3L12 15l-4 1 1-4
-                                    9.586-9.586z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2.121
+                                                    2.121 0 113 3L12 15l-4 1 1-4
+                                                    9.586-9.586z" />
                                             </svg>
                                         </a>
                                     @endif
-                                    <!-- Delete -->
+
                                     @if (auth()->user()->level === 'admin' || $isAntre)
                                         <form action="{{ route('customer-books.destroy', $book) }}" method="POST"
                                             onsubmit="return confirm('Are you sure?');">
-                                            @csrf @method('DELETE')
+                                            @csrf
+                                            @method('DELETE')
                                             <button type="submit"
                                                 class="p-2 bg-red-500 hover:bg-red-600 text-white rounded-full transition"
                                                 title="Delete">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                                     viewBox="0 0 24 24" stroke="currentColor">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138
-                                      21H7.862a2 2 0 01-1.995-1.858L5
-                                      7m5 4v6m4-6v6m1-10V4a1 1 0
-                                      00-1-1h-4a1 1 0 00-1 1v3M4
-                                      7h16" />
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
                                             </button>
                                         </form>
@@ -279,7 +355,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="12" class="py-6 text-center text-gray-500">
+                            <td colspan="13" class="py-6 text-center text-gray-500">
                                 Tidak ada data ditemukan.
                             </td>
                         </tr>
@@ -287,29 +363,50 @@
                 </tbody>
             </table>
 
-            <!-- 🎟️ MOBILE COLORFUL RECEIPT STYLE CARD VIEW -->
+            <!-- MOBILE CARD VIEW -->
             <div class="space-y-6 md:hidden px-4 pb-10">
                 @forelse($books as $book)
                     @php
-                        // DONE jika: price + qr ada, dan ADA salah satu data coloring / harga
+                        $serviceItems = [];
+                        if (!empty($book->services)) {
+                            $serviceItems = $toArrayList($book->services);
+                        } elseif (!empty($book->colouring_other)) {
+                            $serviceItems = $toArrayList($book->colouring_other);
+                        }
+
+                        $productItems = [];
+                        if (!empty($book->products)) {
+                            $productItems = $toArrayList($book->products);
+                        } elseif (!empty($book->sell_use_product)) {
+                            $productItems = $toArrayList($book->sell_use_product);
+                        }
+
+                        $fixedServices = [];
+                        foreach ($serviceItems as $item) {
+                            if (in_array($normalizeKey($item), array_map($normalizeKey, $productNames), true)) {
+                                $productItems[] = $item;
+                            } else {
+                                $fixedServices[] = $item;
+                            }
+                        }
+                        $serviceItems = $fixedServices;
+
                         $isDone = $book->price && $book->qr && (
-                            $book->colouring_other ||
+                            !empty($serviceItems) ||
                             $book->hair_coloring_price ||
                             $book->hair_extension_price ||
-                            $book->hair_extension_services_price
+                            $book->hair_extension_services_price ||
+                            !empty($productItems)
                         );
 
-                        // PROSES jika belum done tapi sudah ada cap
                         $isProses = !$isDone && $book->cap;
 
-                        // ANTRE jika belum done & proses
                         $isAntre = !$isDone
                             && !$isProses
                             && $book->customer
                             && $book->barber_name
                             && $book->antrian;
 
-                        // Label status
                         $status = $isDone
                             ? 'DONE'
                             : ($isProses
@@ -318,7 +415,6 @@
                                     ? 'ANTRE'
                                     : 'PENDING'));
 
-                        // Warna status
                         $statusColor = $isDone
                             ? 'bg-green-100 text-green-700 border-green-500'
                             : ($isProses
@@ -327,23 +423,21 @@
                                     ? 'bg-yellow-100 text-yellow-700 border-yellow-500'
                                     : 'bg-gray-100 text-gray-500 border-gray-400'));
                     @endphp
+
                     <div
                         class="relative bg-gradient-to-br from-white via-slate-50 to-gray-100 border border-gray-200 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                        <!-- Top & Bottom perforated edge -->
                         <div class="absolute top-0 left-0 right-0 border-t-2 border-dashed border-gray-300"></div>
                         <div class="absolute bottom-0 left-0 right-0 border-t-2 border-dashed border-gray-300"></div>
 
-                        <!-- Gradient side glow -->
-                        <div
-                            class="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-pink-300 via-blue-300 to-green-300 opacity-70">
-                        </div>
+                        <div class="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-pink-300 via-blue-300 to-green-300 opacity-70"></div>
 
                         <div class="p-5 font-mono text-[13px] text-gray-800">
-                            <!-- Header -->
                             <div class="flex justify-between items-center mb-3">
                                 <div>
                                     <p class="font-bold text-sm text-gray-900">{{ $book->customer ?? 'Unknown' }}</p>
-                                    <p class="text-[11px] text-gray-500 mt-0.5">💈 {{ $book->barber_name ?? '-' }}</p>
+                                    <p class="text-[11px] text-gray-500 mt-0.5">
+                                        <i class="fa-solid fa-store mr-1"></i> {{ $book->barber_name ?? '-' }}
+                                    </p>
                                 </div>
                                 <span
                                     class="px-2.5 py-1 border rounded-full text-[11px] font-bold uppercase tracking-wide {{ $statusColor }}">
@@ -351,65 +445,105 @@
                                 </span>
                             </div>
 
-                            <!-- Divider -->
                             <div class="border-t border-dashed border-gray-300 mb-3"></div>
 
-                            <!-- Info Section -->
                             <div class="space-y-1.5 text-[13px]">
                                 <div class="flex justify-between">
                                     <span>C&A</span>
-                                    <span>{{ $book->cap ?? '-' }} {{ $book->asisten ? "($book->asisten)" : '' }}</span>
+                                    <span>{{ $book->cap ?? '-' }} {{ $book->asisten ? "({$book->asisten})" : '' }}</span>
                                 </div>
+
                                 <div class="flex justify-between">
                                     <span>Antrian</span>
                                     <span>{{ $book->antrian ?? '-' }}</span>
                                 </div>
+
                                 <div class="flex justify-between">
                                     <span>Haircut</span>
                                     <span>{{ $book->haircut_type ?? '-' }}</span>
                                 </div>
 
-                                <!-- Coloring: gabungkan -->
                                 <div class="flex justify-between items-start">
-                                    <span>Coloring</span>
+                                    <span>Services</span>
                                     <div class="text-right">
-                                        <div class="text-sm">{{ $book->colouring_other ?? '-' }}</div>
+                                        @if (!empty($serviceItems))
+                                            <div class="text-sm">
+                                                @foreach ($serviceItems as $item)
+                                                    <div class="text-gray-700">{{ $item }}</div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div class="text-sm text-gray-400">-</div>
+                                        @endif
 
                                         @if ($book->hair_coloring_price)
-                                            <div class="text-xs text-gray-500">Hair Coloring: <span class="rupiah"
-                                                    data-price="{{ $book->hair_coloring_price }}"></span></div>
+                                            <div class="text-xs text-gray-500">
+                                                Hair Coloring: <span class="rupiah" data-price="{{ $book->hair_coloring_price }}"></span>
+                                            </div>
                                         @endif
 
                                         @if ($book->hair_extension_price)
-                                            <div class="text-xs text-gray-500">Extension Price: <span class="rupiah"
-                                                    data-price="{{ $book->hair_extension_price }}"></span></div>
+                                            <div class="text-xs text-gray-500">
+                                                Extension Price: <span class="rupiah" data-price="{{ $book->hair_extension_price }}"></span>
+                                            </div>
                                         @endif
 
                                         @if ($book->hair_extension_services_price)
-                                            <div class="text-xs text-gray-500">Services: <span class="rupiah"
-                                                    data-price="{{ $book->hair_extension_services_price }}"></span></div>
+                                            <div class="text-xs text-gray-500">
+                                                Services: <span class="rupiah" data-price="{{ $book->hair_extension_services_price }}"></span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between items-start">
+                                    <span>Products</span>
+                                    <div class="text-right">
+                                        @if (!empty($productItems))
+                                            @foreach ($productItems as $item)
+                                                @php
+                                                    $productPrice = match ($item) {
+                                                        'Pomade' => 85000,
+                                                        'Clay' => 85000,
+                                                        'Hair Powder' => 25000,
+                                                        default => null,
+                                                    };
+                                                @endphp
+                                                <div class="text-gray-700">
+                                                    {{ $item }}
+                                                    @if ($productPrice)
+                                                        <span class="text-xs text-emerald-600">
+                                                            — <span class="rupiah" data-price="{{ $productPrice }}"></span>
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="text-sm text-gray-400">-</div>
                                         @endif
                                     </div>
                                 </div>
 
                                 <div class="flex justify-between">
-                                    <span>Produk</span>
-                                    <span>{{ $book->sell_use_product ?? '-' }}</span>
-                                </div>
-                                <div class="flex justify-between">
                                     <span>Price</span>
-                                    <span class="rupiah font-semibold text-gray-900"
-                                        data-price="{{ $book->price }}"></span>
+                                    <span class="rupiah font-semibold text-gray-900" data-price="{{ $book->price }}"></span>
                                 </div>
+
                                 <div class="flex justify-between items-center">
                                     <span>Payment</span>
                                     <span class="font-medium">
                                         @if ($book->qr === 'qr_transfer')
-                                            <span class="text-purple-600">💳 QR Transfer</span>
+                                            <span class="text-purple-600">
+                                                <i class="fa-solid fa-qrcode mr-1"></i> QR Transfer
+                                            </span>
                                         @elseif($book->qr === 'cash')
-                                            <span class="text-gray-700">💵 Cash</span>
+                                            <span class="text-gray-700">
+                                                <i class="fa-solid fa-money-bill-wave mr-1"></i> Cash
+                                            </span>
                                         @elseif($book->qr === 'no revenue' || $book->qr === null)
-                                            <span class="text-red-600">❌ No Revenue</span>
+                                            <span class="text-red-600">
+                                                <i class="fa-solid fa-ban mr-1"></i> No Revenue
+                                            </span>
                                         @else
                                             {{ Str::title($book->qr) }}
                                         @endif
@@ -417,12 +551,9 @@
                                 </div>
                             </div>
 
-                            <!-- Bottom Divider -->
                             <div class="border-t border-dashed border-gray-300 mt-4 mb-3"></div>
 
-                            <!-- Action Buttons -->
                             <div class="flex justify-center space-x-5">
-                                <!-- Show -->
                                 <a href="{{ route('customer-books.show', $book) }}"
                                     class="text-green-600 hover:text-green-800 transition transform hover:scale-110"
                                     title="Show">
@@ -430,9 +561,8 @@
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268
-                                2.943 9.542 7c-1.274 4.057-5.065 7-9.542
-                                7s-8.268-2.943-9.542-7z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z" />
                                     </svg>
                                 </a>
 
@@ -453,10 +583,9 @@
                                         title="Edit">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                             viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0
-                                  002 2h11a2 2 0 002-2v-5m-1.414-9.414a2.121
-                                  2.121 0 113 3L12 15l-4 1 1-4
-                                  9.586-9.586z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2.121 2.121 0 113 3L12 15l-4 1 1-4
+                                                9.586-9.586z" />
                                         </svg>
                                     </a>
                                 @endif
@@ -464,17 +593,15 @@
                                 @if (auth()->user()->level === 'admin' || $isAntre)
                                     <form action="{{ route('customer-books.destroy', $book) }}" method="POST"
                                         onsubmit="return confirm('Are you sure?');">
-                                        @csrf @method('DELETE')
+                                        @csrf
+                                        @method('DELETE')
                                         <button type="submit"
                                             class="text-red-600 hover:text-red-800 transition transform hover:scale-110"
                                             title="Delete">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                                 viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138
-                                    21H7.862a2 2 0 01-1.995-1.858L5
-                                    7m5 4v6m4-6v6m1-10V4a1 1 0
-                                    00-1-1h-4a1 1 0 00-1 1v3M4
-                                    7h16" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
                                         </button>
                                     </form>
@@ -486,7 +613,6 @@
                     <div class="py-6 text-center text-gray-500 font-mono">-- No Data Found --</div>
                 @endforelse
             </div>
-
         </div>
 
         <!-- Pagination -->
@@ -495,7 +621,6 @@
         </div>
     </div>
 
-    {{-- JS Formatter --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.rupiah').forEach(el => {
@@ -504,7 +629,7 @@
                     style: 'currency',
                     currency: 'IDR',
                     minimumFractionDigits: 0
-                }).format(raw).replace('Rp', 'Rp ');
+                }).format(raw).replace('Rp', 'Rp ');
             });
         });
     </script>

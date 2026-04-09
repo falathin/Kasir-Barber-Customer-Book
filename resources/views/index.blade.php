@@ -4,7 +4,7 @@
 
 @section('content')
     <main class="space-y-6 p-4">
-
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         {{-- ===================== GREETING CARD ===================== --}}
         <div class="rounded-2xl overflow-hidden shadow-2xl">
             {{-- Barber stripe --}}
@@ -128,7 +128,8 @@
                     <div
                         class="w-full max-w-xs sm:max-w-none p-5 bg-purple-50 rounded-xl shadow hover:shadow-lg transition">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-center">
-                            <h3 class="text-md font-medium text-purple-700 text-center sm:text-left">Pelanggan Hari Ini</h3>
+                            <h3 class="text-md font-medium text-purple-700 text-center sm:text-left">Pelanggan Hari Ini
+                            </h3>
                             <div
                                 class="mt-3 sm:mt-0 bg-white rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-purple-500" fill="none"
@@ -222,8 +223,10 @@
 
         @if ($role === 'admin')
             <div class="mt-10 bg-white p-6 rounded-xl shadow-xl animate__animated animate__fadeInUp">
-                <h2 class="text-2xl font-bold text-indigo-700 mb-6">📊 Ranking Pendapatan Per Barber</h2>
-
+                <h2 class="text-2xl font-bold text-indigo-700 mb-6">
+                    <i class="fa-solid fa-chart-column mr-2"></i>
+                    Ranking Pendapatan Per Barber
+                </h2>
                 @forelse ($pendapatanPerBarber as $index => $item)
                     @php
                         $percentage = round(($item->total / $maxTotal) * 100);

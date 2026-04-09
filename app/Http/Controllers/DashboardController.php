@@ -29,14 +29,21 @@ class DashboardController extends Controller
             $query->where('barber_name', $user->name);
         }
 
+        // FILTER GLOBAL: exclude no revenue
+        $validRevenue = function ($q) {
+            $q->where('price', '>', 0)
+              ->whereNotNull('qr')
+              ->where('qr', '!=', 'no revenue');
+        };
+
         $totalTransaksi = (clone $query)
             ->whereDate('created_at', $today)
-            ->where('price', '>', 0)
+            ->where($validRevenue)
             ->count();
 
         $totalPendapatan = (clone $query)
             ->whereDate('created_at', $today)
-            ->where('price', '>', 0)
+            ->where($validRevenue)
             ->sum('price');
 
         $totalPengembalian = (clone $query)
@@ -62,19 +69,19 @@ class DashboardController extends Controller
         $pendapatanBulanan = (clone $query)
             ->whereMonth('created_at', $now->month)
             ->whereYear('created_at', $now->year)
-            ->where('price', '>', 0)
+            ->where($validRevenue)
             ->sum('price');
 
         $pendapatanTahunan = (clone $query)
             ->whereYear('created_at', $now->year)
-            ->where('price', '>', 0)
+            ->where($validRevenue)
             ->sum('price');
 
         $pendapatanPerBarber = [];
         if ($user->level === 'admin') {
             $pendapatanPerBarber = CustomerBook::select('barber_name')
                 ->selectRaw('SUM(price) as total')
-                ->where('price', '>', 0)
+                ->where($validRevenue)
                 ->groupBy('barber_name')
                 ->orderByDesc('total')
                 ->get();
@@ -92,5 +99,4 @@ class DashboardController extends Controller
             'pendapatanPerBarber'
         ));
     }
-
 }

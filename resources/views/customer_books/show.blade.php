@@ -17,7 +17,8 @@
                 </p>
                 @if($customerBook->antrian)
                     <p class="text-xs text-gray-600 print:text-black">
-                        🪑 Antrian Ke-{{ $customerBook->antrian }}
+                        <i class="fa-solid fa-chair mr-1"></i>
+                        Antrian Ke-{{ $customerBook->antrian }}
                     </p>
                 @endif
             </div>
@@ -25,17 +26,7 @@
             {{-- Detail Items --}}
             <div class="text-xs text-gray-700 space-y-3 print:text-black">
                 @php
-                    /**
-                     * show.blade.php (improved)
-                     * - Prioritize DB manual columns:
-                     *     hair_coloring_price
-                     *     hair_extension_price
-                     *     hair_extension_services_price
-                     * - Fallback: manual_service_prices JSON (older rows)
-                     * - Fallback: priceMap values
-                     * - Include manual-only entries even jika colouring_other kosong
-                     * - Merge duplicates, show (Nx) when duplicated
-                     */
+                    use Illuminate\Support\Str;
 
                     $priceMap = [
                         "Men Haircut Reguler" => 50000,
@@ -82,162 +73,205 @@
                         "Facial" => 80000,
                         "Eyelash" => 150000,
                         "Eyelash Retouch" => 50000,
+
+                        // Products
+                        "Pomade" => 85000,
+                        "Clay" => 85000,
+                        "Hair Powder" => 25000,
                     ];
 
-                    // helpers
-                    function rupiah($n) {
-                        return number_format((int)$n, 0, ',', '.');
-                    }
-                    function shortForm($n) {
-                        $n = (int)$n;
+                    $productNames = [
+                        'Pomade',
+                        'Clay',
+                        'Hair Powder',
+                    ];
+
+                    $rupiah = function ($n) {
+                        return number_format((int) $n, 0, ',', '.');
+                    };
+
+                    $shortForm = function ($n) {
+                        $n = (int) $n;
                         if ($n >= 1000000000000) return round($n / 1000000000000, 1) . 'T';
                         if ($n >= 1000000000) return round($n / 1000000000, 1) . 'M';
                         if ($n >= 1000000) return round($n / 1000000, 1) . 'jt';
                         if ($n >= 1000) return round($n / 1000) . 'rb';
-                        return (string)$n;
-                    }
+                        return (string) $n;
+                    };
 
-                    // normalize: lowercase, strip parenthesis content, remove strange chars, collapse spaces
-                    function normalize_key($s) {
-                        $s = (string)$s;
+                    $normalizeKey = function ($s) {
+                        $s = (string) $s;
                         $s = trim($s);
-                        $s = preg_replace('/\s*\(.*?\)\s*/', ' ', $s); // remove (...) content
-                        $s = preg_replace('/[^\p{L}\p{N}\s\-\/]+/u', '', $s); // keep letters/numbers/spaces/dash/slash
+                        $s = preg_replace('/\s*\(.*?\)\s*/', ' ', $s);
+                        $s = preg_replace('/[^\p{L}\p{N}\s\-\/]+/u', '', $s);
                         $s = preg_replace('/\s+/', ' ', $s);
                         return mb_strtolower(trim($s));
-                    }
+                    };
 
-                    // Build normalized priceMap for tolerant lookup
+                    $toArrayList = function ($value) {
+                        if (is_array($value)) {
+                            return array_values(array_filter(array_map('trim', $value), fn($v) => $v !== ''));
+                        }
+
+                        if (is_string($value) && $value !== '') {
+                            $decoded = json_decode($value, true);
+                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                return array_values(array_filter(array_map('trim', $decoded), fn($v) => $v !== ''));
+                            }
+
+                            return array_values(array_filter(array_map('trim', preg_split('/\s*,\s*/', $value)), fn($v) => $v !== ''));
+                        }
+
+                        return [];
+                    };
+
                     $priceMapNormalized = [];
                     foreach ($priceMap as $k => $v) {
-                        $priceMapNormalized[ normalize_key($k) ] = (int)$v;
+                        $priceMapNormalized[$normalizeKey($k)] = (int) $v;
                     }
 
-                    // Build manual prices preferring DB columns (new approach)
-                    $manualPricesNormalized = [];
-                    $manualOriginalNames = []; // norm => original display name (from DB keys or JSON keys)
+                    $productNamesNormalized = [];
+                    foreach ($productNames as $pname) {
+                        $productNamesNormalized[] = $normalizeKey($pname);
+                    }
 
-                    // DB column names: hair_coloring_price, hair_extension_price, hair_extension_services_price
+                    // Manual prices from DB columns (services)
+                    $manualPricesNormalized = [];
+                    $manualOriginalNames = [];
+
                     if (!is_null($customerBook->hair_coloring_price) && $customerBook->hair_coloring_price !== '') {
-                        $nk = normalize_key('Hair Coloring');
-                        $manualPricesNormalized[$nk] = (int)$customerBook->hair_coloring_price;
+                        $nk = $normalizeKey('Hair Coloring');
+                        $manualPricesNormalized[$nk] = (int) $customerBook->hair_coloring_price;
                         $manualOriginalNames[$nk] = 'Hair Coloring';
                     }
+
                     if (!is_null($customerBook->hair_extension_price) && $customerBook->hair_extension_price !== '') {
-                        $nk = normalize_key('Hair Extension');
-                        $manualPricesNormalized[$nk] = (int)$customerBook->hair_extension_price;
+                        $nk = $normalizeKey('Hair Extension');
+                        $manualPricesNormalized[$nk] = (int) $customerBook->hair_extension_price;
                         $manualOriginalNames[$nk] = 'Hair Extension';
                     }
+
                     if (!is_null($customerBook->hair_extension_services_price) && $customerBook->hair_extension_services_price !== '') {
-                        $nk = normalize_key('Hair Extension services');
-                        $manualPricesNormalized[$nk] = (int)$customerBook->hair_extension_services_price;
-                        $manualOriginalNames[$nk] = 'Hair Extension services';
+                        $nk = $normalizeKey('Hair Extension Services');
+                        $manualPricesNormalized[$nk] = (int) $customerBook->hair_extension_services_price;
+                        $manualOriginalNames[$nk] = 'Hair Extension Services';
                     }
 
-                    // If DB columns empty, fallback to manual_service_prices JSON (older data)
-                    if (empty($manualPricesNormalized) && !empty($customerBook->manual_service_prices)) {
-                        $decoded = json_decode($customerBook->manual_service_prices, true);
-                        if (is_array($decoded)) {
-                            foreach ($decoded as $k => $v) {
-                                $nk = normalize_key($k);
-                                // accept strings with dots/commas -> strip non-digits
-                                $numOnly = preg_replace('/[^\d]/', '', (string)$v);
-                                $manualPricesNormalized[$nk] = $numOnly === '' ? 0 : (int)$numOnly;
-                                $manualOriginalNames[$nk] = (string)$k;
-                            }
-                        }
-                    }
-
-                    // Parse colouring_other preserving order
+                    // Services source: prefer `services`, fallback `colouring_other`
                     $servicesRaw = [];
-                    $servicesRawNorms = [];
-                    if (!empty($customerBook->colouring_other)) {
-                        $parts = preg_split('/\s*,\s*/', trim($customerBook->colouring_other));
-                        foreach ($parts as $p) {
-                            $p = trim((string)$p);
-                            if ($p === '') continue;
-                            $servicesRaw[] = $p;
-                            $servicesRawNorms[] = normalize_key($p);
-                        }
+                    if (!empty($customerBook->services)) {
+                        $servicesRaw = $toArrayList($customerBook->services);
+                    } elseif (!empty($customerBook->colouring_other)) {
+                        $servicesRaw = $toArrayList($customerBook->colouring_other);
                     }
 
-                    // Ensure manual-only entries are included in servicesRaw (if not present)
+                    // Products source: prefer `products`, fallback `sell_use_product`
+                    $productsRaw = [];
+                    if (!empty($customerBook->products)) {
+                        $productsRaw = $toArrayList($customerBook->products);
+                    } elseif (!empty($customerBook->sell_use_product)) {
+                        $productsRaw = $toArrayList($customerBook->sell_use_product);
+                    }
+
+                    // Akalin: kalau data lama produk masih kebaca di services, pindahkan ke products
+                    $fixedServicesRaw = [];
+                    foreach ($servicesRaw as $item) {
+                        $norm = $normalizeKey($item);
+                        if (in_array($norm, $productNamesNormalized, true)) {
+                            $productsRaw[] = $item;
+                        } else {
+                            $fixedServicesRaw[] = $item;
+                        }
+                    }
+                    $servicesRaw = $fixedServicesRaw;
+
+                    // Make sure manual-only services still appear
                     foreach ($manualPricesNormalized as $norm => $val) {
-                        if (!in_array($norm, $servicesRawNorms, true)) {
-                            // pick original name if available, otherwise fallback to priceMap label or norm
-                            $label = $manualOriginalNames[$norm] ?? (array_search($val, $priceMap, true) ?: $norm);
-                            $servicesRaw[] = $label;
-                            $servicesRawNorms[] = $norm;
-                        }
-                    }
-
-                    // Resolve each raw entry to price: prefer manualPricesNormalized -> priceMapNormalized -> direct priceMap match -> 0
-                    $resolved = [];
-                    foreach ($servicesRaw as $orig) {
-                        $norm = normalize_key($orig);
-
-                        if (isset($manualPricesNormalized[$norm])) {
-                            $price = $manualPricesNormalized[$norm];
-                        } elseif (isset($priceMapNormalized[$norm])) {
-                            $price = $priceMapNormalized[$norm];
-                        } else {
-                            // try case-insensitive original key match in priceMap
-                            $found = 0;
-                            foreach ($priceMap as $kpm => $vpm) {
-                                if (mb_strtolower(trim($kpm)) === mb_strtolower(trim($orig))) {
-                                    $found = (int)$vpm;
-                                    break;
-                                }
+                        $exists = false;
+                        foreach ($servicesRaw as $srv) {
+                            if ($normalizeKey($srv) === $norm) {
+                                $exists = true;
+                                break;
                             }
-                            $price = $found;
                         }
-
-                        $resolved[] = [
-                            'original' => $orig,
-                            'norm' => $norm,
-                            'price' => (int)$price,
-                        ];
+                        if (!$exists) {
+                            $servicesRaw[] = $manualOriginalNames[$norm] ?? $norm;
+                        }
                     }
 
-                    // Merge duplicates by normalized key (sum price, count occurrences, preserve first original name)
-                    $merged = [];
-                    $order = [];
-                    foreach ($resolved as $r) {
-                        $k = $r['norm'];
-                        if (!isset($merged[$k])) {
-                            $merged[$k] = [
-                                'name' => $r['original'],
-                                'norm' => $k,
-                                'price' => $r['price'],
-                                'count' => 1
+                    $resolveItems = function (array $rawItems, array $manualMap = []) use ($normalizeKey, $priceMapNormalized, $priceMap) {
+                        $resolved = [];
+
+                        foreach ($rawItems as $orig) {
+                            $norm = $normalizeKey($orig);
+
+                            if (isset($manualMap[$norm])) {
+                                $price = $manualMap[$norm];
+                            } elseif (isset($priceMapNormalized[$norm])) {
+                                $price = $priceMapNormalized[$norm];
+                            } else {
+                                $found = 0;
+                                foreach ($priceMap as $kpm => $vpm) {
+                                    if (mb_strtolower(trim($kpm)) === mb_strtolower(trim($orig))) {
+                                        $found = (int) $vpm;
+                                        break;
+                                    }
+                                }
+                                $price = $found;
+                            }
+
+                            $resolved[] = [
+                                'original' => $orig,
+                                'norm' => $norm,
+                                'price' => (int) $price,
                             ];
-                            $order[] = $k;
-                        } else {
-                            $merged[$k]['price'] += $r['price'];
-                            $merged[$k]['count'] += 1;
                         }
-                    }
 
-                    $mergedList = [];
-                    foreach ($order as $k) {
-                        $mergedList[] = $merged[$k];
-                    }
-
-                    // Build breakdownParts and breakdownTotal from mergedList
-                    $breakdownParts = [];
-                    $breakdownTotal = 0;
-                    foreach ($mergedList as $m) {
-                        $label = $m['name'];
-                        if ($m['count'] > 1) $label .= ' (' . $m['count'] . 'x)';
-                        if ($m['price'] > 0) {
-                            $breakdownParts[] = 'Rp ' . rupiah($m['price']) . ' · ' . $label;
-                        } else {
-                            $breakdownParts[] = $label;
+                        $merged = [];
+                        $order = [];
+                        foreach ($resolved as $r) {
+                            $k = $r['norm'];
+                            if (!isset($merged[$k])) {
+                                $merged[$k] = [
+                                    'name' => $r['original'],
+                                    'norm' => $k,
+                                    'price' => $r['price'],
+                                    'count' => 1
+                                ];
+                                $order[] = $k;
+                            } else {
+                                $merged[$k]['price'] += $r['price'];
+                                $merged[$k]['count'] += 1;
+                            }
                         }
-                        $breakdownTotal += (int)$m['price'];
-                    }
 
-                    // top metadata
+                        $mergedList = [];
+                        foreach ($order as $k) {
+                            $mergedList[] = $merged[$k];
+                        }
+
+                        $breakdownParts = [];
+                        $breakdownTotal = 0;
+                        foreach ($mergedList as $m) {
+                            $label = $m['name'];
+                            if ($m['count'] > 1) {
+                                $label .= ' (' . $m['count'] . 'x)';
+                            }
+                            if ($m['price'] > 0) {
+                                $breakdownParts[] = 'Rp ' . number_format($m['price'], 0, ',', '.') . ' · ' . $label;
+                            } else {
+                                $breakdownParts[] = $label;
+                            }
+                            $breakdownTotal += (int) $m['price'];
+                        }
+
+                        return [$mergedList, $breakdownParts, $breakdownTotal];
+                    };
+
+                    [$serviceList, $serviceBreakdownParts, $serviceTotal] = $resolveItems($servicesRaw, $manualPricesNormalized);
+                    [$productList, $productBreakdownParts, $productTotal] = $resolveItems($productsRaw, []);
+                    $grandTotal = $serviceTotal + $productTotal;
+
                     $asistenNama = null;
                     if ($customerBook->asisten) {
                         $capsters = \App\Models\Capster::all()->keyBy('inisial');
@@ -247,10 +281,10 @@
                     $items = [
                         'Booking ID' => $customerBook->id,
                         'Customer'   => $customerBook->customer,
-                        'Capster'    => $customerBook->capster?->nama ?? $customerBook->cap,
-                        'Asisten'    => $asistenNama ?? '-',
-                        'Style'      => $customerBook->haircut_type,
-                        'Shop'       => $customerBook->barber_name,
+                        'Capster'     => $customerBook->capster?->nama ?? $customerBook->cap,
+                        'Asisten'     => $asistenNama ?? '-',
+                        'Style'       => $customerBook->haircut_type,
+                        'Shop'        => $customerBook->barber_name,
                     ];
                 @endphp
 
@@ -266,12 +300,12 @@
                 <div class="border-b border-dashed pb-1 print:border-b print:border-black">
                     <div class="flex items-center justify-between">
                         <span class="uppercase">Services</span>
-                        <span class="text-xs text-gray-500">{{ count($mergedList) ?: '-' }}</span>
+                        <span class="text-xs text-gray-500">{{ count($serviceList) ?: '-' }}</span>
                     </div>
 
                     <ul class="mt-1 pl-4 list-disc list-inside print:pl-2 print:list-none print:mt-0">
-                        @if (!empty($mergedList))
-                            @foreach ($mergedList as $svc)
+                        @if (!empty($serviceList))
+                            @foreach ($serviceList as $svc)
                                 <li class="break-words flex justify-between items-center">
                                     <span class="truncate">
                                         {{ $svc['name'] }}
@@ -280,8 +314,8 @@
                                         @endif
                                     </span>
                                     <span class="ml-2 text-right">
-                                        <span class="text-xs font-medium text-indigo-700">Rp {{ rupiah($svc['price']) }}</span>
-                                        <span class="text-xs text-indigo-600 ml-1">({{ shortForm($svc['price']) }})</span>
+                                        <span class="text-xs font-medium text-indigo-700">Rp {{ $rupiah($svc['price']) }}</span>
+                                        <span class="text-xs text-indigo-600 ml-1">({{ $shortForm($svc['price']) }})</span>
                                     </span>
                                 </li>
                             @endforeach
@@ -290,19 +324,58 @@
                         @endif
                     </ul>
 
-                    {{-- Breakdown --}}
-                    @if (!empty($mergedList))
+                    @if (!empty($serviceList))
                         <p class="mt-2 text-xs text-gray-600">
                             <span class="font-semibold">Keterangan:</span>
                             <span class="ml-1">
-                                {!! implode(' + ', array_map('e', $breakdownParts)) !!}
-                                <span class="font-semibold"> = Rp {{ rupiah($breakdownTotal) }}</span>
+                                {!! implode(' + ', array_map('e', $serviceBreakdownParts)) !!}
+                                <span class="font-semibold"> = Rp {{ $rupiah($serviceTotal) }}</span>
                             </span>
                         </p>
                     @endif
                 </div>
 
                 {{-- Products --}}
+                <div class="border-b border-dashed pb-1 print:border-b print:border-black">
+                    <div class="flex items-center justify-between">
+                        <span class="uppercase">Products</span>
+                        <span class="text-xs text-gray-500">{{ count($productList) ?: '-' }}</span>
+                    </div>
+
+                    <ul class="mt-1 pl-4 list-disc list-inside print:pl-2 print:list-none print:mt-0">
+                        @if (!empty($productList))
+                            @foreach ($productList as $prd)
+                                <li class="break-words flex justify-between items-center">
+                                    <span class="truncate">
+                                        {{ $prd['name'] }}
+                                        @if($prd['count'] > 1)
+                                            <small class="text-gray-500">({{ $prd['count'] }}x)</small>
+                                        @endif
+                                    </span>
+                                    <span class="ml-2 text-right">
+                                        <span class="text-xs font-medium text-emerald-700">Rp {{ $rupiah($prd['price']) }}</span>
+                                        <span class="text-xs text-emerald-600 ml-1">({{ $shortForm($prd['price']) }})</span>
+                                    </span>
+                                </li>
+                            @endforeach
+                        @else
+                            <li>-</li>
+                        @endif
+                    </ul>
+
+                    @if (!empty($productList))
+                        <p class="mt-2 text-xs text-gray-600">
+                            <span class="font-semibold">Keterangan:</span>
+                            <span class="ml-1">
+                                {!! implode(' + ', array_map('e', $productBreakdownParts)) !!}
+                                <span class="font-semibold"> = Rp {{ $rupiah($productTotal) }}</span>
+                            </span>
+                        </p>
+                    @endif
+                </div>
+
+                {{-- sell_use_product lama: tetap dikomentari --}}
+                {{--
                 <div class="border-b border-dashed pb-1 print:border-b print:border-black">
                     <span class="uppercase">Products</span>
                     <ul class="mt-1 pl-4 list-disc list-inside print:pl-2 print:list-none print:mt-0">
@@ -315,6 +388,7 @@
                         @endif
                     </ul>
                 </div>
+                --}}
 
                 {{-- Rincian --}}
                 <div class="border-b border-dashed pb-1 print:hidden">
@@ -325,7 +399,8 @@
                 </div>
 
                 @php
-                    $isPending = ($customerBook->price == 0 || is_null($customerBook->price)) && empty($customerBook->colouring_other) && $breakdownTotal == 0;
+                    $isPending = ($customerBook->price == 0 || is_null($customerBook->price)) && $grandTotal == 0;
+
                     if (is_null($customerBook->cap)) {
                         $status = 'Antri';
                         $statusColor = 'bg-gray-100 text-gray-600';
@@ -346,19 +421,21 @@
                 {{-- Total & Payment --}}
                 <div class="flex justify-between pt-2 font-bold print:pt-1 print:font-semibold">
                     <span class="uppercase text-sm">Total</span>
-                    <span class="text-sm">Rp {{ number_format((int)$customerBook->price, 0, ',', '.') }}</span>
+                    <span class="text-sm">Rp {{ number_format((int) $customerBook->price, 0, ',', '.') }}</span>
                 </div>
 
-                {{-- mismatch note --}}
-                @if (!empty($mergedList) && $breakdownTotal != (int)$customerBook->price)
+                @if (($serviceTotal + $productTotal) != (int) $customerBook->price && ($serviceTotal + $productTotal) > 0)
                     <div class="text-xs text-red-600">
-                        <small>Catatan: jumlah dari keterangan layanan (Rp {{ rupiah($breakdownTotal) }}) berbeda dengan total yang tersimpan (Rp {{ rupiah($customerBook->price) }}).</small>
+                        <small>
+                            Catatan: jumlah rincian (Rp {{ $rupiah($grandTotal) }}) berbeda dengan total tersimpan
+                            (Rp {{ $rupiah($customerBook->price) }}).
+                        </small>
                     </div>
                 @endif
 
                 <div class="flex justify-between text-xs text-gray-600 print:text-black">
                     <span>Payment</span>
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full 
+                    <span class="px-3 py-1 text-xs font-semibold rounded-full
                       @if($customerBook->qr === 'qr_transfer')
                         bg-purple-100 text-purple-800
                       @elseif($customerBook->qr === 'cash')
@@ -369,19 +446,18 @@
                         bg-blue-100 text-blue-800
                       @endif
                     ">
-                      @php use Illuminate\Support\Str; @endphp
-
                       @if($customerBook->qr === 'qr_transfer')
-                        QR Transfer
+                        <i class="fa-solid fa-qrcode mr-1"></i> QR Transfer
                       @elseif($customerBook->qr === 'cash')
-                        Cash
+                        <i class="fa-solid fa-money-bill-wave mr-1"></i> Cash
                       @elseif($customerBook->qr === 'no revenue' || $customerBook->qr === null || $customerBook->qr === '')
-                        No Revenue
+                        <i class="fa-solid fa-ban mr-1"></i> No Revenue
                       @else
                         {{ Str::title($customerBook->qr) }}
                       @endif
                     </span>
                 </div>
+
                 <div class="flex justify-between text-xs text-gray-600 print:text-black">
                     <span>Time</span>
                     <span>
@@ -391,25 +467,25 @@
             </div>
 
             @php
-                $isPending = ($customerBook->price == 0 || is_null($customerBook->price)) && empty($customerBook->colouring_other) && $breakdownTotal == 0;
+                $isPending = ($customerBook->price == 0 || is_null($customerBook->price)) && $grandTotal == 0;
                 $isAntre   = empty($customerBook->cap);
             @endphp
 
             <div class="mt-6 grid grid-cols-2 gap-2 print:hidden">
                 <a href="{{ route('customer-books.index') }}"
                     class="w-full block text-center py-2 bg-gray-200 rounded text-xs hover:bg-gray-300">
-                    Back
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Back
                 </a>
 
                 <button onclick="window.print()"
                     class="w-full block text-center py-2 bg-green-600 text-white rounded text-xs hover:bg-green-700">
-                    Print
+                    <i class="fa-solid fa-print mr-1"></i> Print
                 </button>
 
                 @if($isAntre)
                     <a href="{{ route('customer-books.createWithCap', $customerBook) }}"
                         class="w-full block text-center py-2 bg-blue-500 text-white rounded text-xs hover:bg-blue-600">
-                        Proseskan
+                        <i class="fa-solid fa-play mr-1"></i> Proseskan
                     </a>
                     <form action="{{ route('customer-books.destroy', $customerBook) }}"
                         method="POST"
@@ -419,14 +495,14 @@
                         @method('DELETE')
                         <button type="submit"
                             class="w-full block py-2 bg-red-600 text-white rounded text-xs hover:bg-red-700">
-                            Delete
+                            <i class="fa-solid fa-trash mr-1"></i> Delete
                         </button>
                     </form>
                 @else
                     @if(auth()->user()->level === 'admin')
                         <a href="{{ route('customer-books.edit', $customerBook) }}"
                             class="w-full block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
-                            Done
+                            <i class="fa-solid fa-circle-check mr-1"></i> Done
                         </a>
 
                         <form action="{{ route('customer-books.destroy', $customerBook) }}"
@@ -437,17 +513,17 @@
                             @method('DELETE')
                             <button type="submit"
                                 class="w-full block py-2 bg-red-600 text-white rounded text-xs hover:bg-red-700">
-                                Delete
+                                <i class="fa-solid fa-trash mr-1"></i> Delete
                             </button>
                         </form>
                     @elseif(auth()->user()->level === 'kasir')
                         @if($isPending)
-                            <a href="{{ route('customer-books.edit', $customerBook) }} "
+                            <a href="{{ route('customer-books.edit', $customerBook) }}"
                                 class="w-full block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
-                                Done
+                                <i class="fa-solid fa-circle-check mr-1"></i> Done
                             </a>
 
-                            <form action="{{ route('customer-books.destroy', $customerBook) }} "
+                            <form action="{{ route('customer-books.destroy', $customerBook) }}"
                                 method="POST"
                                 class="w-full"
                                 onsubmit="return confirm('Delete this receipt?');">
@@ -455,17 +531,17 @@
                                 @method('DELETE')
                                 <button type="submit"
                                     class="w-full block py-2 bg-red-600 text-white rounded text-xs hover:bg-red-700">
-                                    Delete
+                                    <i class="fa-solid fa-trash mr-1"></i> Delete
                                 </button>
                             </form>
                         @else
                             <button disabled
                                 class="w-full block text-center py-2 bg-gray-300 text-gray-500 rounded text-xs cursor-not-allowed">
-                                Done
+                                <i class="fa-solid fa-circle-check mr-1"></i> Done
                             </button>
                             <button disabled
                                 class="w-full block py-2 bg-gray-300 text-gray-500 rounded text-xs cursor-not-allowed">
-                                Delete
+                                <i class="fa-solid fa-trash mr-1"></i> Delete
                             </button>
                         @endif
                     @endif
