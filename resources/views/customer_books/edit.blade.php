@@ -166,6 +166,7 @@
                       <optgroup label="Haircut">
                         <option value="Men Haircut Reguler">Men Haircut Reguler</option>
                         <option value="Ladies Haircut Reguler">Ladies Haircut Reguler</option>
+                        <option value="Long Haircut For Men">Long Haircut For Men</option>
                         <option value="Baby Haircut">Baby Haircut</option>
                         <option value="Kids Haircut">Kids Haircut</option>
                         <option value="Kids Haircut Female">Kids Haircut Female</option>
@@ -189,6 +190,7 @@
 
                       <optgroup label="Coloring and Styling">
                         <option value="Hair Toning For Men">Hair Toning For Men</option>
+                        <option value="Hairtonic Massage">Hairtonic Massage</option>
                         <option value="Highlight For Men">Highlight For Men</option>
                         <option value="Hair Styling">Hair Styling</option>
                         <option value="Hair Tatto">Hair Tatto</option>
@@ -207,8 +209,11 @@
 
                       <optgroup label="Others">
                         <option value="Shaving">Shaving</option>
+                        <option value="Shaving Razor">Shaving Razor</option>
+                        <option value="Balding">Balding</option>
                         <option value="Perming">Perming</option>
                         <option value="Downperm">Downperm</option>
+                        <option value="Downperm Up And Side">Downperm Up And Side</option>
                         <option value="Eyelash">Eyelash</option>
                         <option value="Eyelash Retouch">Eyelash Retouch</option>
                       </optgroup>
@@ -378,7 +383,8 @@
       // Price map (sama seperti yang kamu punya)
       const priceMap = {
         "Men Haircut Reguler": 50000,
-        "Ladies Haircut Reguler": 60000,
+        "Long Haircut For Men": 60000,
+        "Ladies Haircut Reguler": 75000,
         "Baby Haircut": 30000,
         "Poni": 25000,
         "Keratin For Men": 350000,
@@ -390,6 +396,9 @@
         "Kids Haircut": 40000,
         "Kids Haircut Female": 65000,
         "Shaving": 10000,
+        "Shaving Razor": 20000,
+        "Balding": 60000,
+        "Hairtonic Massage": 10000,
         "Hair Tatto": 35000,
         "Hair Styling": 50000,
         "Men Hair Treatment": 85000,
@@ -406,6 +415,7 @@
         "Hair Smoothing Over": 700000,
         "Perming": 300000,
         "Downperm": 150000,
+        "Downperm Up And Side": 250000,
         "Facial": 80000,
         "Eyelash": 150000,
         "Eyelash Retouch": 50000

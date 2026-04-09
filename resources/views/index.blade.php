@@ -7,8 +7,7 @@
 
         {{-- ===================== GREETING CARD ===================== --}}
         <div class="rounded-2xl overflow-hidden shadow-2xl">
-
-            {{-- Barber stripe dekoratif di atas card --}}
+            {{-- Barber stripe --}}
             <div class="flex h-1">
                 <div class="w-1/3 bg-red-600"></div>
                 <div class="w-1/3 bg-white"></div>
@@ -17,14 +16,15 @@
 
             <div id="greeting-card"
                 class="p-6 rounded-b-2xl animate__animated animate__fadeInUp
-                   flex flex-col md:flex-row items-center justify-between gap-6 bg-yellow-50">
+        flex flex-col md:flex-row items-center justify-between gap-6 bg-yellow-50 transition-all duration-500">
 
-                {{-- Bagian teks greeting --}}
+                {{-- TEXT --}}
                 <div class="flex-1 min-w-0">
                     <h2 id="greeting" class="text-2xl font-semibold text-gray-800"></h2>
+
                     <p id="time" class="text-lg text-gray-700 mt-1 font-mono tracking-widest"></p>
 
-                    <p class="mt-4 text-gray-600 leading-relaxed">
+                    <p id="desc-text" class="mt-4 text-gray-600 leading-relaxed">
                         @if (auth()->user()->level === 'admin')
                             Hai <span class="font-semibold text-indigo-600">Admin</span> 👋
                         @else
@@ -37,8 +37,8 @@
                         Semoga harimu lancar dan produktif. Statistik hari ini ada di bawah.
                     </p>
                 </div>
-                
-                {{-- Bagian ikon greeting --}}
+
+                {{-- ICON --}}
                 <div class="w-28 h-28 md:w-36 md:h-36 flex-shrink-0">
                     <img id="greeting-icon" src="https://cdn-icons-png.flaticon.com/512/869/869869.png"
                         class="w-full h-full object-cover rounded-xl shadow-sm animate__animated animate__fadeInRight"
@@ -62,11 +62,13 @@
                     - Small (sm) ke atas: 2 kolom
                     - Large (lg) ke atas: auto-fit minmax 250px
                     - justify-items-center di mobile -> membuat card berada di tengah; di sm ke atas stretch agar layout tetap rapi --}}
-                <div class="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 gap-y-8 justify-items-center sm:justify-items-stretch">
+                <div
+                    class="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 gap-y-8 justify-items-center sm:justify-items-stretch">
                     {{-- ===================== Total Transaksi Hari Ini ===================== --}}
                     <div class="w-full max-w-xs sm:max-w-none p-5 bg-green-50 rounded-xl shadow hover:shadow-lg transition">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-center">
-                            <h3 class="text-md font-medium text-green-700 text-center sm:text-left">Total Transaksi Hari Ini</h3>
+                            <h3 class="text-md font-medium text-green-700 text-center sm:text-left">Total Transaksi Hari Ini
+                            </h3>
                             <div class="mt-3 sm:mt-0 bg-white rounded-full p-2 shadow-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                     class="h-10 w-10 text-green-500 drop-shadow-lg transition-transform duration-300 hover:scale-110"
@@ -84,25 +86,33 @@
                     {{-- ===================== Total Pendapatan Hari Ini ===================== --}}
                     <div class="w-full max-w-xs sm:max-w-none p-5 bg-blue-50 rounded-xl shadow hover:shadow-lg transition">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-center">
-                            <h3 class="text-md font-medium text-blue-700 text-center sm:text-left">Total Pendapatan Hari Ini</h3>
-                            <div class="mt-3 sm:mt-0 bg-white rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300">
+                            <h3 class="text-md font-medium text-blue-700 text-center sm:text-left">Total Pendapatan Hari Ini
+                            </h3>
+                            <div
+                                class="mt-3 sm:mt-0 bg-white rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-blue-600" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="6" width="18" height="12" rx="2" ry="2" stroke="currentColor" fill="none" />
+                                    <rect x="3" y="6" width="18" height="12" rx="2" ry="2"
+                                        stroke="currentColor" fill="none" />
                                     <circle cx="12" cy="12" r="3" stroke="currentColor" fill="none" />
-                                    <line x1="6" y1="9" x2="6" y2="15" stroke="currentColor" />
-                                    <line x1="18" y1="9" x2="18" y2="15" stroke="currentColor" />
+                                    <line x1="6" y1="9" x2="6" y2="15"
+                                        stroke="currentColor" />
+                                    <line x1="18" y1="9" x2="18" y2="15"
+                                        stroke="currentColor" />
                                 </svg>
                             </div>
                         </div>
-                        <p class="text-3xl font-bold text-blue-600 mt-4 text-center sm:text-left">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
+                        <p class="text-3xl font-bold text-blue-600 mt-4 text-center sm:text-left">Rp
+                            {{ number_format($totalPendapatan, 0, ',', '.') }}</p>
                     </div>
 
                     {{-- ===================== Total Pengembalian ===================== --}}
                     <div class="w-full max-w-xs sm:max-w-none p-5 bg-red-50 rounded-xl shadow hover:shadow-lg transition">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-center">
-                            <h3 class="text-md font-medium text-red-700 text-center sm:text-left">Total Belum Lunas (Pengembalian)</h3>
-                            <div class="mt-3 sm:mt-0 bg-white rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300">
+                            <h3 class="text-md font-medium text-red-700 text-center sm:text-left">Total Belum Lunas
+                                (Pengembalian)</h3>
+                            <div
+                                class="mt-3 sm:mt-0 bg-white rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-red-500" fill="none"
                                     viewBox="0 0 24 24" stroke="CurrentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l-4-4m4 4l4-4" />
@@ -110,14 +120,17 @@
                                 </svg>
                             </div>
                         </div>
-                        <p class="text-3xl font-bold text-red-600 mt-4 text-center sm:text-left">-Rp {{ number_format(abs($totalPengembalian), 0, ',', '.') }}</p>
+                        <p class="text-3xl font-bold text-red-600 mt-4 text-center sm:text-left">-Rp
+                            {{ number_format(abs($totalPengembalian), 0, ',', '.') }}</p>
                     </div>
 
                     {{-- ===================== Pelanggan Hari Ini ===================== --}}
-                    <div class="w-full max-w-xs sm:max-w-none p-5 bg-purple-50 rounded-xl shadow hover:shadow-lg transition">
+                    <div
+                        class="w-full max-w-xs sm:max-w-none p-5 bg-purple-50 rounded-xl shadow hover:shadow-lg transition">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-center">
                             <h3 class="text-md font-medium text-purple-700 text-center sm:text-left">Pelanggan Hari Ini</h3>
-                            <div class="mt-3 sm:mt-0 bg-white rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300">
+                            <div
+                                class="mt-3 sm:mt-0 bg-white rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-purple-500" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <circle cx="12" cy="8" r="4" />
@@ -125,14 +138,17 @@
                                 </svg>
                             </div>
                         </div>
-                        <p class="text-3xl font-bold text-purple-600 mt-4 text-center sm:text-left">{{ $customersToday }}</p>
+                        <p class="text-3xl font-bold text-purple-600 mt-4 text-center sm:text-left">{{ $customersToday }}
+                        </p>
                     </div>
 
                     {{-- ===================== Pelanggan Bulan Ini ===================== --}}
                     <div class="w-full max-w-xs sm:max-w-none p-5 bg-pink-50 rounded-xl shadow hover:shadow-lg transition">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-center">
-                            <h3 class="text-base font-semibold text-pink-700 tracking-wide text-center sm:text-left">Pelanggan Bulan Ini</h3>
-                            <div class="mt-3 sm:mt-0 bg-pink-50 rounded-full p-2 shadow hover:shadow-md transition-all duration-300">
+                            <h3 class="text-base font-semibold text-pink-700 tracking-wide text-center sm:text-left">
+                                Pelanggan Bulan Ini</h3>
+                            <div
+                                class="mt-3 sm:mt-0 bg-pink-50 rounded-full p-2 shadow hover:shadow-md transition-all duration-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-500" fill="none"
                                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <rect x="3" y="5" width="18" height="16" rx="2" ry="2" />
@@ -146,27 +162,34 @@
                     </div>
 
                     {{-- ===================== Pendapatan Bulanan ===================== --}}
-                    <div class="w-full max-w-xs sm:max-w-none p-5 bg-yellow-50 rounded-xl shadow hover:shadow-lg transition">
+                    <div
+                        class="w-full max-w-xs sm:max-w-none p-5 bg-yellow-50 rounded-xl shadow hover:shadow-lg transition">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-center">
-                            <h3 class="text-md font-medium text-yellow-700 text-center sm:text-left">Pendapatan Bulanan</h3>
-                            <div class="mt-3 sm:mt-0 bg-white rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-yellow-500" fill="currentColor"
-                                    viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <line x1="3" y1="20" x2="21" y2="20" stroke="currentColor" stroke-width="2" />
+                            <h3 class="text-md font-medium text-yellow-700 text-center sm:text-left">Pendapatan Bulanan
+                            </h3>
+                            <div
+                                class="mt-3 sm:mt-0 bg-white rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-yellow-500"
+                                    fill="currentColor" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <line x1="3" y1="20" x2="21" y2="20"
+                                        stroke="currentColor" stroke-width="2" />
                                     <rect x="6" y="12" width="2" height="8" rx="1" />
                                     <rect x="11" y="8" width="2" height="12" rx="1" />
                                     <rect x="16" y="14" width="2" height="6" rx="1" />
                                 </svg>
                             </div>
                         </div>
-                        <p class="text-3xl font-bold text-yellow-600 mt-4 text-center sm:text-left">Rp {{ number_format($pendapatanBulanan, 0, ',', '.') }}</p>
+                        <p class="text-3xl font-bold text-yellow-600 mt-4 text-center sm:text-left">Rp
+                            {{ number_format($pendapatanBulanan, 0, ',', '.') }}</p>
                     </div>
 
                     {{-- ===================== Pendapatan Tahunan ===================== --}}
-                    <div class="w-full max-w-xs sm:max-w-none p-5 rounded-2xl shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+                    <div
+                        class="w-full max-w-xs sm:max-w-none p-5 rounded-2xl shadow-lg hover:shadow-2xl transition transform hover:-translate-y-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-center">
                             <h3 class="text-md font-medium text-white text-center sm:text-left">Pendapatan Tahunan</h3>
-                            <div class="mt-3 sm:mt-0 bg-white/20 backdrop-blur-md rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300">
+                            <div
+                                class="mt-3 sm:mt-0 bg-white/20 backdrop-blur-md rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2" class="h-8 w-8 text-white" aria-hidden="true"
                                     title="Icon Pendapatan Tahunan">
@@ -237,7 +260,6 @@
 
     {{-- ===================== SCRIPTS ===================== --}}
     <script>
-        // ===================== Fungsi Greeting Card =====================
         function updateGreeting() {
             const now = new Date();
             const hour24 = now.getHours();
@@ -246,47 +268,73 @@
 
             const ampm = hour24 >= 12 ? 'PM' : 'AM';
             const hour12 = hour24 % 12 || 12;
+
             const formattedTime =
                 `${String(hour12).padStart(2,'0')}:${String(minute).padStart(2,'0')}:${String(second).padStart(2,'0')} ${ampm}`;
 
-            // Tentukan greeting, ikon, dan warna background berdasarkan jam
-            let greetingText, iconUrl, bgClass, textClass;
+            let greetingText, iconUrl, bgClass, textClass, subTextClass;
+
             if (hour24 < 10) {
                 greetingText = 'Selamat pagi!';
                 iconUrl = 'https://cdn-icons-png.flaticon.com/512/869/869869.png';
                 bgClass = 'bg-yellow-50';
                 textClass = 'text-gray-800';
+                subTextClass = 'text-gray-600';
+
             } else if (hour24 < 15) {
                 greetingText = 'Selamat siang!';
                 iconUrl = 'https://cdn-icons-png.flaticon.com/512/1163/1163661.png';
                 bgClass = 'bg-blue-50';
                 textClass = 'text-gray-800';
+                subTextClass = 'text-gray-600';
+
             } else if (hour24 < 18) {
                 greetingText = 'Selamat sore!';
                 iconUrl = 'https://cdn-icons-png.flaticon.com/512/414/414927.png';
                 bgClass = 'bg-orange-50';
                 textClass = 'text-gray-800';
+                subTextClass = 'text-gray-600';
+
             } else {
                 greetingText = 'Selamat malam!';
                 iconUrl = 'https://cdn-icons-png.flaticon.com/512/1163/1163624.png';
-                bgClass = 'bg-gray-800';
+                bgClass = 'bg-gradient-to-r from-gray-900 to-gray-800'; // 🔥 lebih keren
                 textClass = 'text-white';
+                subTextClass = 'text-gray-300';
             }
 
             const card = document.getElementById('greeting-card');
+
             card.className =
-                `p-6 rounded-2xl shadow-lg animate__animated animate__fadeInUp flex flex-col md:flex-row items-center justify-between gap-6 ${bgClass}`;
-            document.getElementById('greeting').textContent = greetingText;
-            document.getElementById('greeting').className = `text-2xl font-semibold ${textClass}`;
-            document.getElementById('time').textContent = formattedTime;
-            document.getElementById('time').className =
-                `text-lg ${ textClass === 'text-white' ? 'text-gray-300' : 'text-gray-700'} mt-1 font-mono tracking-widest`;
+                `p-6 rounded-b-2xl animate__animated animate__fadeInUp flex flex-col md:flex-row items-center justify-between gap-6 transition-all duration-500 ${bgClass}`;
+
+            // 🌙 Glow effect malam
+            if (hour24 >= 18) {
+                card.classList.add('shadow-[0_0_30px_rgba(255,255,255,0.05)]');
+            }
+
+            // TEXT UTAMA
+            const greetingEl = document.getElementById('greeting');
+            greetingEl.textContent = greetingText;
+            greetingEl.className = `text-2xl font-semibold ${textClass}`;
+
+            // JAM
+            const timeEl = document.getElementById('time');
+            timeEl.textContent = formattedTime;
+            timeEl.className = `text-lg ${subTextClass} mt-1 font-mono tracking-widest`;
+
+            // DESKRIPSI
+            const descEl = document.getElementById('desc-text');
+            descEl.className = `mt-4 ${subTextClass} leading-relaxed`;
+
+            // ICON
             document.getElementById('greeting-icon').src = iconUrl;
         }
+
         setInterval(updateGreeting, 1000);
         updateGreeting();
 
-        // ===================== Toggle Statistik dengan localStorage =====================
+        // ===================== TOGGLE STATS =====================
         document.addEventListener('DOMContentLoaded', () => {
             const stats = document.getElementById('stats-panel');
             const btn = document.getElementById('toggle-stats');
@@ -301,6 +349,7 @@
 
             const saved = localStorage.getItem('showStats');
             const initialShow = saved === null ? true : (saved === 'true');
+
             applyStatsState(initialShow);
 
             btn.addEventListener('click', () => {

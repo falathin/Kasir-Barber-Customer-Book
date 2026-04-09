@@ -18,8 +18,7 @@
             {{-- Nama --}}
             <div class="flex flex-col">
                 <label for="nama" class="text-sm text-gray-700 mb-1">Nama Lengkap</label>
-                <input type="text" name="nama" id="nama"
-                    value="{{ old('nama', $capster->nama ?? '') }}"
+                <input type="text" name="nama" id="nama" value="{{ old('nama', $capster->nama ?? '') }}"
                     placeholder="Contoh: Budi Santoso" required
                     class="px-3 py-2 text-sm sm:text-base border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-600">
                 @error('nama')
@@ -31,8 +30,7 @@
             <div class="flex flex-col">
                 <label for="inisial" class="text-sm text-gray-700 mb-1">Inisial</label>
                 <input type="text" name="inisial" id="inisial"
-                    value="{{ old('inisial', $capster->inisial ?? '') }}"
-                    placeholder="Contoh: BS" required
+                    value="{{ old('inisial', $capster->inisial ?? '') }}" placeholder="Contoh: BS" required
                     class="px-3 py-2 text-sm sm:text-base border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-600">
                 @error('inisial')
                     <div class="mt-1 text-xs sm:text-sm text-red-700">{{ $message }}</div>
@@ -86,13 +84,36 @@
             {{-- Tanggal Lahir --}}
             <div class="flex flex-col">
                 <label for="tgl_lahir" class="text-sm text-gray-700 mb-1">Tanggal Lahir</label>
+
                 <input type="date" name="tgl_lahir" id="tgl_lahir"
-                    value="{{ old('tgl_lahir', isset($capster) ? $capster->tgl_lahir->toDateString() : '') }}" required
+                    value="{{ old('tgl_lahir', isset($capster) ? $capster->tgl_lahir->toDateString() : '') }}"
+                    max="{{ now()->subYears(18)->format('Y-m-d') }}" required
                     class="px-3 py-2 text-sm sm:text-base border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-600">
+
+                {{-- NOTE --}}
+                <p class="mt-1 text-xs text-gray-500 italic">
+                    Minimal usia untuk bekerja adalah <span class="font-semibold text-gray-700">18 tahun</span>.
+                </p>
+
                 @error('tgl_lahir')
                     <div class="mt-1 text-xs sm:text-sm text-red-700">{{ $message }}</div>
                 @enderror
             </div>
+
+            <script>
+                document.getElementById('tgl_lahir').addEventListener('change', function() {
+                    const inputDate = new Date(this.value);
+                    const today = new Date();
+
+                    const minAgeDate = new Date();
+                    minAgeDate.setFullYear(today.getFullYear() - 18);
+
+                    if (inputDate > minAgeDate) {
+                        alert('Umur minimal 18 tahun!');
+                        this.value = '';
+                    }
+                });
+            </script>
 
             {{-- Asal --}}
             <div class="flex flex-col md:col-span-2">
@@ -106,11 +127,13 @@
 
             {{-- Foto --}}
             <div class="flex flex-col md:col-span-2">
-                <label for="foto" class="text-sm text-gray-700 mb-2">Foto (opsional) — seret & lepas atau klik</label>
+                <label for="foto" class="text-sm text-gray-700 mb-2">Foto (opsional) — seret & lepas atau
+                    klik</label>
 
                 <div id="dropzone"
                     class="border-2 border-dashed border-gray-400 rounded-md p-4 sm:p-6 text-center cursor-pointer hover:border-gray-600 transition-colors duration-150">
-                    <p id="dz-text" class="text-gray-600 text-sm sm:text-base">Seret & lepas gambar di sini, atau klik untuk pilih file</p>
+                    <p id="dz-text" class="text-gray-600 text-sm sm:text-base">Seret & lepas gambar di sini, atau klik
+                        untuk pilih file</p>
                     <img id="dz-preview" src="" alt="Preview Foto"
                         class="mx-auto mt-4 hidden max-h-48 object-cover rounded-md shadow-sm">
                 </div>
@@ -121,7 +144,8 @@
                 @enderror
 
                 @isset($capster)
-                    <div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center sm:space-x-3 space-y-2 sm:space-y-0">
+                    <div
+                        class="mt-4 flex flex-col sm:flex-row items-start sm:items-center sm:space-x-3 space-y-2 sm:space-y-0">
                         <span class="text-sm text-gray-700">Preview tersimpan:</span>
                         <img src="{{ $capster->foto_url }}" alt="Avatar"
                             class="w-20 h-20 object-cover rounded-md border border-gray-300">
@@ -134,8 +158,11 @@
                 <label for="status" class="text-sm text-gray-700 mb-1">Status</label>
                 <select name="status" id="status" required
                     class="px-3 py-2 text-sm sm:text-base border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-600">
-                    <option value="Aktif" {{ old('status', $capster->status ?? '') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
-                    <option value="sudah keluar" {{ old('status', $capster->status ?? '') == 'sudah keluar' ? 'selected' : '' }}>Sudah Keluar</option>
+                    <option value="Aktif" {{ old('status', $capster->status ?? '') == 'Aktif' ? 'selected' : '' }}>
+                        Aktif</option>
+                    <option value="sudah keluar"
+                        {{ old('status', $capster->status ?? '') == 'sudah keluar' ? 'selected' : '' }}>Sudah Keluar
+                    </option>
                 </select>
                 @error('status')
                     <div class="mt-1 text-xs sm:text-sm text-red-700">{{ $message }}</div>

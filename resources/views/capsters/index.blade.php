@@ -59,13 +59,15 @@
             <td class="px-4 py-3 text-gray-700">{{ $capster->inisial }}</td>
             <td class="px-4 py-3 text-gray-700">{{ $capster->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
             <td class="px-4 py-3 text-gray-700">{{ $capster->no_hp }}</td>
-            <td class="px-4 py-3 text-gray-700">{{ $capster->asal }}</td>
+            <td class="px-4 py-3 text-gray-700">
+              {{ Str::limit($capster->asal, 100, '...') }}
+            </td>
             <td class="px-4 py-3">
-              @if(strtolower($capster->status)==='aktif')
-                <span class="px-3 py-1 text-xs font-semibold bg-green-100 text-green-700 rounded-full">Aktif</span>
-              @else
-                <span class="px-3 py-1 text-xs font-semibold bg-red-100 text-red-700 rounded-full">Sudah Keluar</span>
-              @endif
+            @if(strtolower($capster->status)==='aktif')
+              <span class="px-3 py-1 text-xs font-semibold bg-green-500 text-white rounded-full">Aktif</span>
+            @else
+              <span class="px-3 py-1 text-xs font-semibold bg-red-500 text-white rounded-full">Keluar</span>
+            @endif
             </td>
             <td class="px-4 py-3">
               <div class="flex items-center space-x-2">

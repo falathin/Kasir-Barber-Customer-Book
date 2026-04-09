@@ -37,21 +37,36 @@
                      * - Merge duplicates, show (Nx) when duplicated
                      */
 
-                    // priceMap must match edit.js / picker
                     $priceMap = [
                         "Men Haircut Reguler" => 50000,
-                        "Ladies Haircut Reguler" => 60000,
+                        "Long Haircut For Men" => 60000,
+                        "Ladies Haircut Reguler" => 75000,
                         "Baby Haircut" => 30000,
                         "Poni" => 25000,
-                        "Fading Haircut" => 60000,
+
+                        "Keratin For Men" => 350000,
+                        "Keratin S" => 400000,
+                        "Keratin M" => 600000,
+                        "Keratin L" => 800000,
+                        "Keratin XL" => 950000,
+                        "Keratin XXL" => 1000000,
+
+                        "Kids Haircut" => 40000,
+                        "Kids Haircut Female" => 65000,
+
                         "Shaving" => 10000,
+                        "Shaving Razor" => 20000,
+                        "Balding" => 60000,
+                        "Hairtonic Massage" => 10000,
                         "Hair Tatto" => 35000,
                         "Hair Styling" => 50000,
+
                         "Men Hair Treatment" => 85000,
                         "Ladies Hair Treatment" => 100000,
-                        "Hair Coloring" => 200000,
+
                         "Hair Toning For Men" => 85000,
                         "Highlight For Men" => 300000,
+
                         "Hair Smoothing For Men" => 250000,
                         "Hair Smoothing S" => 300000,
                         "Hair Smoothing M" => 350000,
@@ -60,23 +75,13 @@
                         "Hair Smoothing XXL" => 500000,
                         "Hair Smoothing XXXL" => 600000,
                         "Hair Smoothing Over" => 700000,
-                        "Keratin For Men" => 350000,
-                        "Keratin S" => 400000,
-                        "Keratin M" => 600000,
-                        "Keratin L" => 800000,
-                        "Keratin XL" => 950000,
-                        "Keratin XXL" => 1000000,
-                        "Kids Haircut" => 40000,
-                        "Kids Haircut Female" => 65000,
+
                         "Perming" => 300000,
                         "Downperm" => 150000,
-                        "Hair Extension" => 300000,
-                        "Hair Extension services" => 350000,
+                        "Downperm Up And Side" => 250000,
                         "Facial" => 80000,
                         "Eyelash" => 150000,
                         "Eyelash Retouch" => 50000,
-                        "Haircut Reguler" => 50000,
-                        "Ladies Only Haircut" => 60000,
                     ];
 
                     // helpers
