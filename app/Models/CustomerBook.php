@@ -19,10 +19,17 @@ class CustomerBook extends Model
         'rincian',
         'created_time',
         'antrian',
-        // manual columns
         'hair_coloring_price',
         'hair_extension_price',
         'hair_extension_services_price',
+    ];
+
+    protected $casts = [
+        'created_time' => 'datetime',
+        'price' => 'decimal:2',
+        'hair_coloring_price' => 'decimal:2',
+        'hair_extension_price' => 'decimal:2',
+        'hair_extension_services_price' => 'decimal:2',
     ];
 
     public function capster()
@@ -33,5 +40,13 @@ class CustomerBook extends Model
     public function asistenCapster()
     {
         return $this->belongsTo(Capster::class, 'asisten', 'inisial');
+    }
+
+    public function getTotalPenjualanAttribute()
+    {
+        return (float) $this->price
+            + (float) $this->hair_coloring_price
+            + (float) $this->hair_extension_price
+            + (float) $this->hair_extension_services_price;
     }
 }

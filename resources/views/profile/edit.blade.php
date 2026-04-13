@@ -40,11 +40,11 @@
     {{-- Grid: two columns on md+, single on sm --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
 
-      {{-- Update Profile --}}
+      {{-- Perbarui Profil --}}
       <section class="bg-white rounded-3xl shadow-xl border-4 border-[var(--gold)] overflow-hidden">
         <div class="bg-[var(--burgundy)] text-white px-8 py-5 flex items-center space-x-3">
           <i class="bi bi-person-lines-fill text-2xl"></i>
-          <h2 class="text-2xl font-semibold">Update Profile</h2>
+          <h2 class="text-2xl font-semibold">Perbarui Profil</h2>
         </div>
         <div class="p-8">
           <form method="POST" action="{{ route('profile.update') }}" class="space-y-6">

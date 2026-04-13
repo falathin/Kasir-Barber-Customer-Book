@@ -130,11 +130,6 @@
                                                     <p class="mt-2 text-sm text-slate-500">
                                                         Tambahkan akun kasir baru untuk mulai mengelola data.
                                                     </p>
-                                                    <a href="{{ route('kasirs.create') }}"
-                                                        class="mt-5 inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-[#7a1422] via-[#a61d2b] to-[#203b5a] px-5 py-3 font-semibold text-white shadow-lg shadow-[#7a1422]/20 transition hover:scale-[1.01]">
-                                                        <i class="fa-solid fa-user-plus mr-2 text-[#e0a33a]"></i>
-                                                        Tambah Kasir
-                                                    </a>
                                                 </div>
                                             </td>
                                         </tr>

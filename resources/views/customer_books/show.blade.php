@@ -1,101 +1,102 @@
 @extends('layouts.app')
 
-@section('title', 'Show Customer Book #' . $customerBook->id . ' – ' . $customerBook->customer)
+@section('title', 'Lihat Customer Book #' . $customerBook->id . ' – ' . $customerBook->customer)
 
 @section('content')
     <div class="flex justify-center bg-gray-50 min-h-screen py-12 px-4 print:bg-white print:min-h-fit">
         <div
             class="bg-white w-full max-w-sm p-6 rounded-2xl shadow-lg font-mono border border-gray-200 print:shadow-none print:border-none print:rounded-none print:p-0 print:max-w-full print:w-[58mm] print:text-sm print:font-normal">
 
-            {{-- Header --}}
             <div class="text-center mb-6 print:mb-2">
                 <h1 class="text-lg font-bold text-gray-800 uppercase print:text-base print:font-semibold print:text-black">
-                    Customer Receipt
+                    Struk Pelanggan
                 </h1>
                 <p class="text-xs text-gray-500 print:text-black">
                     {{ $customerBook->created_at->format('d M Y') }}
                 </p>
-                @if($customerBook->antrian)
+                @if ($customerBook->antrian)
                     <p class="text-xs text-gray-600 print:text-black">
                         <i class="fa-solid fa-chair mr-1"></i>
-                        Antrian Ke-{{ $customerBook->antrian }}
+                        Nomor Antrian {{ $customerBook->antrian }}
                     </p>
                 @endif
             </div>
 
-            {{-- Detail Items --}}
             <div class="text-xs text-gray-700 space-y-3 print:text-black">
                 @php
                     use Illuminate\Support\Str;
 
                     $priceMap = [
-                        "Men Haircut Reguler" => 50000,
-                        "Long Haircut For Men" => 60000,
-                        "Ladies Haircut Reguler" => 75000,
-                        "Baby Haircut" => 30000,
-                        "Poni" => 25000,
+                        'Men Haircut Reguler' => 50000,
+                        'Long Haircut For Men' => 60000,
+                        'Ladies Haircut Reguler' => 75000,
+                        'Baby Haircut' => 30000,
+                        'Poni' => 25000,
 
-                        "Keratin For Men" => 350000,
-                        "Keratin S" => 400000,
-                        "Keratin M" => 600000,
-                        "Keratin L" => 800000,
-                        "Keratin XL" => 950000,
-                        "Keratin XXL" => 1000000,
+                        'Keratin For Men' => 350000,
+                        'Keratin S' => 400000,
+                        'Keratin M' => 600000,
+                        'Keratin L' => 800000,
+                        'Keratin XL' => 950000,
+                        'Keratin XXL' => 1000000,
 
-                        "Kids Haircut" => 40000,
-                        "Kids Haircut Female" => 65000,
+                        'Kids Haircut' => 40000,
+                        'Kids Haircut Female' => 65000,
 
-                        "Shaving" => 10000,
-                        "Shaving Razor" => 20000,
-                        "Balding" => 60000,
-                        "Hairtonic Massage" => 10000,
-                        "Hair Tatto" => 35000,
-                        "Hair Styling" => 50000,
+                        'Shaving' => 10000,
+                        'Shaving Razor' => 20000,
+                        'Balding' => 60000,
+                        'Hairtonic Massage' => 10000,
+                        'Hair Tatto' => 35000,
+                        'Hair Styling' => 50000,
 
-                        "Men Hair Treatment" => 85000,
-                        "Ladies Hair Treatment" => 100000,
+                        'Men Hair Treatment' => 85000,
+                        'Ladies Hair Treatment' => 100000,
 
-                        "Hair Toning For Men" => 85000,
-                        "Highlight For Men" => 300000,
+                        'Hair Toning For Men' => 85000,
+                        'Highlight For Men' => 300000,
 
-                        "Hair Smoothing For Men" => 250000,
-                        "Hair Smoothing S" => 300000,
-                        "Hair Smoothing M" => 350000,
-                        "Hair Smoothing L" => 400000,
-                        "Hair Smoothing XL" => 450000,
-                        "Hair Smoothing XXL" => 500000,
-                        "Hair Smoothing XXXL" => 600000,
-                        "Hair Smoothing Over" => 700000,
+                        'Hair Smoothing For Men' => 250000,
+                        'Hair Smoothing S' => 300000,
+                        'Hair Smoothing M' => 350000,
+                        'Hair Smoothing L' => 400000,
+                        'Hair Smoothing XL' => 450000,
+                        'Hair Smoothing XXL' => 500000,
+                        'Hair Smoothing XXXL' => 600000,
+                        'Hair Smoothing Over' => 700000,
 
-                        "Perming" => 300000,
-                        "Downperm" => 150000,
-                        "Downperm Up And Side" => 250000,
-                        "Facial" => 80000,
-                        "Eyelash" => 150000,
-                        "Eyelash Retouch" => 50000,
+                        'Perming' => 300000,
+                        'Downperm' => 150000,
+                        'Downperm Up And Side' => 250000,
+                        'Facial' => 80000,
+                        'Eyelash' => 150000,
+                        'Eyelash Retouch' => 50000,
 
-                        // Products
-                        "Pomade" => 85000,
-                        "Clay" => 85000,
-                        "Hair Powder" => 25000,
+                        'Pomade' => 85000,
+                        'Clay' => 85000,
+                        'Hair Powder' => 25000,
                     ];
 
-                    $productNames = [
-                        'Pomade',
-                        'Clay',
-                        'Hair Powder',
-                    ];
+                    $productNames = ['Pomade', 'Clay', 'Hair Powder'];
 
                     $rupiah = function ($n) {
                         return number_format((int) $n, 0, ',', '.');
                     };
 
-                    $shortForm = function ($n) {
+                    $singkatAngka = function ($n) {
                         $n = (int) $n;
-                        if ($n >= 1000000000000) return round($n / 1000000000000, 1) . 'T';
-                        if ($n >= 1000000000) return round($n / 1000000000, 1) . 'M';
-                        if ($n >= 1000000) return round($n / 1000000, 1) . 'jt';
-                        if ($n >= 1000) return round($n / 1000) . 'rb';
+                        if ($n >= 1000000000000) {
+                            return round($n / 1000000000000, 1) . 'T';
+                        }
+                        if ($n >= 1000000000) {
+                            return round($n / 1000000000, 1) . 'M';
+                        }
+                        if ($n >= 1000000) {
+                            return round($n / 1000000, 1) . 'jt';
+                        }
+                        if ($n >= 1000) {
+                            return round($n / 1000) . 'rb';
+                        }
                         return (string) $n;
                     };
 
@@ -119,7 +120,9 @@
                                 return array_values(array_filter(array_map('trim', $decoded), fn($v) => $v !== ''));
                             }
 
-                            return array_values(array_filter(array_map('trim', preg_split('/\s*,\s*/', $value)), fn($v) => $v !== ''));
+                            return array_values(
+                                array_filter(array_map('trim', preg_split('/\s*,\s*/', $value)), fn($v) => $v !== ''),
+                            );
                         }
 
                         return [];
@@ -135,7 +138,6 @@
                         $productNamesNormalized[] = $normalizeKey($pname);
                     }
 
-                    // Manual prices from DB columns (services)
                     $manualPricesNormalized = [];
                     $manualOriginalNames = [];
 
@@ -151,13 +153,15 @@
                         $manualOriginalNames[$nk] = 'Hair Extension';
                     }
 
-                    if (!is_null($customerBook->hair_extension_services_price) && $customerBook->hair_extension_services_price !== '') {
+                    if (
+                        !is_null($customerBook->hair_extension_services_price) &&
+                        $customerBook->hair_extension_services_price !== ''
+                    ) {
                         $nk = $normalizeKey('Hair Extension Services');
                         $manualPricesNormalized[$nk] = (int) $customerBook->hair_extension_services_price;
                         $manualOriginalNames[$nk] = 'Hair Extension Services';
                     }
 
-                    // Services source: prefer `services`, fallback `colouring_other`
                     $servicesRaw = [];
                     if (!empty($customerBook->services)) {
                         $servicesRaw = $toArrayList($customerBook->services);
@@ -165,7 +169,6 @@
                         $servicesRaw = $toArrayList($customerBook->colouring_other);
                     }
 
-                    // Products source: prefer `products`, fallback `sell_use_product`
                     $productsRaw = [];
                     if (!empty($customerBook->products)) {
                         $productsRaw = $toArrayList($customerBook->products);
@@ -173,7 +176,6 @@
                         $productsRaw = $toArrayList($customerBook->sell_use_product);
                     }
 
-                    // Akalin: kalau data lama produk masih kebaca di services, pindahkan ke products
                     $fixedServicesRaw = [];
                     foreach ($servicesRaw as $item) {
                         $norm = $normalizeKey($item);
@@ -185,7 +187,6 @@
                     }
                     $servicesRaw = $fixedServicesRaw;
 
-                    // Make sure manual-only services still appear
                     foreach ($manualPricesNormalized as $norm => $val) {
                         $exists = false;
                         foreach ($servicesRaw as $srv) {
@@ -199,7 +200,11 @@
                         }
                     }
 
-                    $resolveItems = function (array $rawItems, array $manualMap = []) use ($normalizeKey, $priceMapNormalized, $priceMap) {
+                    $resolveItems = function (array $rawItems, array $manualMap = []) use (
+                        $normalizeKey,
+                        $priceMapNormalized,
+                        $priceMap,
+                    ) {
                         $resolved = [];
 
                         foreach ($rawItems as $orig) {
@@ -236,7 +241,7 @@
                                     'name' => $r['original'],
                                     'norm' => $k,
                                     'price' => $r['price'],
-                                    'count' => 1
+                                    'count' => 1,
                                 ];
                                 $order[] = $k;
                             } else {
@@ -268,7 +273,10 @@
                         return [$mergedList, $breakdownParts, $breakdownTotal];
                     };
 
-                    [$serviceList, $serviceBreakdownParts, $serviceTotal] = $resolveItems($servicesRaw, $manualPricesNormalized);
+                    [$serviceList, $serviceBreakdownParts, $serviceTotal] = $resolveItems(
+                        $servicesRaw,
+                        $manualPricesNormalized,
+                    );
                     [$productList, $productBreakdownParts, $productTotal] = $resolveItems($productsRaw, []);
                     $grandTotal = $serviceTotal + $productTotal;
 
@@ -279,16 +287,15 @@
                     }
 
                     $items = [
-                        'Booking ID' => $customerBook->id,
-                        'Customer'   => $customerBook->customer,
-                        'Capster'     => $customerBook->capster?->nama ?? $customerBook->cap,
-                        'Asisten'     => $asistenNama ?? '-',
-                        'Style'       => $customerBook->haircut_type,
-                        'Shop'        => $customerBook->barber_name,
+                        'ID Booking' => $customerBook->id,
+                        'Pelanggan' => $customerBook->customer,
+                        'Capster' => $customerBook->capster?->nama ?? $customerBook->cap,
+                        'Asisten' => $asistenNama ?? '-',
+                        'Gaya' => $customerBook->haircut_type,
+                        'Nama Barber' => $customerBook->barber_name,
                     ];
                 @endphp
 
-                {{-- metadata --}}
                 @foreach ($items as $k => $v)
                     <div class="flex justify-between border-b border-dashed pb-1 print:border-b print:border-black">
                         <span class="uppercase">{{ $k }}</span>
@@ -296,10 +303,9 @@
                     </div>
                 @endforeach
 
-                {{-- Services --}}
                 <div class="border-b border-dashed pb-1 print:border-b print:border-black">
                     <div class="flex items-center justify-between">
-                        <span class="uppercase">Services</span>
+                        <span class="uppercase">Layanan</span>
                         <span class="text-xs text-gray-500">{{ count($serviceList) ?: '-' }}</span>
                     </div>
 
@@ -309,13 +315,15 @@
                                 <li class="break-words flex justify-between items-center">
                                     <span class="truncate">
                                         {{ $svc['name'] }}
-                                        @if($svc['count'] > 1)
+                                        @if ($svc['count'] > 1)
                                             <small class="text-gray-500">({{ $svc['count'] }}x)</small>
                                         @endif
                                     </span>
                                     <span class="ml-2 text-right">
-                                        <span class="text-xs font-medium text-indigo-700">Rp {{ $rupiah($svc['price']) }}</span>
-                                        <span class="text-xs text-indigo-600 ml-1">({{ $shortForm($svc['price']) }})</span>
+                                        <span class="text-xs font-medium text-indigo-700">Rp
+                                            {{ $rupiah($svc['price']) }}</span>
+                                        <span
+                                            class="text-xs text-indigo-600 ml-1">({{ $singkatAngka($svc['price']) }})</span>
                                     </span>
                                 </li>
                             @endforeach
@@ -326,7 +334,7 @@
 
                     @if (!empty($serviceList))
                         <p class="mt-2 text-xs text-gray-600">
-                            <span class="font-semibold">Keterangan:</span>
+                            <span class="font-semibold">Rincian:</span>
                             <span class="ml-1">
                                 {!! implode(' + ', array_map('e', $serviceBreakdownParts)) !!}
                                 <span class="font-semibold"> = Rp {{ $rupiah($serviceTotal) }}</span>
@@ -335,10 +343,9 @@
                     @endif
                 </div>
 
-                {{-- Products --}}
                 <div class="border-b border-dashed pb-1 print:border-b print:border-black">
                     <div class="flex items-center justify-between">
-                        <span class="uppercase">Products</span>
+                        <span class="uppercase">Produk</span>
                         <span class="text-xs text-gray-500">{{ count($productList) ?: '-' }}</span>
                     </div>
 
@@ -348,13 +355,15 @@
                                 <li class="break-words flex justify-between items-center">
                                     <span class="truncate">
                                         {{ $prd['name'] }}
-                                        @if($prd['count'] > 1)
+                                        @if ($prd['count'] > 1)
                                             <small class="text-gray-500">({{ $prd['count'] }}x)</small>
                                         @endif
                                     </span>
                                     <span class="ml-2 text-right">
-                                        <span class="text-xs font-medium text-emerald-700">Rp {{ $rupiah($prd['price']) }}</span>
-                                        <span class="text-xs text-emerald-600 ml-1">({{ $shortForm($prd['price']) }})</span>
+                                        <span class="text-xs font-medium text-emerald-700">Rp
+                                            {{ $rupiah($prd['price']) }}</span>
+                                        <span
+                                            class="text-xs text-emerald-600 ml-1">({{ $singkatAngka($prd['price']) }})</span>
                                     </span>
                                 </li>
                             @endforeach
@@ -365,7 +374,7 @@
 
                     @if (!empty($productList))
                         <p class="mt-2 text-xs text-gray-600">
-                            <span class="font-semibold">Keterangan:</span>
+                            <span class="font-semibold">Rincian:</span>
                             <span class="ml-1">
                                 {!! implode(' + ', array_map('e', $productBreakdownParts)) !!}
                                 <span class="font-semibold"> = Rp {{ $rupiah($productTotal) }}</span>
@@ -374,25 +383,8 @@
                     @endif
                 </div>
 
-                {{-- sell_use_product lama: tetap dikomentari --}}
-                {{--
-                <div class="border-b border-dashed pb-1 print:border-b print:border-black">
-                    <span class="uppercase">Products</span>
-                    <ul class="mt-1 pl-4 list-disc list-inside print:pl-2 print:list-none print:mt-0">
-                        @if ($customerBook->sell_use_product)
-                            @foreach (explode(',', $customerBook->sell_use_product) as $p)
-                                <li class="break-words">{{ trim($p) }}</li>
-                            @endforeach
-                        @else
-                            <li>-</li>
-                        @endif
-                    </ul>
-                </div>
-                --}}
-
-                {{-- Rincian --}}
                 <div class="border-b border-dashed pb-1 print:hidden">
-                    <span class="uppercase">Rincian</span>
+                    <span class="uppercase">Catatan</span>
                     <p class="mt-1 break-words whitespace-pre-line">
                         {{ $customerBook->rincian ?? '-' }}
                     </p>
@@ -418,13 +410,12 @@
                     <span>{{ $status }}</span>
                 </div>
 
-                {{-- Total & Payment --}}
                 <div class="flex justify-between pt-2 font-bold print:pt-1 print:font-semibold">
                     <span class="uppercase text-sm">Total</span>
                     <span class="text-sm">Rp {{ number_format((int) $customerBook->price, 0, ',', '.') }}</span>
                 </div>
 
-                @if (($serviceTotal + $productTotal) != (int) $customerBook->price && ($serviceTotal + $productTotal) > 0)
+                @if ($serviceTotal + $productTotal != (int) $customerBook->price && $serviceTotal + $productTotal > 0)
                     <div class="text-xs text-red-600">
                         <small>
                             Catatan: jumlah rincian (Rp {{ $rupiah($grandTotal) }}) berbeda dengan total tersimpan
@@ -434,32 +425,31 @@
                 @endif
 
                 <div class="flex justify-between text-xs text-gray-600 print:text-black">
-                    <span>Payment</span>
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full
-                      @if($customerBook->qr === 'qr_transfer')
-                        bg-purple-100 text-purple-800
+                    <span>Pembayaran</span>
+                    <span
+                        class="px-3 py-1 text-xs font-semibold rounded-full
+                      @if ($customerBook->qr === 'qr_transfer') bg-purple-100 text-purple-800
                       @elseif($customerBook->qr === 'cash')
                         bg-gray-100 text-gray-800
                       @elseif($customerBook->qr === 'no revenue' || $customerBook->qr === null || $customerBook->qr === '')
                         bg-red-100 text-red-800
                       @else
-                        bg-blue-100 text-blue-800
-                      @endif
+                        bg-blue-100 text-blue-800 @endif
                     ">
-                      @if($customerBook->qr === 'qr_transfer')
-                        <i class="fa-solid fa-qrcode mr-1"></i> QR Transfer
-                      @elseif($customerBook->qr === 'cash')
-                        <i class="fa-solid fa-money-bill-wave mr-1"></i> Cash
-                      @elseif($customerBook->qr === 'no revenue' || $customerBook->qr === null || $customerBook->qr === '')
-                        <i class="fa-solid fa-ban mr-1"></i> No Revenue
-                      @else
-                        {{ Str::title($customerBook->qr) }}
-                      @endif
+                        @if ($customerBook->qr === 'qr_transfer')
+                            <i class="fa-solid fa-qrcode mr-1"></i> Transfer QR
+                        @elseif($customerBook->qr === 'cash')
+                            <i class="fa-solid fa-money-bill-wave mr-1"></i> Tunai
+                        @elseif($customerBook->qr === 'no revenue' || $customerBook->qr === null || $customerBook->qr === '')
+                            <i class="fa-solid fa-ban mr-1"></i> Tanpa Pendapatan
+                        @else
+                            {{ Str::title($customerBook->qr) }}
+                        @endif
                     </span>
                 </div>
 
                 <div class="flex justify-between text-xs text-gray-600 print:text-black">
-                    <span>Time</span>
+                    <span>Waktu</span>
                     <span>
                         {{ \Carbon\Carbon::parse($customerBook->created_time)->translatedFormat('d F Y - H:i') }}
                     </span>
@@ -468,80 +458,74 @@
 
             @php
                 $isPending = ($customerBook->price == 0 || is_null($customerBook->price)) && $grandTotal == 0;
-                $isAntre   = empty($customerBook->cap);
+                $isAntre = empty($customerBook->cap);
             @endphp
 
             <div class="mt-6 grid grid-cols-2 gap-2 print:hidden">
                 <a href="{{ route('customer-books.index') }}"
                     class="w-full block text-center py-2 bg-gray-200 rounded text-xs hover:bg-gray-300">
-                    <i class="fa-solid fa-arrow-left mr-1"></i> Back
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Kembali
                 </a>
 
                 <button onclick="window.print()"
                     class="w-full block text-center py-2 bg-green-600 text-white rounded text-xs hover:bg-green-700">
-                    <i class="fa-solid fa-print mr-1"></i> Print
+                    <i class="fa-solid fa-print mr-1"></i> Cetak
                 </button>
 
-                @if($isAntre)
+                @if ($isAntre)
                     <a href="{{ route('customer-books.createWithCap', $customerBook) }}"
                         class="w-full block text-center py-2 bg-blue-500 text-white rounded text-xs hover:bg-blue-600">
                         <i class="fa-solid fa-play mr-1"></i> Proseskan
                     </a>
-                    <form action="{{ route('customer-books.destroy', $customerBook) }}"
-                        method="POST"
-                        class="w-full"
-                        onsubmit="return confirm('Delete this receipt?');">
+                    <form action="{{ route('customer-books.destroy', $customerBook) }}" method="POST" class="w-full"
+                        onsubmit="return confirm('Hapus struk ini?');">
                         @csrf
                         @method('DELETE')
                         <button type="submit"
                             class="w-full block py-2 bg-red-600 text-white rounded text-xs hover:bg-red-700">
-                            <i class="fa-solid fa-trash mr-1"></i> Delete
+                            <i class="fa-solid fa-trash mr-1"></i> Hapus
                         </button>
                     </form>
                 @else
-                    @if(auth()->user()->level === 'admin')
+                    @if (auth()->user()->level === 'admin')
                         <a href="{{ route('customer-books.edit', $customerBook) }}"
                             class="w-full block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
-                            <i class="fa-solid fa-circle-check mr-1"></i> Done
+                            <i class="fa-solid fa-circle-check mr-1"></i> Selesai
                         </a>
 
-                        <form action="{{ route('customer-books.destroy', $customerBook) }}"
-                            method="POST"
-                            class="w-full"
-                            onsubmit="return confirm('Delete this receipt?');">
+                        <form action="{{ route('customer-books.destroy', $customerBook) }}" method="POST" class="w-full"
+                            onsubmit="return confirm('Hapus struk ini?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit"
                                 class="w-full block py-2 bg-red-600 text-white rounded text-xs hover:bg-red-700">
-                                <i class="fa-solid fa-trash mr-1"></i> Delete
+                                <i class="fa-solid fa-trash mr-1"></i> Hapus
                             </button>
                         </form>
                     @elseif(auth()->user()->level === 'kasir')
-                        @if($isPending)
+                        @if ($isPending)
                             <a href="{{ route('customer-books.edit', $customerBook) }}"
                                 class="w-full block text-center py-2 bg-indigo-600 text-white rounded text-xs hover:bg-indigo-700">
-                                <i class="fa-solid fa-circle-check mr-1"></i> Done
+                                <i class="fa-solid fa-circle-check mr-1"></i> Selesai
                             </a>
 
-                            <form action="{{ route('customer-books.destroy', $customerBook) }}"
-                                method="POST"
-                                class="w-full"
-                                onsubmit="return confirm('Delete this receipt?');">
+                            <form action="{{ route('customer-books.destroy', $customerBook) }}" method="POST"
+                                class="w-full" onsubmit="return confirm('Hapus struk ini?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"
                                     class="w-full block py-2 bg-red-600 text-white rounded text-xs hover:bg-red-700">
-                                    <i class="fa-solid fa-trash mr-1"></i> Delete
+                                    <i class="fa-solid fa-trash mr-1"></i> Hapus
                                 </button>
                             </form>
                         @else
                             <button disabled
                                 class="w-full block text-center py-2 bg-gray-300 text-gray-500 rounded text-xs cursor-not-allowed">
-                                <i class="fa-solid fa-circle-check mr-1"></i> Done
+                                <i class="fa-solid fa-circle-check mr-1"></i> Selesai
                             </button>
                             <button disabled
                                 class="w-full block py-2 bg-gray-300 text-gray-500 rounded text-xs cursor-not-allowed">
-                                <i class="fa-solid fa-trash mr-1"></i> Delete
+                                <i class="fa-solid fa-trash mr-1"></i> Hapus
                             </button>
                         @endif
                     @endif

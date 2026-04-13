@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Kasir')
+@section('title', 'Dasbor')
 
 @section('content')
     <main class="space-y-6 p-4">
@@ -51,14 +51,29 @@
 
         {{-- ===================== TOGGLE STATISTIK ===================== --}}
         <div class="bg-white p-6 rounded-2xl shadow-lg animate__animated animate__fadeInUp">
-            <button id="toggle-stats"
-                class="px-5 py-2 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition duration-200"
-                aria-controls="stats-panel" aria-expanded="true">
-                Tampilkan Statistik Transaksi & Pelanggan
-            </button>
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+
+                {{-- Tombol Statistik --}}
+                <button id="toggle-stats"
+                    class="px-5 py-2 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition duration-200"
+                    aria-controls="stats-panel" aria-expanded="true">
+                    Tampilkan Statistik Transaksi & Pelanggan
+                </button>
+
+                @auth
+                    @if (auth()->user()->level === 'admin')
+                        <a href="{{ route('sales.export.form') }}"
+                            class="px-5 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 transition duration-200">
+                            Export Excel
+                        </a>
+                    @endif
+                @endauth
+
+            </div>
 
             <div id="stats-panel" class="mt-6">
-                <div class="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 gap-y-8 justify-items-center sm:justify-items-stretch">
+                <div
+                    class="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 gap-y-8 justify-items-center sm:justify-items-stretch">
 
                     {{-- Total Transaksi --}}
                     <div class="w-full max-w-xs sm:max-w-none p-5 bg-green-50 rounded-xl shadow hover:shadow-lg transition">
@@ -98,7 +113,8 @@
                     </div>
 
                     {{-- Customer Hari Ini --}}
-                    <div class="w-full max-w-xs sm:max-w-none p-5 bg-purple-50 rounded-xl shadow hover:shadow-lg transition">
+                    <div
+                        class="w-full max-w-xs sm:max-w-none p-5 bg-purple-50 rounded-xl shadow hover:shadow-lg transition">
                         <div class="flex justify-between items-center">
                             <h3 class="text-md font-medium text-purple-700">Pelanggan Hari Ini</h3>
                             <div class="bg-white rounded-full p-3 shadow">
@@ -120,7 +136,8 @@
                     </div>
 
                     {{-- Pendapatan Bulanan --}}
-                    <div class="w-full max-w-xs sm:max-w-none p-5 bg-yellow-50 rounded-xl shadow hover:shadow-lg transition">
+                    <div
+                        class="w-full max-w-xs sm:max-w-none p-5 bg-yellow-50 rounded-xl shadow hover:shadow-lg transition">
                         <div class="flex justify-between items-center">
                             <h3 class="text-md font-medium text-yellow-700">Pendapatan Bulanan</h3>
                             <div class="bg-white rounded-full p-3 shadow">
@@ -133,7 +150,8 @@
                     </div>
 
                     {{-- Pendapatan Tahunan --}}
-                    <div class="w-full max-w-xs sm:max-w-none p-5 rounded-2xl shadow-lg hover:shadow-2xl transition bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+                    <div
+                        class="w-full max-w-xs sm:max-w-none p-5 rounded-2xl shadow-lg hover:shadow-2xl transition bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
                         <div class="flex justify-between items-center">
                             <h3 class="text-md font-medium text-white">Pendapatan Tahunan</h3>
                             <div class="bg-white/20 rounded-full p-3">
@@ -159,11 +177,17 @@
         @endphp
 
         @if ($role === 'admin')
-            <div class="mt-10 bg-white p-6 rounded-xl shadow-xl animate__animated animate__fadeInUp">
-                <h2 class="text-2xl font-bold text-indigo-700 mb-6">
-                    <i class="fa-solid fa-chart-column mr-2"></i>
-                    Ranking Pendapatan Per Barber
-                </h2>
+            <div class="mt-10 bg-white p-6 rounded-2xl shadow-xl animate__animated animate__fadeInUp">
+
+                {{-- HEADER --}}
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                    <h2 class="text-2xl font-bold text-indigo-700 flex items-center gap-2">
+                        <i class="fa-solid fa-chart-column"></i>
+                        Ranking Pendapatan Per Barber
+                    </h2>
+                </div>
+
+                {{-- CONTENT --}}
                 @forelse ($pendapatanPerBarber as $index => $item)
                     @php
                         $percentage = round(($item->total / $maxTotal) * 100);
@@ -172,27 +196,45 @@
                     @endphp
 
                     <div class="mb-6">
+
+                        {{-- TOP INFO --}}
                         <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center gap-2 text-gray-700 font-semibold">
-                                <span class="text-lg">{{ $medal ?? $index + 1 . '.' }}</span>
-                                <span>{{ $item->barber_name }}</span>
+                            <div class="flex items-center gap-3 text-gray-700 font-semibold">
+                                <span class="text-lg">
+                                    {{ $medal ?? $index + 1 . '.' }}
+                                </span>
+                                <span class="truncate">
+                                    {{ $item->barber_name }}
+                                </span>
                             </div>
-                            <span class="text-indigo-600 font-bold text-lg">
+
+                            <span class="text-indigo-600 font-bold text-lg whitespace-nowrap">
                                 Rp {{ number_format($item->total, 0, ',', '.') }}
                             </span>
                         </div>
+
+                        {{-- PROGRESS BAR --}}
                         <div class="relative w-full bg-gray-100 rounded-full h-5 overflow-hidden group">
                             <div class="h-5 rounded-full {{ $barColor }} transition-all duration-500"
-                                style="width: {{ $percentage }}%;"></div>
+                                style="width: {{ $percentage }}%;">
+                            </div>
+
+                            {{-- PERCENT HOVER --}}
                             <span
                                 class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-600 opacity-0 group-hover:opacity-100 transition">
                                 {{ $percentage }}%
                             </span>
                         </div>
+
                     </div>
+
                 @empty
-                    <p class="text-gray-500 italic">Belum ada data pendapatan.</p>
+                    <div class="text-center py-10 text-gray-500">
+                        <i class="fa-solid fa-chart-column text-3xl mb-3"></i>
+                        <p>Belum ada data pendapatan.</p>
+                    </div>
                 @endforelse
+
             </div>
         @endif
 
